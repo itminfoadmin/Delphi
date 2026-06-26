@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>델파이 설문 선택</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+      background-color: #f0f0f0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100vh; padding: 40px 20px;
+    }
+
+    /* 상단 바 */
+    .top-bar {
+      width: 100%; max-width: 640px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .top-email { font-size: 14px; color: #555; }
+    .btn-logout {
+      font-size: 13px; padding: 6px 16px;
+      background: #fff; border: 1px solid #bbb; border-radius: 4px;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-logout:hover { background: #e8e8e8; }
+
+    /* 카드 */
+    .card {
+      background: #fff; border-radius: 8px;
+      width: 100%; max-width: 640px;
+      padding: 40px 40px 36px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+    }
+    .card-title {
+      font-size: 18px; font-weight: bold; color: #111;
+      margin-bottom: 32px; text-align: center;
+    }
+
+    /* 설문 목록 */
+    .delphi-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .delphi-item {
+      display: flex; align-items: center;
+      border: 1px solid #ddd; border-radius: 6px;
+      padding: 18px 22px; background: #fafafa;
+      transition: background .15s;
+    }
+    .delphi-item:hover { background: #f0f4ff; }
+
+    .delphi-label {
+      flex: 1; font-size: 16px; font-weight: bold; color: #222;
+    }
+
+    /* 상태 텍스트 */
+    .status-text { font-size: 14px; font-weight: bold; margin-right: 16px; white-space: nowrap; }
+    .status-waiting    { color: #1a73e8; }
+    .status-proceeding { color: #27ae60; }
+    .status-done       { color: #555; }
+
+    /* 진입 버튼 */
+    .btn-enter {
+      padding: 8px 20px; font-size: 14px; font-weight: bold;
+      border-radius: 4px; cursor: pointer; white-space: nowrap;
+      transition: opacity .2s;
+    }
+    .btn-enter:hover { opacity: .85; }
+    .btn-enter.active-btn  { background: #1e1e1e; border: none; color: #fff; }
+    .btn-enter.disabled-btn{ background: #eee; border: 1px solid #ccc; color: #aaa; cursor: default; }
+
+    /* 로딩 */
+    .loading { text-align: center; color: #aaa; font-size: 14px; padding: 40px 0; }
+
+    /* 로그아웃 확인 모달 */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.35); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .overlay.active { display: flex; }
+    .lo-modal {
+      background: #fff; border-radius: 6px;
+      padding: 36px 40px 28px; width: 320px; max-width: 92vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18); text-align: center;
+    }
+    .lo-modal p { font-size: 15px; color: #333; line-height: 1.7; margin-bottom: 28px; }
+    .lo-actions { display: flex; gap: 10px; }
+    .lo-actions button {
+      flex: 1; padding: 11px 0; font-size: 14px; font-weight: bold;
+      border-radius: 4px; cursor: pointer; transition: opacity .2s;
+    }
+    .lo-actions button:hover { opacity: .85; }
+    .lo-cancel  { background: #fff; border: 1.5px solid #ccc; color: #333; }
+    .lo-confirm { background: #1e1e1e; border: none; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- 로그아웃 확인 모달 -->
+  <div class="overlay" id="loOverlay">
+    <div class="lo-modal">
+      <p>로그아웃 하시겠습니까?</p>
+      <div class="lo-actions">
+        <button class="lo-cancel"  id="loCancel">취소</button>
+        <button class="lo-confirm" id="loConfirm">로그아웃</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <span class="top-email" id="topEmail"></span>
+    <button class="btn-logout" id="btnLogout">로그아웃</button>
+  </div>
+
+  <div class="card">
+    <p class="card-title">델파이 설문 선택</p>
+    <div class="delphi-list" id="delphiList">
+      <p class="loading">설문 정보를 불러오는 중...</p>
+    </div>
+  </div>
+
+<script>
+  /* ════════════════════════════════
+     설정
+  ════════════════════════════════ */
+  const DELPHI_NO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1701744269&single=true&output=csv';
+
+  const ROUND_INFO = [
+    { key: '1st_delphi', label: '1차 설문', page: '1st_delphi_intro.html' },
+    { key: '2nd_delphi', label: '2차 설문', page: '2nd_delphi.html' },
+    { key: '3rd_delphi', label: '3차 설문', page: '3rd_delphi.html' },
+    { key: '4th_delphi', label: '4차 설문', page: '4th_delphi.html' },
+  ];
+
+  /* 세션 확인 */
+  const panelEmail = sessionStorage.getItem('panelEmail') || '';
+  if (!panelEmail) { location.href='index.html'; }
+  document.getElementById('topEmail').textContent = '👤 ' + panelEmail;
+
+  /* 로그아웃 모달 */
+  const loOverlay = document.getElementById('loOverlay');
+  document.getElementById('btnLogout').addEventListener('click', ()=>loOverlay.classList.add('active'));
+  document.getElementById('loCancel').addEventListener('click',  ()=>loOverlay.classList.remove('active'));
+  document.getElementById('loConfirm').addEventListener('click', ()=>{ sessionStorage.clear(); location.href='index.html'; });
+  loOverlay.addEventListener('click', e=>{ if(e.target===loOverlay) loOverlay.classList.remove('active'); });
+
+  /* CSV 파싱 */
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r\n|\r|\n/);
+    const headers = lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+    return lines.slice(1).filter(l=>l.trim()!=='').map(line=>{
+      const cols=[]; let cur='', inQ=false;
+      for(let i=0;i<line.length;i++){
+        const ch=line[i];
+        if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+        else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}
+        else cur+=ch;
+      }
+      cols.push(cur.trim());
+      const row={};
+      headers.forEach((h,i)=>{row[h]=(cols[i]||'').replace(/^"|"$/g,'').trim();});
+      return row;
+    });
+  }
+
+  /* 상태 → 색상 텍스트 */
+  function badgeHtml(check) {
+    const v = check || '대기';
+    let cls = 'status-waiting', label = '대기';
+    if (v === '진행중') { cls = 'status-proceeding'; label = '진행중'; }
+    if (v === '완료')   { cls = 'status-done';       label = '완료'; }
+    return `<span class="status-text ${cls}">${label}</span>`;
+  }
+
+  /* 버튼 활성화 여부: 진행중일 때만 활성 */
+  function enterBtn(check, page) {
+    if (check === '진행중') {
+      return `<button class="btn-enter active-btn" onclick="location.href='${page}'">설문 참여</button>`;
+    }
+    return `<button class="btn-enter disabled-btn" disabled>설문 참여</button>`;
+  }
+
+  /* 설문 목록 렌더링 */
+  async function loadDelphi() {
+    const list = document.getElementById('delphiList');
+    try {
+      const res  = await fetch(DELPHI_NO_CSV);
+      const text = await res.text();
+      const rows = parseCSV(text);
+
+      // Delphi_no → check 매핑
+      const map = {};
+      rows.forEach(r=>{ map[r['Delphi_no']] = r['check']||'대기'; });
+
+      list.innerHTML = ROUND_INFO.map(info => {
+        const check = map[info.key] || '대기';
+        return `
+          <div class="delphi-item">
+            <span class="delphi-label">${info.label}</span>
+            ${badgeHtml(check)}
+            ${enterBtn(check, info.page)}
+          </div>`;
+      }).join('');
+    } catch(e) {
+      list.innerHTML = `<p class="loading">로드 실패: ${e.message}</p>`;
+    }
+  }
+
+  loadDelphi();
+</script>
+</body>
+</html>

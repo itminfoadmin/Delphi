@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>비밀번호 변경</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+      background-color: #f0f0f0;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 40px 20px;
+    }
+
+    .card {
+      background: #fff; border-radius: 6px;
+      width: 480px; max-width: 96vw;
+      padding: 48px 48px 40px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+    }
+
+    .card-title {
+      font-family: 'Courier New', monospace;
+      font-size: 15px; line-height: 1.75;
+      color: #555; text-align: center; margin-bottom: 36px;
+    }
+
+    .field-group { margin-bottom: 22px; }
+    .field-group label { display: block; font-size: 13px; color: #666; margin-bottom: 7px; letter-spacing: .03em; }
+    .field-group input {
+      width: 100%; border: 1px solid #ccc; border-radius: 4px;
+      font-size: 14px; padding: 11px 14px; outline: none;
+      color: #333; background: #fafafa; transition: border-color .2s, background .2s;
+    }
+    .field-group input:focus { border-color: #888; background: #fff; }
+    .field-group input::placeholder { color: #bbb; }
+    .field-group input[readonly] { background: #f0f0f0; color: #888; cursor: default; }
+
+    .error-msg  { font-size: 13px; color: #c0392b; min-height: 18px; margin-bottom: 16px; text-align: center; }
+    .success-msg{ font-size: 14px; color: #27ae60; min-height: 18px; margin-bottom: 16px; text-align: center; }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+    .btn-row button {
+      flex: 1; padding: 14px 0; font-size: 15px; font-weight: bold;
+      border-radius: 4px; cursor: pointer; transition: opacity .2s;
+    }
+    .btn-row button:hover { opacity: .85; }
+    .btn-row button:disabled { opacity: .45; cursor: default; }
+    .btn-confirm { background: #1e1e1e; border: none; color: #fff; }
+    .btn-cancel  { background: #fff; border: 1.5px solid #ccc; color: #333; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <p class="card-title">
+    최초 로그인 하셨습니다.<br>
+    보안을 위해 로그인 비밀번호를 변경해주세요.
+  </p>
+
+  <div class="field-group">
+    <label>e-mail</label>
+    <input type="email" id="pcEmail" readonly />
+  </div>
+  <div class="field-group">
+    <label>현재 패스워드</label>
+    <input type="password" id="pcCurrent" placeholder="현재 패스워드를 입력해주세요." autocomplete="current-password" />
+  </div>
+  <div class="field-group">
+    <label>변경 패스워드</label>
+    <input type="password" id="pcNew" placeholder="새로운 패스워드를 입력해주세요." autocomplete="new-password" />
+  </div>
+  <div class="field-group">
+    <label>변경 패스워드 (확인)</label>
+    <input type="password" id="pcNewConfirm" placeholder="새로운 패스워드를 입력해주세요." autocomplete="new-password" />
+  </div>
+
+  <p class="error-msg"    id="errorMsg"></p>
+  <p class="success-msg"  id="successMsg"></p>
+
+  <div class="btn-row">
+    <button class="btn-confirm" id="confirmBtn">확인 (Confirm)</button>
+    <button class="btn-cancel"  id="cancelBtn">취소 (Cancel)</button>
+  </div>
+</div>
+
+<script>
+  /* ════════════════════════════════
+     설정
+  ════════════════════════════════ */
+  const GAS_URL   = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+  const PANEL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
+
+  /* 세션에서 이메일 자동 채우기 */
+  const savedEmail = sessionStorage.getItem('panelEmail') || '';
+  document.getElementById('pcEmail').value = savedEmail;
+
+  const errorEl   = document.getElementById('errorMsg');
+  const successEl = document.getElementById('successMsg');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const cancelBtn  = document.getElementById('cancelBtn');
+
+  // 취소 → select_delphi.html
+  cancelBtn.addEventListener('click', () => { location.href = 'select_delphi.html'; });
+
+  /* CSV 파싱 */
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r\n|\r|\n/);
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
+    return lines.slice(1).filter(l=>l.trim()!=='').map(line => {
+      const cols=[]; let cur='', inQ=false;
+      for (let i=0;i<line.length;i++) {
+        const ch=line[i];
+        if (ch==='"') { if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ; }
+        else if (ch===','&&!inQ){cols.push(cur.trim());cur='';}
+        else cur+=ch;
+      }
+      cols.push(cur.trim());
+      const row={};
+      headers.forEach((h,i)=>{row[h]=(cols[i]||'').replace(/^"|"$/g,'').trim();});
+      return row;
+    });
+  }
+
+  /* GAS 호출 */
+  async function gasCall(payload) {
+    const res = await fetch(GAS_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify(payload)
+    });
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch(e) { return { status:'error', message:'응답 파싱 실패: '+text }; }
+  }
+
+  /* 확인 버튼 */
+  confirmBtn.addEventListener('click', async () => {
+    errorEl.textContent=''; successEl.textContent='';
+
+    const email     = document.getElementById('pcEmail').value.trim();
+    const currentPw = document.getElementById('pcCurrent').value;
+    const newPw     = document.getElementById('pcNew').value;
+    const newPwConf = document.getElementById('pcNewConfirm').value;
+
+    if (!email||!currentPw||!newPw||!newPwConf) {
+      errorEl.textContent='모든 항목을 입력해주세요.'; return;
+    }
+    if (newPw!==newPwConf) {
+      errorEl.textContent='새 패스워드와 확인 패스워드가 일치하지 않습니다.'; return;
+    }
+    if (newPw===currentPw) {
+      errorEl.textContent='새 패스워드는 현재 패스워드와 달라야 합니다.'; return;
+    }
+
+    confirmBtn.disabled=true; confirmBtn.textContent='처리 중…';
+    try {
+      // 현재 패스워드 검증
+      const res  = await fetch(PANEL_CSV);
+      const text = await res.text();
+      const rows = parseCSV(text);
+      const user = rows.find(r=>r['e-mail']===email);
+
+      if (!user) { errorEl.textContent='등록되지 않은 이메일입니다.'; return; }
+      if (user['password']!==currentPw) { errorEl.textContent='현재 패스워드가 올바르지 않습니다.'; return; }
+
+      // GAS로 패스워드 업데이트 (panel_no 기반)
+      const result = await gasCall({
+        action    : 'changePanelPassword',
+        panel_no  : user['panel_no'],
+        newPassword: newPw
+      });
+
+      if (result.status==='ok'||result.status===undefined) {
+        successEl.textContent='비밀번호가 성공적으로 변경되었습니다. 잠시 후 이동합니다.';
+        sessionStorage.setItem('panelData', JSON.stringify({...user, password: newPw}));
+        setTimeout(()=>{ location.href='select_delphi.html'; }, 2000);
+      } else {
+        errorEl.textContent='변경 실패: '+(result.message||'알 수 없는 오류');
+      }
+    } catch(err) {
+      errorEl.textContent='처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      console.error(err);
+    } finally {
+      confirmBtn.disabled=false; confirmBtn.textContent='확인 (Confirm)';
+    }
+  });
+</script>
+</body>
+</html>

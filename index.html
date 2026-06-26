@@ -1,7 +1,383 @@
-<html>
+<!DOCTYPE html>
+<html lang="ko">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>교육활동 평정 지표에 대한 델파이 조사</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #1a1a2e;
+      --ink-mid:  #3d3d5c;
+      --ink-soft: #6b6b8a;
+      --accent:   #4a6fa5;
+      --accent-lt:#e8edf5;
+      --divider:  #d0d5e0;
+      --bg:       #f4f5f8;
+      --card-bg:  #ffffff;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 24px;
+    }
+
+    /* ── 본문 카드 ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: 4px;
+      border-top: 4px solid var(--accent);
+      max-width: 1100px; width: 100%;
+      padding: 40px 52px 40px;
+      box-shadow: 0 2px 16px rgba(26,26,46,.08), 0 1px 4px rgba(26,26,46,.06);
+      position: relative;
+    }
+
+    /* 관리자 트리거 */
+    .expand-icon {
+      position: absolute; top: 14px; right: 16px;
+      font-size: 18px; color: var(--ink-soft);
+      cursor: pointer; text-decoration: none; transition: color .2s;
+    }
+    .expand-icon:hover { color: var(--ink); }
+
+    /* 인사말 */
+    .greeting {
+      font-size: 17px; font-weight: 500;
+      color: var(--ink); margin-bottom: 4px;
+    }
+
+    .divider {
+      border: none; border-top: 1px solid var(--divider);
+      margin: 20px 0 24px;
+    }
+
+    /* 본문 */
+    .body-text {
+      font-size: 16px; line-height: 1.8;
+      color: var(--ink-mid);
+      text-align: justify; word-break: keep-all;
+    }
+    .body-text p { margin-bottom: 18px; text-indent: 1em; }
+    .body-text p:last-child { margin-bottom: 0; }
+
+    /* 서명 */
+    .signature {
+      margin-top: 24px; text-align: right;
+      font-size: 16px; color: var(--ink-soft);
+    }
+
+    /* 참고문헌 */
+    .references {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--divider);
+      font-size: 14px; line-height: 2.0;
+      color: var(--ink-soft);
+    }
+
+    /* ── 로그인 카드 ── */
+    .login-card {
+      background: var(--card-bg);
+      border-radius: 4px;
+      max-width: 1100px; width: 100%;
+      margin-top: 16px;
+      padding: 32px 52px;
+      box-shadow: 0 2px 16px rgba(26,26,46,.08), 0 1px 4px rgba(26,26,46,.06);
+      display: flex; align-items: center;
+      justify-content: center; gap: 48px;
+    }
+
+    .login-fields { display: flex; flex-direction: column; gap: 22px; }
+
+    .login-row { display: flex; align-items: center; gap: 20px; }
+
+    .login-row label {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 13px; font-weight: 600;
+      color: var(--ink-soft);
+      letter-spacing: .08em;
+      width: 58px; flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .login-row input {
+      width: 260px;
+      border: none; border-bottom: 1.5px solid var(--divider);
+      outline: none;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 15px; padding: 6px 2px;
+      background: transparent; color: var(--ink);
+      transition: border-color .2s;
+    }
+    .login-row input:focus { border-bottom-color: var(--accent); }
+
+    /* Log-in 버튼 */
+    .login-btn {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: var(--accent);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px; font-weight: 600;
+      color: #fff; cursor: pointer;
+      transition: background .2s, box-shadow .2s;
+      box-shadow: 0 2px 8px rgba(74,111,165,.30);
+      flex-shrink: 0;
+    }
+    .login-btn:hover {
+      background: #3a5c8f;
+      box-shadow: 0 4px 14px rgba(74,111,165,.40);
+    }
+    .login-btn:disabled { opacity: .5; cursor: default; }
+
+    /* 오류 메시지 */
+    .login-error {
+      max-width: 1076px; width: 100%;
+      margin-top: 10px;
+      font-size: 13px; color: #c0392b;
+      text-align: center; min-height: 18px;
+    }
+
+    /* 안내 */
+    .notice {
+      margin-top: 16px;
+      font-size: 13px; color: var(--ink-soft);
+      max-width: 1076px; width: 100%; text-align: center;
+    }
+    .notice a { color: var(--accent); text-decoration: none; }
+    .notice a:hover { text-decoration: underline; }
+
+    /* ── Admin Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.38); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: #f4f5f8;
+      border-top: 4px solid var(--accent);
+      border-radius: 4px;
+      padding: 40px 44px 36px;
+      width: 690px; max-width: 94vw;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(26,26,46,.18);
+    }
+    .modal-close {
+      position: absolute; top: 14px; right: 18px;
+      font-size: 20px; color: var(--ink-soft);
+      cursor: pointer; background: none; border: none;
+      line-height: 1; transition: color .15s;
+    }
+    .modal-close:hover { color: var(--ink); }
+
+    .modal-desc {
+      font-family: 'Courier New', monospace;
+      font-size: 14px; line-height: 1.8;
+      color: var(--ink-mid); margin-bottom: 28px;
+    }
+
+    .modal-field { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .modal-field label {
+      font-family: 'Courier New', monospace;
+      font-size: 14px; color: var(--ink-soft);
+      width: 80px; text-align: right; flex-shrink: 0;
+    }
+    .modal-field input {
+      flex: 1; border: 1px solid var(--divider); border-radius: 4px;
+      background: #fff; font-size: 14px; padding: 10px 14px;
+      outline: none; color: var(--ink); transition: border-color .2s;
+    }
+    .modal-field input::placeholder { color: #bbb; }
+    .modal-field input:focus { border-color: var(--accent); }
+
+    .modal-error {
+      color: #c0392b; font-size: 13px;
+      margin-top: -6px; margin-bottom: 6px;
+      min-height: 18px; padding-left: 96px;
+    }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 28px; }
+    .modal-actions button {
+      flex: 1; padding: 13px 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px; font-weight: 600;
+      border-radius: 4px; cursor: pointer; transition: opacity .2s;
+    }
+    .modal-actions button:hover { opacity: .85; }
+    .btn-cancel  { background: #fff; border: 1.5px solid var(--divider); color: var(--ink-mid); }
+    .btn-confirm { background: var(--ink); border: none; color: #fff; }
+    .btn-confirm:disabled { opacity: .5; cursor: default; }
+  </style>
 </head>
 <body>
-Hello
+
+  <!-- 본문 카드 -->
+  <div class="card">
+    <a class="expand-icon" href="#" title="관리자 로그인" id="adminTrigger">↗</a>
+    <p class="greeting">&nbsp &nbsp 안녕하세요.</p><br>
+    <div class="body-text">
+      <p>델파이 조사에 참여해주셔서 감사합니다. 본 델파이 조사는 선행연구(김종수, 이지산, 2025, 2026a, 2026b)에서 탐색된 교육활동의 식별 및 평정을 위한 지표에 대한 전문가 의견을 묻기 위한 것으로, 총 4회의 델파이 설문이 예정되어 있습니다. 이중 1차 설문은 기 탐색된 교육활동 평정 지표를 보강하기 위해 교육활동을 식별 및 평정하기 위한 추가 지표를 수합하기 위한 것으로 자유 기술식으로 진행됩니다. 2차 설문은 기 탐색된 교육활동 평정 지표에 패널의 추가 지표를 종합한 후 교육활동 평정에 있어서 각 지표의 적절성 여부를 Likert 척도를 사용하여 응답하는 형식으로 되어 있습니다. 이어지는 3차와 4차 설문은 2차 설문과 마찬가지로 교육활동 평정에 있어서 각 지표의 적절성 여부를 Likert 척도를 사용하여 응답하는 형식으로 진행되며, 직전 델파이 설문의 결과(중앙값, 4분위 범위, CVR)가 환류됩니다.</p>
+      <p>각 회차의 델파이 설문은 본 사이트에서 이루어지며, 설문의 결과는 오직 연구를 위해서만 사용될 것을 약속드립니다. 설문을 위해 아래 로그인 창에 전자우편으로 안내된 사용자 e-mail 주소와 비밀번호를 입력후 로그인 해주세요.</p>
+      <p>마지막으로, 교육본위론의 발전을 위하여 1차 델파이 설문부터 4차 델파이 설문까지 긴 여정에 함께 해주셔서 다시 한번 감사드립니다.</p>
+    </div>
+    <div class="signature">연구자 김종수, 이지산 올림</div>
+    <div class="references">
+      김종수, 이지산(2025). 교육활동 평정 지표의 탐색. <b>교육원리연구</b>, <b>30</b>(1), 23-66.<br>
+      김종수, 이지산(2026a). 하화활동 평정을 위한 지표의 탐색. <b>교육원리연구</b>, <b>31</b>(1), 31-69.<br>
+      김종수, 이지산(2026b). 상구활동 평정을 위한 지표의 탐색. <b>교육원리연구</b>, <b>31</b>(2), 23-66.
+    </div>
+  </div>
+
+  <!-- 로그인 카드 -->
+  <div class="login-card">
+    <div class="login-fields">
+      <div class="login-row">
+        <label>E-MAIL</label>
+        <input type="email" id="panelEmail" placeholder="" autocomplete="username" />
+      </div>
+      <div class="login-row">
+        <label>P/W</label>
+        <input type="password" id="panelPw" placeholder="" autocomplete="current-password" />
+      </div>
+    </div>
+    <button class="login-btn" id="panelLoginBtn">Log-in</button>
+  </div>
+
+  <p class="login-error" id="loginError"></p>
+
+  <p class="notice">
+    ※ 비밀번호 분실, 설문 과정의 오류 등은 <a href="mailto:nicobass5735@gmail.com">nicobass5735@gmail.com</a> 으로 알려주세요.
+  </p>
+
+  <!-- Admin Login Modal -->
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">×</button>
+      <p class="modal-desc">
+        To log in as an administrator,<br>
+        enter your administrator account below.
+      </p>
+      <div class="modal-field">
+        <label>e-mail</label>
+        <input type="email" id="adminEmail" placeholder="이메일 주소를 입력해주세요." autocomplete="username" />
+      </div>
+      <div class="modal-field">
+        <label>Password</label>
+        <input type="password" id="adminPw" placeholder="패스워드를 입력해주세요." autocomplete="current-password" />
+      </div>
+      <p class="modal-error" id="adminError"></p>
+      <div class="modal-actions">
+        <button class="btn-cancel"  id="modalCancel">Cancel</button>
+        <button class="btn-confirm" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkDVzf4EpV7PqZSd-IkSKDbJznhnuABEjcOddp0HCsRqPIVjsbpiAqjdPPn03A1Amp8XzUTbhUwXx-/pub?gid=0&single=true&output=csv';
+    const PANEL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r\n|\r|\n/);
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      return lines.slice(1).filter(l => l.trim() !== '').map(line => {
+        const cols = []; let cur = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
+          else if (ch===',' && !inQ) { cols.push(cur.trim()); cur=''; }
+          else cur+=ch;
+        }
+        cols.push(cur.trim());
+        const row = {};
+        headers.forEach((h, i) => { row[h] = (cols[i]||'').replace(/^"|"$/g,'').trim(); });
+        return row;
+      });
+    }
+
+    /* ── 패널 로그인 ── */
+    const panelLoginBtn = document.getElementById('panelLoginBtn');
+    const loginError    = document.getElementById('loginError');
+
+    async function doPanelLogin() {
+      const email = document.getElementById('panelEmail').value.trim();
+      const pw    = document.getElementById('panelPw').value;
+      if (!email || !pw) { loginError.textContent = '이메일과 패스워드를 입력해주세요.'; return; }
+      panelLoginBtn.disabled = true; panelLoginBtn.textContent = '확인 중…'; loginError.textContent = '';
+      try {
+        const rows = parseCSV(await (await fetch(PANEL_CSV)).text());
+        const user = rows.find(r => r['e-mail'] === email);
+        if (!user) { loginError.textContent = '등록되지 않은 이메일입니다.'; return; }
+        if (user['password'] !== pw) { loginError.textContent = '패스워드가 올바르지 않습니다.'; return; }
+        sessionStorage.setItem('panelEmail', email);
+        sessionStorage.setItem('panelNo',    user['panel_no'] || '');
+        sessionStorage.setItem('panelData',  JSON.stringify(user));
+        location.href = (user['e-mail'] === user['password']) ? 'pass_change.html' : 'select_delphi.html';
+      } catch(err) {
+        loginError.textContent = '인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        console.error(err);
+      } finally {
+        panelLoginBtn.disabled = false; panelLoginBtn.textContent = 'Log-in';
+      }
+    }
+
+    panelLoginBtn.addEventListener('click', doPanelLogin);
+    ['panelEmail','panelPw'].forEach(id =>
+      document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doPanelLogin(); })
+    );
+
+    /* ── 관리자 모달 ── */
+    const trigger    = document.getElementById('adminTrigger');
+    const modal      = document.getElementById('adminModal');
+    const closeBtn   = document.getElementById('modalClose');
+    const cancelBtn  = document.getElementById('modalCancel');
+    const confirmBtn = document.getElementById('modalConfirm');
+    const emailInput = document.getElementById('adminEmail');
+    const pwInput    = document.getElementById('adminPw');
+    const errorEl    = document.getElementById('adminError');
+
+    const openModal  = e => { e.preventDefault(); errorEl.textContent=''; modal.classList.add('active'); emailInput.focus(); };
+    const closeModal = () => { modal.classList.remove('active'); emailInput.value=''; pwInput.value=''; errorEl.textContent=''; };
+
+    trigger.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if(e.target===modal) closeModal(); });
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+    async function doAdminLogin() {
+      const email = emailInput.value.trim();
+      const pw    = pwInput.value;
+      if (!email || !pw) { errorEl.textContent='이메일과 패스워드를 입력해주세요.'; return; }
+      confirmBtn.disabled=true; confirmBtn.textContent='확인 중…'; errorEl.textContent='';
+      try {
+        const rows = parseCSV(await (await fetch(ADMIN_CSV)).text());
+        const user = rows.find(r => r['e-mail']===email);
+        if (!user)               { errorEl.textContent='등록되지 않은 이메일입니다.'; return; }
+        if (user['password']!==pw){ errorEl.textContent='패스워드가 올바르지 않습니다.'; return; }
+        sessionStorage.setItem('adminEmail', email);
+        location.href = (user['e-mail']===user['password']) ? 'admin_pass_change.html' : 'admin_mng-01.html';
+      } catch(err) {
+        errorEl.textContent='인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        console.error(err);
+      } finally {
+        confirmBtn.disabled=false; confirmBtn.textContent='Confirm';
+      }
+    }
+
+    confirmBtn.addEventListener('click', doAdminLogin);
+    [emailInput, pwInput].forEach(el =>
+      el.addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin(); })
+    );
+  </script>
 </body>
 </html>
