@@ -318,6 +318,7 @@
           <th class="th-survey" id="thSurvey2"></th>
           <th class="th-survey" id="thSurvey3"></th>
           <th class="th-survey" id="thSurvey4"></th>
+          <th class="th-survey" id="thSurvey5"></th>
           <th class="th-edit"   rowspan="2">수정/삭제</th>
         </tr>
         <tr>
@@ -337,11 +338,15 @@
             <select class="hdr-select" id="hdrSel4"><option value="대기">대기</option><option value="진행중">진행중</option><option value="완료">완료</option></select>
             <button class="btn-col-save" data-round="4">Save</button>
           </div></th>
+          <th><div class="th-ctrl-combo">
+            <select class="hdr-select" id="hdrSel5"><option value="대기">대기</option><option value="진행중">진행중</option><option value="완료">완료</option></select>
+            <button class="btn-col-save" data-round="5">Save</button>
+          </div></th>
           <th></th>
         </tr>
       </thead>
       <tbody id="tableBody">
-        <tr class="state-row"><td colspan="7">데이터를 불러오는 중...</td></tr>
+        <tr class="state-row"><td colspan="8">데이터를 불러오는 중...</td></tr>
       </tbody>
     </table>
   </div>
@@ -354,9 +359,9 @@
   const PANEL_CSV     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
   const DELPHI_NO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1701744269&single=true&output=csv';
 
-  const ROUND_LABELS = ['1차 설문', '2차 설문', '3차 설문', '4차 설문'];
-  const DELPHI_KEYS  = ['1st_delphi','2nd_delphi','3rd_delphi','4th_delphi'];
-  const STATUS_KEYS  = ['1st_delphi_status','2nd_delphi_status','3rd_delphi_status','4th_delphi_status'];
+  const ROUND_LABELS = ['1차 설문', '2차 설문', '3차 설문', '4차 설문', '5차 설문'];
+  const DELPHI_KEYS  = ['1st_delphi','2nd_delphi','3rd_delphi','4th_delphi','5th_delphi'];
+  const STATUS_KEYS  = ['1st_delphi_status','2nd_delphi_status','3rd_delphi_status','4th_delphi_status','5th_delphi_status'];
 
   /* 로그인 이메일 표시 */
   const adminEmail = sessionStorage.getItem('adminEmail') || '';
@@ -488,7 +493,7 @@
   }
 
   /* ── 헤더 드롭다운 이벤트 ── */
-  [1,2,3,4].forEach(r => {
+  [1,2,3,4,5].forEach(r => {
     const sel = document.getElementById('hdrSel' + r);
     if (sel) sel.addEventListener('change', () => syncHdrColor(sel));
   });
@@ -530,12 +535,12 @@
       const filtered = panelRows.filter(r => r['panel_no'] && r['panel_no'].trim() !== '');
       console.log('[loadAll] 첫 번째 패널:', filtered[0]);
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr class="state-row"><td colspan="7">등록된 패널이 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr class="state-row"><td colspan="8">등록된 패널이 없습니다.</td></tr>';
       } else {
         filtered.forEach(p => tbody.appendChild(makeRow(p)));
       }
     } catch(e) {
-      tbody.innerHTML = `<tr class="state-row"><td colspan="7">로드 실패: ${e.message}</td></tr>`;
+      tbody.innerHTML = `<tr class="state-row"><td colspan="8">로드 실패: ${e.message}</td></tr>`;
     } finally {
       loadingOverlay.classList.remove('active');
     }

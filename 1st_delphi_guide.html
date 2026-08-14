@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1차 설문 방법 안내</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #1a1a2e;
+      --ink-mid:  #3d3d5c;
+      --ink-soft: #6b6b8a;
+      --accent:   #4a6fa5;
+      --accent-lt:#e8edf5;
+      --divider:  #d0d5e0;
+      --bg:       #f4f5f8;
+      --card-bg:  #ffffff;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 60px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 4px;
+      border-top: 4px solid var(--accent);
+      max-width: 960px;
+      width: 100%;
+      padding: 40px 56px 48px;
+      box-shadow: 0 2px 16px rgba(26,26,46,.08), 0 1px 4px rgba(26,26,46,.06);
+    }
+
+    .card-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0;
+      line-height: 1.3;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .btn-top-back {
+      min-width: auto;
+      padding: 8px 18px;
+      font-size: 13px;
+    }
+    .card-subtitle {
+      font-size: 15px;
+      color: var(--ink-soft);
+      margin-bottom: 36px;
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--divider);
+      margin: 32px 0;
+    }
+
+    /* ── 섹션 ── */
+    .section {
+      margin-bottom: 36px;
+    }
+    .section:last-child { margin-bottom: 0; }
+
+    .section-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px; height: 30px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px; font-weight: 700;
+      border-radius: 50%;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    .section-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .body-text {
+      font-size: 15px;
+      line-height: 2.0;
+      color: var(--ink-mid);
+      word-break: keep-all;
+      text-align: justify;
+    }
+    .body-text p { margin-bottom: 14px; }
+    .body-text p:last-child { margin-bottom: 0; }
+
+    .body-text strong { color: var(--ink); font-weight: 600; }
+
+    /* ── 화면 구성 설명 박스 ── */
+    .ui-box {
+      margin: 16px 0;
+      background: #fafbfd;
+      border: 1px solid var(--divider);
+      border-radius: 6px;
+      padding: 18px 22px;
+    }
+    .ui-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .ui-row:last-child { margin-bottom: 0; }
+
+    .ui-label {
+      flex-shrink: 0;
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .ui-label-blue   { background: var(--accent); color: #fff; }
+    .ui-label-green  { background: #5a9a6e; color: #fff; }
+    .ui-label-purple { background: #8b6fb0; color: #fff; }
+    .ui-label-gray   { background: #555; color: #fff; }
+    .ui-label-outline { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+
+    .ui-desc {
+      font-size: 14px;
+      color: var(--ink-mid);
+      line-height: 1.8;
+    }
+
+    /* ── 카드 색상 미리보기 ── */
+    .color-chips {
+      display: flex; gap: 16px; margin: 14px 0;
+      flex-wrap: wrap;
+    }
+    .color-chip {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--ink-mid);
+    }
+    .chip-swatch {
+      width: 16px; height: 16px;
+      border-radius: 3px; border: 1px solid #ddd;
+    }
+
+    /* ── 주의 박스 ── */
+    .notice-box {
+      margin-top: 20px;
+      background: var(--accent-lt);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 4px 4px 0;
+      padding: 14px 18px;
+      font-size: 13.5px;
+      color: var(--ink-mid);
+      line-height: 1.8;
+    }
+
+    .warning-box {
+      margin-top: 20px;
+      background: #fff5f5;
+      border-left: 3px solid #d9534f;
+      border-radius: 0 4px 4px 0;
+      padding: 14px 18px;
+      font-size: 13.5px;
+      color: #8b3a3a;
+      line-height: 1.8;
+    }
+
+    /* ── 하단 버튼 ── */
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .btn {
+      min-width: 180px;
+      padding: 14px 28px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-back {
+      background: #fff;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+    }
+    .btn-back:hover { background: var(--accent-lt); }
+
+    .btn-start {
+      background: var(--accent);
+      border: 1.5px solid var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(74,111,165,.30);
+    }
+    .btn-start:hover { background: #3a5c8f; border-color: #3a5c8f; }
+
+    /* ── 순서 리스트 ── */
+    .step-list {
+      margin: 12px 0 0 4px;
+      counter-reset: step;
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 14.5px;
+      line-height: 1.9;
+      color: var(--ink-mid);
+    }
+    .step-item:last-child { margin-bottom: 0; }
+    .step-item::before {
+      counter-increment: step;
+      content: counter(step);
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      background: var(--accent-lt);
+      color: var(--accent);
+      font-size: 12px; font-weight: 700;
+      border-radius: 50%;
+      margin-top: 3px;
+    }
+
+    .btn-print {
+      background: #fff;
+      border: 1.5px solid #555;
+      color: #555;
+    }
+    .btn-print:hover { background: #f0f0f0; }
+
+    @media (max-width: 768px) {
+      .card { padding: 28px 24px 36px; }
+      .card-title { font-size: 22px; }
+      .color-chips { flex-direction: column; gap: 8px; }
+      .btn-row { flex-direction: column; }
+      .btn { min-width: auto; width: 100%; }
+    }
+
+    /* ── 인쇄 스타일 ── */
+    @media print {
+      body { padding: 0; background: #fff; }
+      .card { box-shadow: none; border-top: 2px solid var(--accent); padding: 20px 32px; max-width: 100%; }
+      .btn-row { display: none; }
+      .btn-top-back { display: none; }
+      .ui-box { break-inside: avoid; }
+      .section { break-inside: avoid; }
+      .notice-box, .warning-box { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="top-bar">
+      <h1 class="card-title">1차 델파이 설문 방법 안내</h1>
+      <button class="btn btn-back btn-top-back" onclick="history.back()">이전으로 돌아가기</button>
+    </div>
+    <p class="card-subtitle">설문을 시작하기 전에 아래 안내를 꼼꼼히 확인해주세요.</p>
+    <hr class="divider" />
+
+    <!-- 섹션 1: 화면 구성 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">1</span>화면 구성</h2>
+      <div class="body-text">
+        <p>설문 화면은 크게 <strong>상단 헤더</strong>, <strong>평정지표 카드 3개</strong>, <strong>좌우 이동 버튼</strong>으로 구성됩니다.</p>
+      </div>
+
+      <div class="ui-box">
+        <div class="ui-row">
+          <span class="ui-label ui-label-gray">상단 헤더</span>
+          <span class="ui-desc">현재 페이지의 <strong>ID</strong>, <strong>범주명</strong>, <strong>요소명</strong>, 그리고 <strong>전체 진행 상황</strong>(예: 전체 19개 요소중 3번째 요소 진행중...)이 표시됩니다.</span>
+        </div>
+        <div class="ui-row">
+          <span class="ui-label ui-label-blue">교육활동 카드</span>
+          <span class="ui-desc">교육활동 평정지표가 파란색 카드에 표시됩니다.</span>
+        </div>
+        <div class="ui-row">
+          <span class="ui-label ui-label-green">하화활동 카드</span>
+          <span class="ui-desc">하화활동 평정지표가 초록색 카드에 표시됩니다.</span>
+        </div>
+        <div class="ui-row">
+          <span class="ui-label ui-label-purple">상구활동 카드</span>
+          <span class="ui-desc">상구활동 평정지표가 보라색 카드에 표시됩니다.</span>
+        </div>
+      </div>
+
+      <div class="color-chips">
+        <div class="color-chip"><div class="chip-swatch" style="background:#4a6fa5"></div>교육활동</div>
+        <div class="color-chip"><div class="chip-swatch" style="background:#5a9a6e"></div>하화활동</div>
+        <div class="color-chip"><div class="chip-swatch" style="background:#8b6fb0"></div>상구활동</div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 섹션 2: 지표 확인 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">2</span>지표 확인하기</h2>
+      <div class="body-text">
+        <p>각 카드에는 선행연구에서 탐색된 <strong>평정지표</strong>가 표시됩니다. 하나의 페이지에 교육활동, 하화활동, 상구활동의 지표가 요소별로 함께 제시됩니다.</p>
+        <p>카드 헤더에는 <strong>활동 유형명</strong>과 현재 <strong>요소명</strong>이 표시되어, 어떤 범주와 요소에 해당하는 지표를 보고 있는지 확인할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 섹션 3: 지표의 맥락 보기 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">3</span>지표의 맥락 보기</h2>
+      <div class="body-text">
+        <p>각 카드 헤더에 있는 <strong>[지표의 맥락 보기]</strong> 버튼을 클릭하면, 해당 지표에 대한 상세 설명이 별도의 모달 창으로 표시됩니다.</p>
+        <p>이 모달은 <strong>마우스로 드래그하여 위치를 이동</strong>할 수 있어, 지표 내용과 설명을 동시에 확인할 수 있습니다. 모달 우측 상단의 <strong>[닫기]</strong> 버튼을 클릭하면 닫힙니다.</p>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 섹션 4: 평정 지표 추가하기 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">4</span>평정 지표 추가하기</h2>
+      <div class="body-text">
+        <p>각 카드 헤더의 <strong>[평정 지표 추가하기]</strong> 버튼을 클릭하면 추가 지표 입력 창이 열립니다.</p>
+      </div>
+
+      <div class="step-list">
+        <div class="step-item">카드 헤더에서 <strong>[평정 지표 추가하기]</strong> 버튼을 클릭합니다.</div>
+        <div class="step-item">모달 창에 <strong>추가 지표</strong>(지표명)를 입력합니다.</div>
+        <div class="step-item"><strong>지표 설명(사유)</strong>에 해당 지표를 추가하는 이유를 입력합니다.</div>
+        <div class="step-item"><strong>[추가]</strong> 버튼을 클릭하면 즉시 저장되고, 해당 카드의 지표 목록 하단에 표시됩니다.</div>
+      </div>
+
+      <div class="body-text" style="margin-top:16px">
+        <p>추가된 지표는 <strong>[패널 추가 지표]</strong> 표시와 함께 기존 지표 아래에 나타나며, 각 추가 지표의 오른쪽에는 다음 버튼이 제공됩니다.</p>
+      </div>
+
+      <div class="ui-box">
+        <div class="ui-row">
+          <span class="ui-label ui-label-outline">추가 사유 보기</span>
+          <span class="ui-desc">추가 시 입력한 사유를 모달 창으로 확인합니다.</span>
+        </div>
+        <div class="ui-row">
+          <span class="ui-label ui-label-outline">수정</span>
+          <span class="ui-desc">추가한 지표명과 사유를 수정합니다.</span>
+        </div>
+        <div class="ui-row">
+          <span class="ui-label" style="background:#fff;color:#d9534f;border:1px solid #d9534f">삭제</span>
+          <span class="ui-desc">추가한 지표를 삭제합니다. 삭제 전 확인 창이 표시됩니다.</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 섹션 5: 페이지 이동 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">5</span>페이지 이동</h2>
+      <div class="body-text">
+        <p>화면 좌우의 <strong>이전(◁)</strong>, <strong>다음(▷)</strong> 화살표를 클릭하거나 키보드의 <strong>← →</strong> 방향키를 사용하여 요소별 페이지를 이동합니다.</p>
+        <p>첫 번째 페이지에서는 이전 버튼이, 마지막 페이지 이후의 설문 완료 화면에서는 다음 버튼이 숨겨집니다.</p>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 섹션 6: 저장 및 설문 종료 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">6</span>저장 및 설문 종료</h2>
+      <div class="body-text">
+        <p>화면 우측 상단에는 <strong>[저장]</strong> 버튼과 <strong>[설문 종료]</strong> 버튼이 있습니다.</p>
+      </div>
+
+      <div class="ui-box">
+        <div class="ui-row">
+          <span class="ui-label ui-label-blue">저장</span>
+          <span class="ui-desc">현재까지의 추가/수정/삭제 내용을 동기화합니다. 변경 사항이 없으면 안내 메시지가 표시됩니다.</span>
+        </div>
+        <div class="ui-row">
+          <span class="ui-label ui-label-gray">설문 종료</span>
+          <span class="ui-desc">설문을 중간에 종료할 때 사용합니다. 완료되지 않은 설문은 이후에 다시 진행할 수 있습니다.</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 섹션 7: 설문 완료 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">7</span>설문 완료</h2>
+      <div class="body-text">
+        <p>마지막 요소 페이지에서 <strong>다음(▷)</strong> 버튼을 클릭하면 <strong>설문 완료 화면</strong>이 나타납니다.</p>
+        <p><strong>[설문 완료]</strong> 버튼을 클릭하면 1차 델파이 설문이 완료 처리되며, 설문 선택 화면으로 돌아갑니다. 완료 후에는 해당 설문에 다시 참여할 수 없으므로, 모든 요소를 확인한 후 완료해주세요.</p>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <strong>⚠ 주의사항</strong><br>
+      설문 중 페이지를 이탈(브라우저 닫기, 새로고침 등)하더라도 이미 추가한 지표는 서버에 저장되어 있으므로 유실되지 않습니다. 단, 추가 모달에서 입력 중인 내용은 저장되지 않으니 반드시 [추가] 버튼을 눌러 저장해주세요.
+    </div>
+
+    <div class="notice-box">
+      <strong>💡 설문 요약</strong><br>
+      각 요소별로 제시된 교육활동·하화활동·상구활동 평정지표를 검토하고, 추가가 필요한 지표가 있으면 [평정 지표 추가하기]로 지표와 사유를 입력합니다. 모든 요소를 검토한 뒤 설문을 완료합니다.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="history.back()">이전으로 돌아가기</button>
+      <button class="btn btn-print" onclick="window.print()">설문 방법 안내 인쇄하기</button>
+      <button class="btn btn-start" onclick="location.href='1st_delphi_main.html'">설문 시작</button>
+    </div>
+  </div>
+
+</body>
+</html>

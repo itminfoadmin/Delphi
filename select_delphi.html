@@ -62,6 +62,15 @@
     .status-proceeding { color: #27ae60; }
     .status-done       { color: #555; }
 
+    /* 패널 개별 진행 상태 */
+    .panel-status {
+      font-size: 12px; font-weight: 600; margin-right: 14px;
+      padding: 4px 10px; border-radius: 4px; white-space: nowrap;
+    }
+    .ps-waiting    { background: #e8edf5; color: #4a6fa5; }
+    .ps-proceeding { background: #d4edda; color: #1a7a3c; }
+    .ps-done       { background: #333; color: #fff; }
+
     /* 진입 버튼 */
     .btn-enter {
       padding: 8px 20px; font-size: 14px; font-weight: bold;
@@ -128,12 +137,14 @@
      설정
   ════════════════════════════════ */
   const DELPHI_NO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1701744269&single=true&output=csv';
+  const PANEL_CSV    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
 
   const ROUND_INFO = [
-    { key: '1st_delphi', label: '1차 설문', page: '1st_delphi_intro.html' },
-    { key: '2nd_delphi', label: '2차 설문', page: '2nd_delphi.html' },
-    { key: '3rd_delphi', label: '3차 설문', page: '3rd_delphi.html' },
-    { key: '4th_delphi', label: '4차 설문', page: '4th_delphi.html' },
+    { key: '1st_delphi', label: '1차 델파이 설문', page: '1st_delphi_intro.html', statusKey: '1st_delphi_status' },
+    { key: '2nd_delphi', label: '2차 델파이 설문', page: '2nd_delphi.html',       statusKey: '2nd_delphi_status' },
+    { key: '3rd_delphi', label: '3차 델파이 설문', page: '3rd_delphi.html',       statusKey: '3rd_delphi_status' },
+    { key: '4th_delphi', label: '4차 델파이 설문', page: '4th_delphi.html',       statusKey: '4th_delphi_status' },
+    { key: '5th_delphi', label: '5차 델파이 설문', page: '5th_delphi.html',       statusKey: '5th_delphi_status' },
   ];
 
   /* 세션 확인 */
@@ -176,9 +187,19 @@
     return `<span class="status-text ${cls}">${label}</span>`;
   }
 
+  /* 패널 개별 상태 → 뱃지 */
+  function panelStatusHtml(val) {
+    const v = (val || '').trim();
+    if (!v || v === '대기') return '<span class="panel-status ps-waiting">대기</span>';
+    if (v === '진행중')     return '<span class="panel-status ps-proceeding">진행중</span>';
+    if (v.startsWith('완료')) return `<span class="panel-status ps-done">${v}</span>`;
+    return `<span class="panel-status ps-proceeding">${v}</span>`;
+  }
+
   /* 버튼 활성화 여부: 진행중일 때만 활성 */
-  function enterBtn(check, page) {
-    if (check === '진행중') {
+  function enterBtn(status, page) {
+    const v = (status || '').trim();
+    if (v === '진행중') {
       return `<button class="btn-enter active-btn" onclick="location.href='${page}'">설문 참여</button>`;
     }
     return `<button class="btn-enter disabled-btn" disabled>설문 참여</button>`;
@@ -188,21 +209,32 @@
   async function loadDelphi() {
     const list = document.getElementById('delphiList');
     try {
-      const res  = await fetch(DELPHI_NO_CSV);
-      const text = await res.text();
-      const rows = parseCSV(text);
+      const [delphiRes, panelRes] = await Promise.all([
+        fetch(DELPHI_NO_CSV),
+        fetch(PANEL_CSV)
+      ]);
+      const delphiText = await delphiRes.text();
+      const panelText  = await panelRes.text();
+      const delphiRows = parseCSV(delphiText);
+      const panelRows  = parseCSV(panelText);
 
-      // Delphi_no → check 매핑
+      // delphi_no → check 매핑
       const map = {};
-      rows.forEach(r=>{ map[r['Delphi_no']] = r['check']||'대기'; });
+      delphiRows.forEach(r => { map[r['Delphi_no']] = r['check'] || '대기'; });
+
+      // 패널 이메일로 해당 패널 행 찾기
+      const myPanel = panelRows.find(r =>
+        (r['e-mail'] || '').trim() === panelEmail.trim()
+      ) || {};
 
       list.innerHTML = ROUND_INFO.map(info => {
         const check = map[info.key] || '대기';
+        const myStatus = myPanel[info.statusKey] || '대기';
         return `
           <div class="delphi-item">
             <span class="delphi-label">${info.label}</span>
-            ${badgeHtml(check)}
-            ${enterBtn(check, info.page)}
+            ${panelStatusHtml(myStatus)}
+            ${enterBtn(myStatus, info.page)}
           </div>`;
       }).join('');
     } catch(e) {
