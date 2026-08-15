@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1차 델파이 설문지 관리</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a2e;--ink-mid:#3d3d5c;--ink-soft:#6b6b8a;--accent:#4a6fa5;--accent-lt:#e8edf5;--divider:#d0d5e0;--bg:#f4f5f8;--card-bg:#fff;--green:#5a9a6e;--purple:#8b6fb0;--red:#d9534f}
+    body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px 60px}
+
+    /* ── 상단 헤더 ── */
+    .header-bar{width:100%;max-width:1246px;display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+    .header-title{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ink);line-height:1.4;white-space:nowrap}
+    .header-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+    .btn-hdr{padding:10px 22px;font-size:14px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-back{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
+    .btn-back:hover{background:#d5d5d5}
+    .btn-add-row{background:var(--green);color:#fff}
+    .btn-add-row:hover{background:#488a5a}
+    .btn-del-row{background:var(--red);color:#fff}
+    .btn-del-row:hover{background:#c0392b}
+
+    /* ── 메인 ── */
+    .main-area{width:100%;max-width:1246px;display:flex;align-items:flex-start;gap:0}
+    .nav-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px;padding-top:8px}
+    .nav-label{font-size:12px;color:var(--ink-soft);font-weight:500}
+    .btn-logout{background:#fff;color:var(--ink-mid);border:1.5px solid var(--divider) !important;padding:10px 22px;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .btn-logout:hover{background:#f5f5f5;border-color:#999 !important}
+    .nav-arrow{width:56px;min-width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ink-soft);cursor:pointer;user-select:none;transition:color .2s,background .2s;border-radius:6px;background:transparent;border:none}
+    .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+    .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
+    .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+
+    /* ── 범주/요소 편집 영역 ── */
+    .meta-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;padding:20px 24px;border-top:3px solid #555}
+    .meta-row{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+    .meta-row:last-child{margin-bottom:0}
+    .meta-label{font-size:13px;font-weight:600;color:var(--ink-soft);min-width:100px;flex-shrink:0}
+    .meta-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:8px 12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:#fafbfc}
+    .meta-input:focus{border-color:var(--accent);background:#fff}
+
+    /* ── 카드 ── */
+    .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
+    .card-edu{border-top:3px solid #4a6fa5}
+    .card-edu .card-header{background:#e8edf5}
+    .card-hahwa{border-top:3px solid #5a9a6e}
+    .card-hahwa .card-header{background:#e9f5ec}
+    .card-sanggu{border-top:3px solid #8b6fb0}
+    .card-sanggu .card-header{background:#f0eaf7}
+    .card-header{display:flex;align-items:center;padding:9px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);gap:12px}
+    .card-header-title{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
+    .card-body{padding:20px 22px}
+
+    /* 요소명 편집 */
+    .element-row{display:flex;align-items:center;gap:10px;flex:1}
+    .element-label{font-size:12px;font-weight:600;color:var(--ink-soft);flex-shrink:0}
+    .element-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:border-color .2s}
+    .element-input:focus{border-color:var(--accent)}
+
+    /* 헤더 버튼 */
+    .btn-card-action{font-size:12px;font-weight:600;border-radius:4px;padding:4px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;margin-left:auto}
+    .btn-edit-desc{background:#fff;border:1.5px solid currentColor;color:inherit}
+    .card-edu .btn-edit-desc{color:#4a6fa5}
+    .card-hahwa .btn-edit-desc{color:#5a9a6e}
+    .card-sanggu .btn-edit-desc{color:#8b6fb0}
+    .btn-edit-desc:hover{opacity:.8}
+
+    /* 지표 목록 */
+    .index-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+    .index-item:last-child{border-bottom:none}
+    .index-num{font-size:12px;font-weight:700;color:var(--ink-soft);min-width:28px;padding-top:8px;flex-shrink:0}
+    .index-textarea{flex:1;border:1px solid var(--divider);border-radius:4px;padding:8px 10px;font-size:14px;font-family:inherit;line-height:1.7;outline:none;resize:vertical;min-height:38px;transition:border-color .2s;background:#fafbfc}
+    .index-textarea:focus{border-color:var(--accent);background:#fff}
+    .index-btns{display:flex;flex-direction:column;gap:4px;flex-shrink:0;padding-top:4px}
+    .btn-idx{width:28px;height:28px;font-size:16px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;border:1px solid var(--divider);background:#fff;color:var(--ink-soft);transition:all .15s}
+    .btn-idx:hover{background:#f5f5f5}
+    .btn-idx-del{color:var(--red);border-color:var(--red)}
+    .btn-idx-del:hover{background:var(--red);color:#fff}
+
+    .btn-add-index{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;margin-top:8px;font-size:13px;font-weight:600;color:var(--green);background:#fff;border:1.5px dashed var(--green);border-radius:4px;cursor:pointer;transition:all .2s}
+    .btn-add-index:hover{background:#e9f5ec}
+
+    /* ── 맥락 설명 편집 모달 (main과 동일한 크기/스타일) ── */
+    .desc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:1000}
+    .desc-overlay.active{display:block}
+    .desc-edit-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:902px;max-width:96vw;max-height:80vh;background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.22);z-index:1001;display:none;flex-direction:column;overflow:hidden}
+    .desc-edit-modal.active{display:flex}
+    .desc-edit-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none}
+    .desc-edit-header:active{cursor:grabbing}
+    .desc-edit-title{font-size:15px;font-weight:600;color:var(--ink);flex:1;min-width:0}
+    .desc-edit-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .desc-edit-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .desc-edit-close:hover{background:#eee}
+    .desc-edit-apply{padding:5px 16px;font-size:13px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:4px;cursor:pointer;transition:background .15s}
+    .desc-edit-apply:hover{background:#3a5c8f}
+    .desc-edit-body{padding:28px 32px;overflow-y:auto;flex:1}
+    .desc-edit-body textarea{width:100%;min-height:320px;border:1px solid var(--divider);border-radius:4px;padding:20px 24px;font-size:14.5px;font-family:inherit;line-height:2.0;color:var(--ink-mid);outline:none;resize:vertical;transition:border-color .2s;word-break:keep-all;text-align:justify;text-indent:1.5em}
+    .desc-edit-body textarea:focus{border-color:var(--accent)}
+
+    /* ── 일반 모달 (행 추가 등) ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}
+    .modal-overlay.active{display:flex}
+    .modal-box{background:#fff;border-radius:6px;padding:28px 32px 24px;width:520px;max-width:94vw;max-height:85vh;box-shadow:0 8px 32px rgba(0,0,0,.18);display:flex;flex-direction:column}
+    .modal-box h3{font-size:16px;color:var(--ink);margin-bottom:16px;font-weight:600}
+    .modal-textarea{width:100%;min-height:260px;border:1px solid var(--divider);border-radius:4px;padding:14px 16px;font-size:14px;font-family:inherit;line-height:2.0;outline:none;resize:vertical;transition:border-color .2s;flex:1}
+    .modal-textarea:focus{border-color:var(--accent)}
+    .modal-actions{display:flex;gap:10px;margin-top:16px}
+    .modal-actions button{flex:1;padding:12px 0;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;transition:opacity .2s}
+    .modal-actions button:hover{opacity:.85}
+    .modal-cancel{background:#fff;border:1.5px solid #ccc;color:#333}
+    .modal-confirm{background:var(--accent);border:none;color:#fff}
+
+    /* 확인 모달 */
+    .confirm-box{text-align:center;width:480px}
+    .confirm-box p{font-size:15px;color:#333;line-height:1.7;margin-bottom:24px}
+
+    /* ── 로딩 ── */
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;background:var(--accent);animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
+    .toast.show{opacity:1}
+
+    .btn-save{padding:10px 22px;font-size:14px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-save:hover{background:#3a5c8f}
+    .btn-save:disabled{opacity:.5;cursor:default}
+
+    @media(max-width:768px){.header-title{font-size:17px}.nav-arrow{width:36px;min-width:36px;font-size:22px}.header-bar{gap:10px}.meta-row{flex-direction:column;align-items:stretch}.meta-label{min-width:auto}}
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 데이터를 불러오는 중...</span>
+  </div>
+
+  <!-- 맥락 설명 편집 모달 (main과 동일한 구조) -->
+  <div class="desc-overlay" id="descOverlay"></div>
+  <div class="desc-edit-modal" id="descEditModal">
+    <div class="desc-edit-header" id="descEditHeader">
+      <span class="desc-edit-title" id="descEditTitle">맥락 설명 편집</span>
+      <div class="desc-edit-right">
+        <button class="desc-edit-apply" id="descEditApply">적용</button>
+        <button class="desc-edit-close" id="descEditClose">닫기</button>
+      </div>
+    </div>
+    <div class="desc-edit-body">
+      <textarea id="descEditText" placeholder="맥락 설명을 입력해주세요."></textarea>
+    </div>
+  </div>
+
+  <!-- 나가기 확인 모달 -->
+  <div class="modal-overlay" id="leaveModal">
+    <div class="modal-box confirm-box">
+      <p>변경사항이 저장되지 않았습니다.<br>저장하고 나가시겠습니까?</p>
+      <div class="modal-actions" style="gap:8px">
+        <button class="modal-cancel" id="leaveDiscard">저장하지 않고 나가기</button>
+        <button class="modal-confirm" id="leaveSave">저장하고 나가기</button>
+        <button class="modal-cancel" id="leaveCancel">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 행 추가 모달 -->
+  <div class="modal-overlay" id="addRowModal">
+    <div class="modal-box">
+      <h3>새 항목 추가</h3>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;color:var(--ink-soft);margin-bottom:6px;font-weight:500">ID</label>
+        <input class="meta-input" id="addRowId" placeholder="예: ID_20" style="width:100%" />
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;color:var(--ink-soft);margin-bottom:6px;font-weight:500">범주명</label>
+        <input class="meta-input" id="addRowCat" placeholder="범주명을 입력해주세요." style="width:100%" />
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="addRowCancel">취소</button>
+        <button class="modal-confirm" id="addRowConfirm">추가</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 상단 헤더 -->
+  <div class="header-bar">
+    <div class="header-title">1차 델파이 설문지 관리</div>
+    <div class="header-right">
+      <span style="font-size:13px;color:var(--ink-soft);margin-right:6px" id="topEmail"></span>
+      <button class="btn-hdr btn-add-row" id="btnAddRow">＋ 새 항목 추가</button>
+      <button class="btn-save" id="btnSave">변경사항 저장</button>
+      <button class="btn-hdr btn-back" id="btnBack">관리자 메뉴로 가기</button>
+      <button class="btn-logout" id="btnLogout">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main-area">
+    <div class="nav-col" id="navPrevCol">
+      <button class="nav-arrow" id="btnPrev" title="이전">&#10094;</button>
+      <span class="nav-label">이전</span>
+    </div>
+    <div class="cards-container">
+
+      <!-- 범주 / ID -->
+      <div class="meta-card" id="metaCard">
+        <div class="meta-row">
+          <input class="meta-input" id="metaId" readonly style="background:#f0f0f0;color:#666;max-width:100px;font-weight:600" />
+          <span style="min-width:1.5em;flex-shrink:0"></span>
+          <span class="meta-label" style="min-width:48px">범주명</span>
+          <input class="meta-input" id="metaCategory" placeholder="범주명" />
+        </div>
+      </div>
+
+      <!-- 교육활동 -->
+      <div class="indicator-card card-edu">
+        <div class="card-header">
+          <span class="card-header-title">교육활동 평정 지표</span>
+          <div class="element-row">
+            <span class="element-label">요소명</span>
+            <input class="element-input" id="elemEdu" placeholder="교육활동 요소명" />
+          </div>
+          <button class="btn-card-action btn-edit-desc" data-type="edu">맥락 설명 편집</button>
+        </div>
+        <div class="card-body" id="bodyEdu"></div>
+      </div>
+
+      <!-- 하화활동 -->
+      <div class="indicator-card card-hahwa">
+        <div class="card-header">
+          <span class="card-header-title">하화활동 평정 지표</span>
+          <div class="element-row">
+            <span class="element-label">요소명</span>
+            <input class="element-input" id="elemHahwa" placeholder="하화활동 요소명" />
+          </div>
+          <button class="btn-card-action btn-edit-desc" data-type="hahwa">맥락 설명 편집</button>
+        </div>
+        <div class="card-body" id="bodyHahwa"></div>
+      </div>
+
+      <!-- 상구활동 -->
+      <div class="indicator-card card-sanggu">
+        <div class="card-header">
+          <span class="card-header-title">상구활동 평정 지표</span>
+          <div class="element-row">
+            <span class="element-label">요소명</span>
+            <input class="element-input" id="elemSanggu" placeholder="상구활동 요소명" />
+          </div>
+          <button class="btn-card-action btn-edit-desc" data-type="sanggu">맥락 설명 편집</button>
+        </div>
+        <div class="card-body" id="bodySanggu"></div>
+      </div>
+
+    </div>
+    <div class="nav-col" id="navNextCol">
+      <button class="nav-arrow" id="btnNext" title="다음">&#10095;</button>
+      <span class="nav-label">다음</span>
+    </div>
+  </div>
+
+<script>
+  /* ════════════════════ 설정 ════════════════════ */
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbz0YI3MF9lvKRwG7yDIlQmx3I--3zFImt0qK1VOUgTibVW-EH3DzTa4U3CZ-RkFF9D6YQ/exec';
+
+  /* 로그인 이메일 표시 */
+  const adminEmail = sessionStorage.getItem('adminEmail') || '';
+  document.getElementById('topEmail').textContent = adminEmail ? '👤 ' + adminEmail : '';
+
+  let allRows = [];
+  let currentIndex = 0;
+
+  // 각 행의 맥락 설명을 메모리에 보관
+  let descData = {}; // { edu:'...', hahwa:'...', sanggu:'...' }
+
+  /* ── 유틸 ── */
+  async function gasCall(payload) {
+    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+    const t = await res.text();
+    try { return JSON.parse(t); } catch { return { status:'error', message:'GAS 응답 파싱 실패: '+t }; }
+  }
+  function showToast(m, d=2000) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d); }
+  function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('active',v); }
+
+  /* ════════════════════ 데이터 로드 ════════════════════ */
+  async function loadData() {
+    showLoading(true);
+    try {
+      const res = await gasCall({ action:'getData' });
+      if (res.status !== 'ok') throw new Error(res.message);
+      allRows = res.rows || [];
+      if (allRows.length === 0) { showToast('데이터가 없습니다.', 3000); }
+      else { renderPage(); }
+    } catch(e) {
+      showToast('데이터 로드 실패: ' + e.message, 4000);
+    } finally { showLoading(false); }
+  }
+
+  /* ════════════════════ 지표 파싱/조립 ════════════════════ */
+  function parseIndicators(text) {
+    if (!text) return [];
+    return text.split(/(?=\[)/).filter(s => s.trim()).map(s => s.trim());
+  }
+
+  function buildIndicatorText(items) {
+    return items.join(' ');
+  }
+
+  /* ════════════════════ 지표 편집 UI 렌더 ════════════════════ */
+  function renderIndicators(containerId, items, type) {
+    const body = document.getElementById(containerId);
+    body.innerHTML = '';
+
+    items.forEach((text, i) => {
+      const div = document.createElement('div');
+      div.className = 'index-item';
+      div.innerHTML = `
+        <textarea class="index-textarea" data-type="${type}" data-idx="${i}" rows="1">${text.replace(/</g,'&lt;')}</textarea>
+        <div class="index-btns">
+          <button class="btn-idx btn-idx-del" title="삭제" data-type="${type}" data-idx="${i}">×</button>
+        </div>`;
+      body.appendChild(div);
+    });
+
+    // 지표 추가 버튼
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add-index';
+    addBtn.innerHTML = '＋ 지표 추가';
+    addBtn.dataset.type = type;
+    addBtn.addEventListener('click', () => addIndicator(type));
+    body.appendChild(addBtn);
+
+    // 삭제 버튼 이벤트
+    body.querySelectorAll('.btn-idx-del').forEach(btn => {
+      btn.addEventListener('click', () => removeIndicator(btn.dataset.type, parseInt(btn.dataset.idx)));
+    });
+
+    // textarea 자동 높이
+    body.querySelectorAll('.index-textarea').forEach(ta => {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+      ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
+    });
+  }
+
+  function getCurrentIndicators(type) {
+    const body = document.getElementById({ edu:'bodyEdu', hahwa:'bodyHahwa', sanggu:'bodySanggu' }[type]);
+    return Array.from(body.querySelectorAll('.index-textarea')).map(ta => ta.value.trim()).filter(Boolean);
+  }
+
+  function addIndicator(type) {
+    const items = getCurrentIndicators(type);
+    const nextNum = items.length + 1;
+    items.push(`[${nextNum}] `);
+    renderIndicators({ edu:'bodyEdu', hahwa:'bodyHahwa', sanggu:'bodySanggu' }[type], items, type);
+    // 새로 추가된 textarea에 포커스
+    const body = document.getElementById({ edu:'bodyEdu', hahwa:'bodyHahwa', sanggu:'bodySanggu' }[type]);
+    const areas = body.querySelectorAll('.index-textarea');
+    if (areas.length) areas[areas.length - 1].focus();
+  }
+
+  function removeIndicator(type, idx) {
+    const items = getCurrentIndicators(type);
+    items.splice(idx, 1);
+    renderIndicators({ edu:'bodyEdu', hahwa:'bodyHahwa', sanggu:'bodySanggu' }[type], items, type);
+  }
+
+  /* ════════════════════ 페이지 렌더링 ════════════════════ */
+  function renderPage() {
+    if (!allRows.length) return;
+    const row = allRows[currentIndex];
+
+    // 범주/ID
+    document.getElementById('metaId').value = row.ID || '';
+    document.getElementById('metaCategory').value = row.category || '';
+
+    // 요소명
+    document.getElementById('elemEdu').value = row.element_edu_act || '';
+    document.getElementById('elemHahwa').value = row.element_hahwa_act || '';
+    document.getElementById('elemSanggu').value = row.element_sanggu_act || '';
+
+    // 맥락 설명 메모리 보관
+    descData = {
+      edu: row.descrpt_index_edu_act || '',
+      hahwa: row.descrpt_index_hawha_act || '',
+      sanggu: row.descrpt_index_sanggu_act || ''
+    };
+
+    // 지표
+    renderIndicators('bodyEdu', parseIndicators(row.Index_edu_act), 'edu');
+    renderIndicators('bodyHahwa', parseIndicators(row.Index_hahwa_act), 'hahwa');
+    renderIndicators('bodySanggu', parseIndicators(row.Index_sanggu_act), 'sanggu');
+
+    // 네비게이션
+    document.getElementById('navPrevCol').style.visibility = (currentIndex === 0) ? 'hidden' : 'visible';
+    document.getElementById('btnPrev').disabled = (currentIndex === 0);
+    const isLast = currentIndex >= allRows.length - 1;
+    document.getElementById('navNextCol').style.visibility = isLast ? 'hidden' : 'visible';
+    document.getElementById('btnNext').disabled = isLast;
+  }
+
+  /* ════════════════════ 현재 화면 → 데이터 수집 ════════════════════ */
+  function collectCurrentData() {
+    const row = allRows[currentIndex];
+    return {
+      ID: row.ID,
+      category: document.getElementById('metaCategory').value.trim(),
+      element_edu_act: document.getElementById('elemEdu').value.trim(),
+      element_hahwa_act: document.getElementById('elemHahwa').value.trim(),
+      element_sanggu_act: document.getElementById('elemSanggu').value.trim(),
+      Index_edu_act: buildIndicatorText(getCurrentIndicators('edu')),
+      Index_hahwa_act: buildIndicatorText(getCurrentIndicators('hahwa')),
+      Index_sanggu_act: buildIndicatorText(getCurrentIndicators('sanggu')),
+      descrpt_index_edu_act: descData.edu,
+      descrpt_index_hawha_act: descData.hahwa,
+      descrpt_index_sanggu_act: descData.sanggu
+    };
+  }
+
+  /* ════════════════════ 저장 ════════════════════ */
+  document.getElementById('btnSave').addEventListener('click', async () => {
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true; btn.textContent = '저장 중…';
+    try {
+      const data = collectCurrentData();
+      const res = await gasCall({ action:'updateRow', rowData: data });
+      if (res.status !== 'ok') throw new Error(res.message || '저장 실패');
+      // 로컬 데이터도 갱신
+      Object.assign(allRows[currentIndex], data);
+      savedSnapshot = takeSnapshot();
+      showToast('저장되었습니다.');
+    } catch(e) {
+      showToast('저장 오류: ' + e.message, 4000);
+    } finally {
+      btn.disabled = false; btn.textContent = '변경사항 저장';
+    }
+  });
+
+  /* ════════════════════ 맥락 설명 편집 모달 ════════════════════ */
+  const descOverlay = document.getElementById('descOverlay');
+  const descEditModal = document.getElementById('descEditModal');
+  const descEditHeader = document.getElementById('descEditHeader');
+  let descEditType = '';
+
+  function openDescEdit(type) {
+    descEditType = type;
+    const labels = { edu:'교육활동 평정 지표', hahwa:'하화활동 평정 지표', sanggu:'상구활동 평정 지표' };
+    document.getElementById('descEditTitle').textContent = labels[descEditType] + ' — 맥락 설명 편집';
+    document.getElementById('descEditText').value = descData[descEditType] || '';
+    descEditModal.style.cssText = 'top:50%;left:50%;transform:translate(-50%,-50%)';
+    descOverlay.classList.add('active');
+    descEditModal.classList.add('active');
+  }
+  function closeDescEdit() {
+    descOverlay.classList.remove('active');
+    descEditModal.classList.remove('active');
+  }
+
+  document.querySelectorAll('.btn-edit-desc').forEach(btn => {
+    btn.addEventListener('click', () => openDescEdit(btn.dataset.type));
+  });
+  document.getElementById('descEditClose').addEventListener('click', closeDescEdit);
+  descOverlay.addEventListener('click', closeDescEdit);
+  document.getElementById('descEditApply').addEventListener('click', () => {
+    descData[descEditType] = document.getElementById('descEditText').value;
+    closeDescEdit();
+    showToast('맥락 설명이 적용되었습니다. 변경사항 저장을 눌러 반영하세요.', 3000);
+  });
+
+  // 드래그
+  let isDrag=false, dOX=0, dOY=0;
+  descEditHeader.addEventListener('mousedown', e => {
+    if (e.target.closest('.desc-edit-right')) return;
+    isDrag=true; const r=descEditModal.getBoundingClientRect();
+    dOX=e.clientX-r.left; dOY=e.clientY-r.top;
+    descEditModal.style.transform='none'; descEditModal.style.left=r.left+'px'; descEditModal.style.top=r.top+'px';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => { if(!isDrag)return; descEditModal.style.left=(e.clientX-dOX)+'px'; descEditModal.style.top=(e.clientY-dOY)+'px'; });
+  document.addEventListener('mouseup', ()=>{ isDrag=false; });
+  descEditHeader.addEventListener('touchstart', e => {
+    if (e.target.closest('.desc-edit-right')) return;
+    isDrag=true; const t=e.touches[0], r=descEditModal.getBoundingClientRect();
+    dOX=t.clientX-r.left; dOY=t.clientY-r.top;
+    descEditModal.style.transform='none'; descEditModal.style.left=r.left+'px'; descEditModal.style.top=r.top+'px';
+  }, {passive:true});
+  document.addEventListener('touchmove', e => { if(!isDrag)return; const t=e.touches[0]; descEditModal.style.left=(t.clientX-dOX)+'px'; descEditModal.style.top=(t.clientY-dOY)+'px'; }, {passive:true});
+  document.addEventListener('touchend', ()=>{ isDrag=false; });
+
+  /* ════════════════════ 행 추가 ════════════════════ */
+  const addRowModal = document.getElementById('addRowModal');
+  document.getElementById('btnAddRow').addEventListener('click', () => {
+    document.getElementById('addRowId').value = '';
+    document.getElementById('addRowCat').value = '';
+    addRowModal.classList.add('active');
+  });
+  document.getElementById('addRowCancel').addEventListener('click', () => addRowModal.classList.remove('active'));
+  addRowModal.addEventListener('click', e => { if (e.target === addRowModal) addRowModal.classList.remove('active'); });
+
+  document.getElementById('addRowConfirm').addEventListener('click', async () => {
+    const id  = document.getElementById('addRowId').value.trim();
+    const cat = document.getElementById('addRowCat').value.trim();
+    if (!id || !cat) { showToast('ID와 범주명을 모두 입력해주세요.'); return; }
+
+    const btn = document.getElementById('addRowConfirm');
+    btn.disabled = true; btn.textContent = '추가 중…';
+    try {
+      const res = await gasCall({ action:'addRow', rowData:{ ID:id, category:cat } });
+      if (res.status !== 'ok') throw new Error(res.message || '추가 실패');
+      await loadData();
+      currentIndex = allRows.length - 1;
+      renderPage();
+      addRowModal.classList.remove('active');
+      showToast('새 항목이 추가되었습니다.');
+    } catch(e) {
+      showToast('추가 오류: ' + e.message, 4000);
+    } finally {
+      btn.disabled = false; btn.textContent = '추가';
+    }
+  });
+
+  /* ════════════════════ 변경사항 감지 ════════════════════ */
+  let savedSnapshot = '';
+
+  function takeSnapshot() {
+    if (!allRows.length) return '';
+    const d = collectCurrentData();
+    return JSON.stringify(d) + JSON.stringify(descData);
+  }
+
+  function hasChanges() {
+    return allRows.length > 0 && takeSnapshot() !== savedSnapshot;
+  }
+
+  // renderPage 후 스냅샷 갱신
+  const _origRenderPage = renderPage;
+  renderPage = function() {
+    _origRenderPage();
+    savedSnapshot = takeSnapshot();
+  };
+
+  /* ════════════════════ 나가기 확인 모달 ════════════════════ */
+  const leaveModal = document.getElementById('leaveModal');
+  let leaveTarget = ''; // 'back' or 'logout'
+
+  function requestLeave(target) {
+    if (!hasChanges()) {
+      doLeave(target);
+      return;
+    }
+    leaveTarget = target;
+    leaveModal.classList.add('active');
+  }
+
+  function doLeave(target) {
+    leaveModal.classList.remove('active');
+    if (target === 'logout') {
+      sessionStorage.clear();
+      location.href = 'admin_login.html';
+    } else {
+      location.href = 'admin_mng-intro.html';
+    }
+  }
+
+  document.getElementById('leaveCancel').addEventListener('click', () => {
+    leaveModal.classList.remove('active');
+  });
+  document.getElementById('leaveDiscard').addEventListener('click', () => {
+    doLeave(leaveTarget);
+  });
+  document.getElementById('leaveSave').addEventListener('click', async () => {
+    const btn = document.getElementById('leaveSave');
+    btn.disabled = true; btn.textContent = '저장 중…';
+    try {
+      const data = collectCurrentData();
+      const res = await gasCall({ action:'updateRow', rowData: data });
+      if (res.status !== 'ok') throw new Error(res.message || '저장 실패');
+      Object.assign(allRows[currentIndex], data);
+      doLeave(leaveTarget);
+    } catch(e) {
+      showToast('저장 오류: ' + e.message, 4000);
+      leaveModal.classList.remove('active');
+    } finally {
+      btn.disabled = false; btn.textContent = '저장하고 나가기';
+    }
+  });
+
+  /* ════════════════════ 로그아웃 ════════════════════ */
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    requestLeave('logout');
+  });
+
+  /* ════════════════════ 네비게이션 ════════════════════ */
+  function navigate(dir) {
+    const ni = currentIndex + dir;
+    if (ni < 0 || ni >= allRows.length) return;
+    currentIndex = ni;
+    renderPage();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  document.getElementById('btnPrev').addEventListener('click', () => navigate(-1));
+  document.getElementById('btnNext').addEventListener('click', () => navigate(1));
+
+  document.addEventListener('keydown', e => {
+    if (descEditModal.classList.contains('active') || addRowModal.classList.contains('active') || leaveModal.classList.contains('active')) {
+      if (e.key === 'Escape') { closeDescEdit(); addRowModal.classList.remove('active'); leaveModal.classList.remove('active'); }
+      return;
+    }
+    if (e.key === 'ArrowLeft')  navigate(-1);
+    if (e.key === 'ArrowRight') navigate(1);
+  });
+
+  /* ════════════════════ 돌아가기 ════════════════════ */
+  document.getElementById('btnBack').addEventListener('click', () => {
+    requestLeave('back');
+  });
+
+  /* ════════════════════ 시작 ════════════════════ */
+  loadData();
+</script>
+</body>
+</html>

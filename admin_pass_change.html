@@ -159,7 +159,7 @@
   const confirmBtn = document.getElementById('confirmBtn');
   const cancelBtn  = document.getElementById('cancelBtn');
 
-  cancelBtn.addEventListener('click', () => { location.href = 'admin_mng-01.html'; });
+  cancelBtn.addEventListener('click', () => { location.href = 'admin_mng-intro.html'; });
 
   /* ── CSV 파싱 ── */
   function parseCSV(text) {
@@ -225,7 +225,7 @@ if (newPw !== newPwConf) {
 
       // no-cors 는 응답 body를 읽을 수 없으므로 성공으로 간주
       successEl.textContent = '비밀번호가 성공적으로 변경되었습니다. 잠시 후 관리 페이지로 이동합니다.';
-      setTimeout(() => { location.href = 'admin_mng-01.html'; }, 2000);
+      setTimeout(() => { location.href = 'admin_mng-intro.html'; }, 2000);
 
     } catch (err) {
       errorEl.textContent = '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';

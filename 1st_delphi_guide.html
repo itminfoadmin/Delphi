@@ -280,6 +280,12 @@
       <button class="btn btn-back btn-top-back" onclick="history.back()">이전으로 돌아가기</button>
     </div>
     <p class="card-subtitle">설문을 시작하기 전에 아래 안내를 꼼꼼히 확인해주세요.</p>
+
+    <div class="notice-box">
+      <strong>💡 설문 요약</strong><br>
+      각 요소별로 제시된 교육활동·하화활동·상구활동 평정지표를 검토하고, 추가가 필요한 지표가 있으면 [평정 지표 추가하기]로 지표와 사유를 입력합니다. 모든 요소를 검토한 뒤 설문을 완료합니다.
+    </div>
+
     <hr class="divider" />
 
     <!-- 섹션 1: 화면 구성 -->
@@ -292,7 +298,7 @@
       <div class="ui-box">
         <div class="ui-row">
           <span class="ui-label ui-label-gray">상단 헤더</span>
-          <span class="ui-desc">현재 페이지의 <strong>ID</strong>, <strong>범주명</strong>, <strong>요소명</strong>, 그리고 <strong>전체 진행 상황</strong>(예: 전체 19개 요소중 3번째 요소 진행중...)이 표시됩니다.</span>
+          <span class="ui-desc">현재 페이지의 <strong>ID</strong>, <strong>범주명</strong>, <strong>글자 크기 조절 버튼</strong>, <strong>나가기 버튼</strong>이 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-blue">교육활동 카드</span>
@@ -305,6 +311,10 @@
         <div class="ui-row">
           <span class="ui-label ui-label-purple">상구활동 카드</span>
           <span class="ui-desc">상구활동 평정지표가 보라색 카드에 표시됩니다.</span>
+        </div>
+        <div class="ui-row">
+          <span class="ui-label ui-label-gray">진행 상태</span>
+          <span class="ui-desc">상구활동 카드 아래 중앙에 현재 진행 상태(예: 1/19)가 표시됩니다.</span>
         </div>
       </div>
 
@@ -321,8 +331,7 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">2</span>지표 확인하기</h2>
       <div class="body-text">
-        <p>각 카드에는 선행연구에서 탐색된 <strong>평정지표</strong>가 표시됩니다. 하나의 페이지에 교육활동, 하화활동, 상구활동의 지표가 요소별로 함께 제시됩니다.</p>
-        <p>카드 헤더에는 <strong>활동 유형명</strong>과 현재 <strong>요소명</strong>이 표시되어, 어떤 범주와 요소에 해당하는 지표를 보고 있는지 확인할 수 있습니다.</p>
+        <p>각 카드에는 선행연구에서 탐색된 <strong>평정지표</strong>가 표시됩니다. 하나의 페이지에 교육활동, 하화활동, 상구활동의 평정 지표가 요소별로 함께 제시됩니다. 카드 헤더에는 <strong>활동 유형명</strong>과 <strong>(평정 요소)</strong> 표시와 함께 현재 <strong>요소명</strong>이 표시되어, 어떤 범주와 요소에 해당하는 지표를 보고 있는지 확인할 수 있습니다.</p>
       </div>
     </div>
 
@@ -332,8 +341,7 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">3</span>지표의 맥락 보기</h2>
       <div class="body-text">
-        <p>각 카드 헤더에 있는 <strong>[지표의 맥락 보기]</strong> 버튼을 클릭하면, 해당 지표에 대한 상세 설명이 별도의 모달 창으로 표시됩니다.</p>
-        <p>이 모달은 <strong>마우스로 드래그하여 위치를 이동</strong>할 수 있어, 지표 내용과 설명을 동시에 확인할 수 있습니다. 모달 우측 상단의 <strong>[닫기]</strong> 버튼을 클릭하면 닫힙니다.</p>
+        <p>각 카드 헤더에 있는 <strong>[☞ 지표의 맥락 보기]</strong> 버튼을 클릭하면, 해당 지표에 대한 상세 설명이 별도의 모달 창으로 표시됩니다. 이 모달은 <strong>마우스로 드래그하여 위치를 이동</strong>할 수 있어, 지표 내용과 설명을 동시에 확인할 수 있습니다. 모달 상단에는 <strong>글자 크기 조절 버튼(−/+)</strong>이 있어 내용을 확대·축소하여 볼 수 있습니다. 모달 우측 상단의 <strong>[닫기]</strong> 버튼을 클릭하면 닫힙니다.</p>
       </div>
     </div>
 
@@ -343,11 +351,11 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">4</span>평정 지표 추가하기</h2>
       <div class="body-text">
-        <p>각 카드 헤더의 <strong>[평정 지표 추가하기]</strong> 버튼을 클릭하면 추가 지표 입력 창이 열립니다.</p>
+        <p>각 카드 헤더의 <strong>[＋ 평정 지표 추가하기]</strong> 버튼을 클릭하면 추가 지표 입력 창이 열립니다.</p>
       </div>
 
       <div class="step-list">
-        <div class="step-item">카드 헤더에서 <strong>[평정 지표 추가하기]</strong> 버튼을 클릭합니다.</div>
+        <div class="step-item">카드 헤더에서 <strong>[＋ 평정 지표 추가하기]</strong> 버튼을 클릭합니다.</div>
         <div class="step-item">모달 창에 <strong>추가 지표</strong>(지표명)를 입력합니다.</div>
         <div class="step-item"><strong>지표 설명(사유)</strong>에 해당 지표를 추가하는 이유를 입력합니다.</div>
         <div class="step-item"><strong>[추가]</strong> 버튼을 클릭하면 즉시 저장되고, 해당 카드의 지표 목록 하단에 표시됩니다.</div>
@@ -379,29 +387,27 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">5</span>페이지 이동</h2>
       <div class="body-text">
-        <p>화면 좌우의 <strong>이전(◁)</strong>, <strong>다음(▷)</strong> 화살표를 클릭하거나 키보드의 <strong>← →</strong> 방향키를 사용하여 요소별 페이지를 이동합니다.</p>
-        <p>첫 번째 페이지에서는 이전 버튼이, 마지막 페이지 이후의 설문 완료 화면에서는 다음 버튼이 숨겨집니다.</p>
+        <p>화면 좌우의 <strong>이전(◁)</strong>, <strong>다음(▷)</strong> 화살표를 클릭하거나 키보드의 <strong>← →</strong> 방향키를 사용하여 요소별 페이지를 이동합니다. 첫 번째 페이지에서는 이전 버튼이, 마지막 페이지 이후의 설문 완료 화면에서는 다음 버튼이 숨겨집니다.</p>
       </div>
     </div>
 
     <hr class="divider" />
 
-    <!-- 섹션 6: 저장 및 설문 종료 -->
+    <!-- 섹션 6: 글자 크기 조절 -->
     <div class="section">
-      <h2 class="section-title"><span class="section-num">6</span>저장 및 설문 종료</h2>
+      <h2 class="section-title"><span class="section-num">6</span>글자 크기 조절</h2>
       <div class="body-text">
-        <p>화면 우측 상단에는 <strong>[저장]</strong> 버튼과 <strong>[설문 종료]</strong> 버튼이 있습니다.</p>
+        <p>상단 헤더의 <strong>[−A]</strong>, <strong>[A+]</strong> 버튼으로 카드 영역 전체의 글자 크기를 70%~140% 범위에서 조절할 수 있습니다. 현재 배율은 버튼 사이에 표시됩니다. 또한 <strong>[☞ 지표의 맥락 보기]</strong> 모달에서도 별도의 글자 크기 조절 버튼이 제공됩니다.</p>
       </div>
+    </div>
 
-      <div class="ui-box">
-        <div class="ui-row">
-          <span class="ui-label ui-label-blue">저장</span>
-          <span class="ui-desc">현재까지의 추가/수정/삭제 내용을 동기화합니다. 변경 사항이 없으면 안내 메시지가 표시됩니다.</span>
-        </div>
-        <div class="ui-row">
-          <span class="ui-label ui-label-gray">설문 종료</span>
-          <span class="ui-desc">설문을 중간에 종료할 때 사용합니다. 완료되지 않은 설문은 이후에 다시 진행할 수 있습니다.</span>
-        </div>
+    <hr class="divider" />
+
+    <!-- 섹션 7: 나가기 -->
+    <div class="section">
+      <h2 class="section-title"><span class="section-num">7</span>나가기</h2>
+      <div class="body-text">
+        <p>화면 우측 상단에는 <strong>[나가기]</strong> 버튼이 있습니다. <strong>[나가기]</strong> 버튼은 전체 설문을 완료하지 못한 상태에서 중간에 종료할 때 사용합니다. 완료되지 않은 설문은 이후에 다시 진행할 수 있습니다.</p>
       </div>
     </div>
 
@@ -409,21 +415,15 @@
 
     <!-- 섹션 7: 설문 완료 -->
     <div class="section">
-      <h2 class="section-title"><span class="section-num">7</span>설문 완료</h2>
+      <h2 class="section-title"><span class="section-num">8</span>설문 완료</h2>
       <div class="body-text">
-        <p>마지막 요소 페이지에서 <strong>다음(▷)</strong> 버튼을 클릭하면 <strong>설문 완료 화면</strong>이 나타납니다.</p>
-        <p><strong>[설문 완료]</strong> 버튼을 클릭하면 1차 델파이 설문이 완료 처리되며, 설문 선택 화면으로 돌아갑니다. 완료 후에는 해당 설문에 다시 참여할 수 없으므로, 모든 요소를 확인한 후 완료해주세요.</p>
+        <p>마지막 요소 페이지에서 <strong>다음(▷)</strong> 버튼을 클릭하면 <strong>설문 완료 화면</strong>이 나타납니다. <strong>[설문 완료]</strong> 버튼을 클릭하면 1차 델파이 설문이 완료 처리되며, 설문 선택 화면으로 돌아갑니다. 완료 후에는 해당 설문에 다시 참여할 수 없으므로, 모든 요소를 확인한 후 완료해주세요.</p>
       </div>
     </div>
 
     <div class="warning-box">
       <strong>⚠ 주의사항</strong><br>
       설문 중 페이지를 이탈(브라우저 닫기, 새로고침 등)하더라도 이미 추가한 지표는 서버에 저장되어 있으므로 유실되지 않습니다. 단, 추가 모달에서 입력 중인 내용은 저장되지 않으니 반드시 [추가] 버튼을 눌러 저장해주세요.
-    </div>
-
-    <div class="notice-box">
-      <strong>💡 설문 요약</strong><br>
-      각 요소별로 제시된 교육활동·하화활동·상구활동 평정지표를 검토하고, 추가가 필요한 지표가 있으면 [평정 지표 추가하기]로 지표와 사유를 입력합니다. 모든 요소를 검토한 뒤 설문을 완료합니다.
     </div>
 
     <div class="btn-row">

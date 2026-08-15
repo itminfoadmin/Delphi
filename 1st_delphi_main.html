@@ -17,16 +17,23 @@
     .header-element{font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:600;color:var(--accent);white-space:nowrap}
     .header-progress{font-size:16px;font-weight:600;color:var(--ink-soft);white-space:nowrap;flex:1;min-width:0}
     .header-right{display:flex;align-items:center;gap:10px;margin-left:auto}
-    .font-ctrl{display:flex;gap:4px}
-    .btn-font{width:36px;height:30px;font-size:13px;font-weight:700;background:#fff;color:var(--ink-mid);border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
-    .btn-font:hover{background:var(--accent-lt);border-color:var(--accent);color:var(--accent)}
+    .font-ctrl{display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid var(--divider);border-radius:6px;overflow:hidden}
+    .btn-font{height:32px;padding:0 10px;font-weight:700;background:#fff;color:var(--ink-mid);border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:2px;position:relative}
+    .btn-font:hover{background:var(--accent-lt);color:var(--accent)}
+    .btn-font:active{background:var(--accent);color:#fff}
+    .btn-font:disabled{opacity:.35;cursor:default;background:#fff;color:var(--ink-mid)}
+    .btn-font-letter{line-height:1}
+    .btn-font-down .btn-font-letter{font-size:12px}
+    .btn-font-up .btn-font-letter{font-size:17px}
+    .btn-font-icon{font-size:13px;font-weight:400;margin-top:-1px}
+    .font-scale-label{font-size:11px;font-weight:600;color:var(--ink-soft);min-width:36px;text-align:center;padding:0 2px;border-left:1px solid var(--divider);border-right:1px solid var(--divider);height:32px;display:flex;align-items:center;justify-content:center;background:#fafbfc;user-select:none}
     .panel-label{font-size:14px;color:var(--ink-soft);white-space:nowrap}
     .btn-hdr{padding:10px 22px;font-size:14px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
     .btn-save{background:var(--accent);color:#fff}
     .btn-save:hover{background:#3a5c8f}
     .btn-save:disabled{opacity:.5;cursor:default}
-    .btn-end{background:#fff;color:var(--ink);border:1.5px solid var(--divider) !important}
-    .btn-end:hover{background:#eee}
+    .btn-end{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
+    .btn-end:hover{background:#d5d5d5}
 
     /* ── 메인 ── */
     .main-area{width:100%;max-width:1246px;display:flex;align-items:center;gap:0}
@@ -36,6 +43,7 @@
     .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
     .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
     .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+    .progress-bar-bottom{font-size:13px;color:var(--ink-soft);font-weight:500;text-align:center;padding:4px 2px 0}
 
     /* ── 카드 ── */
     .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
@@ -46,10 +54,22 @@
     .card-sanggu{border-top:3px solid #8b6fb0}
     .card-sanggu .card-header{background:#f0eaf7}
     .card-header{display:flex;align-items:center;padding:9px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);gap:12px}
-    .card-header-title{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
-    .card-header-element{font-size:15px;font-weight:600;color:var(--accent);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .btn-desc{font-size:12px;font-weight:600;color:#fff;background:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
-    .btn-desc:hover{background:#3a5c8f;border-color:#3a5c8f}
+    .card-header-title{font-size:17px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
+    .card-header-element{font-size:15px;font-weight:600;color:var(--accent);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .btn-desc{font-size:12px;font-weight:600;border-radius:4px;padding:4px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+    .card-edu .btn-desc:not(.btn-add){background:#fff;color:#4a6fa5;border:1.5px solid #4a6fa5}
+    .card-edu .btn-desc:not(.btn-add):hover{background:#4a6fa5;color:#fff}
+    .card-hahwa .btn-desc:not(.btn-add){background:#fff;color:#5a9a6e;border:1.5px solid #5a9a6e}
+    .card-hahwa .btn-desc:not(.btn-add):hover{background:#5a9a6e;color:#fff}
+    .card-sanggu .btn-desc:not(.btn-add){background:#fff;color:#8b6fb0;border:1.5px solid #8b6fb0}
+    .card-sanggu .btn-desc:not(.btn-add):hover{background:#8b6fb0;color:#fff}
+    .card-edu .btn-add{background:#7a9dc8;color:#fff;border:1px solid #7a9dc8}
+    .card-edu .btn-add:hover{background:#4a6fa5;border-color:#4a6fa5}
+    .card-hahwa .btn-add{background:#82bb92;color:#fff;border:1px solid #82bb92}
+    .card-hahwa .btn-add:hover{background:#5a9a6e;border-color:#5a9a6e}
+    .card-sanggu .btn-add{background:#ab96cb;color:#fff;border:1px solid #ab96cb}
+    .card-sanggu .btn-add:hover{background:#8b6fb0;border-color:#8b6fb0}
+    .btn-add{margin-left:auto;font-weight:700;font-size:13px;padding:5px 18px;border-radius:4px}
     .card-body{padding:20px 22px}
 
     /* 지표 내어쓰기 */
@@ -75,9 +95,16 @@
     .desc-overlay.active{display:block}
     .desc-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:902px;max-width:96vw;max-height:80vh;background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.22);z-index:1001;display:none;flex-direction:column;overflow:hidden}
     .desc-modal.active{display:flex}
-    .desc-modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none}
+    .desc-modal-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none}
     .desc-modal-header:active{cursor:grabbing}
-    .desc-modal-title{font-size:15px;font-weight:600;color:var(--ink)}
+    .desc-modal-title{font-size:15px;font-weight:600;color:var(--ink);flex:1;min-width:0}
+    .desc-modal-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .desc-font-ctrl{display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid var(--divider);border-radius:5px;overflow:hidden}
+    .desc-font-btn{width:30px;height:26px;font-size:15px;font-weight:700;background:#fff;color:var(--ink-mid);border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+    .desc-font-btn:hover{background:var(--accent-lt);color:var(--accent)}
+    .desc-font-btn:active{background:var(--accent);color:#fff}
+    .desc-font-btn:disabled{opacity:.3;cursor:default;background:#fff;color:var(--ink-mid)}
+    .desc-font-label{font-size:10px;font-weight:600;color:var(--ink-soft);min-width:32px;text-align:center;border-left:1px solid var(--divider);border-right:1px solid var(--divider);height:26px;display:flex;align-items:center;justify-content:center;background:#fafbfc;user-select:none}
     .desc-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
     .desc-modal-close:hover{background:#eee}
     .desc-modal-body{padding:28px 32px;overflow-y:auto;font-size:14.5px;color:var(--ink-mid);line-height:2.0;word-break:keep-all;text-align:justify}
@@ -108,11 +135,20 @@
     .del-confirm{background:#d9534f;border:none;color:#fff}
 
     /* ── 로딩 ── */
-    .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
     .loading-overlay.active{display:flex}
-    .spinner{width:36px;height:36px;border:4px solid #ddd;border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .loading-text{font-size:14px;color:var(--ink-soft)}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;background:var(--accent);animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
     .completion-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;text-align:center;padding:60px 40px}
     .completion-text{font-size:18px;color:var(--ink-mid);line-height:2.0;margin-bottom:36px;word-break:keep-all}
     .btn-completion{padding:16px 48px;font-size:16px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;transition:background .2s;box-shadow:0 2px 12px rgba(74,111,165,.3)}
@@ -124,7 +160,11 @@
 </head>
 <body>
 
-  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span class="loading-text">설문 데이터를 불러오는 중...</span></div>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 데이터를 불러오는 중...</span>
+  </div>
 
   <!-- 데이터 로드 실패 모달 -->
   <div class="modal-overlay" id="retryModal">
@@ -141,7 +181,14 @@
   <div class="desc-modal" id="descModal">
     <div class="desc-modal-header" id="descModalHeader">
       <span class="desc-modal-title" id="descModalTitle">지표 설명</span>
-      <button class="desc-modal-close" id="descModalClose">닫기</button>
+      <div class="desc-modal-right">
+        <div class="desc-font-ctrl">
+          <button class="desc-font-btn" id="descFontDown" title="글자 축소">−</button>
+          <span class="desc-font-label" id="descFontLabel">100%</span>
+          <button class="desc-font-btn" id="descFontUp" title="글자 확대">+</button>
+        </div>
+        <button class="desc-modal-close" id="descModalClose">닫기</button>
+      </div>
     </div>
     <div class="desc-modal-body" id="descModalBody"></div>
   </div>
@@ -213,15 +260,16 @@
   <div class="header-bar">
     <div class="id-badge" id="idBadge">ID</div>
     <div class="header-title" id="headerTitle">불러오는 중...</div>
-    <span class="header-element" id="headerElement"></span>
-    <span class="header-progress" id="headerProgress"></span>
+    <span class="header-element" id="headerElement" style="display:none"></span>
+    <span class="header-progress" id="headerProgress" style="display:none"></span>
     <div class="header-right">
       <span class="panel-label" id="panelLabel">패널 : </span>
       <div class="font-ctrl">
-        <button class="btn-font" id="btnFontDown" title="글자 축소">A -</button>
-        <button class="btn-font" id="btnFontUp" title="글자 확대">A +</button>
+        <button class="btn-font btn-font-down" id="btnFontDown" title="글자 축소"><span class="btn-font-icon">−</span><span class="btn-font-letter">A</span></button>
+        <span class="font-scale-label" id="fontScaleLabel">100%</span>
+        <button class="btn-font btn-font-up" id="btnFontUp" title="글자 확대"><span class="btn-font-letter">A</span><span class="btn-font-icon">+</span></button>
       </div>
-      <button class="btn-hdr btn-end" id="btnEnd">설문 종료</button>
+      <button class="btn-hdr btn-end" id="btnEnd">나가기</button>
     </div>
   </div>
 
@@ -235,33 +283,35 @@
       <!-- 교육활동 -->
       <div class="indicator-card card-edu">
         <div class="card-header">
-          <span class="card-header-title">교육활동 평정지표</span>
+          <span class="card-header-title">교육활동 평정 지표</span>
           <span class="card-header-element" id="labelEduElement"></span>
-          <button class="btn-desc" id="btnDescEdu">지표의 맥락 보기</button>
-          <button class="btn-desc btn-add" data-type="edu">평정 지표 추가하기</button>
+          <button class="btn-desc" id="btnDescEdu">☞ &nbsp 지표의 맥락 보기</button>
+          <button class="btn-desc btn-add" data-type="edu">＋ 평정 지표 추가하기</button>
         </div>
         <div class="card-body" id="bodyEdu"></div>
       </div>
       <!-- 하화활동 -->
       <div class="indicator-card card-hahwa">
         <div class="card-header">
-          <span class="card-header-title">하화활동 평정지표</span>
+          <span class="card-header-title">하화활동 평정 지표</span>
           <span class="card-header-element" id="labelHahwaElement"></span>
-          <button class="btn-desc" id="btnDescHahwa">지표의 맥락 보기</button>
-          <button class="btn-desc btn-add" data-type="hahwa">평정 지표 추가하기</button>
+          <button class="btn-desc" id="btnDescHahwa">☞ &nbsp 지표의 맥락 보기</button>
+          <button class="btn-desc btn-add" data-type="hahwa">＋ 평정 지표 추가하기</button>
         </div>
         <div class="card-body" id="bodyHahwa"></div>
       </div>
       <!-- 상구활동 -->
       <div class="indicator-card card-sanggu">
         <div class="card-header">
-          <span class="card-header-title">상구활동 평정지표</span>
+          <span class="card-header-title">상구활동 평정 지표</span>
           <span class="card-header-element" id="labelSangguElement"></span>
-          <button class="btn-desc" id="btnDescSanggu">지표의 맥락 보기</button>
-          <button class="btn-desc btn-add" data-type="sanggu">평정 지표 추가하기</button>
+          <button class="btn-desc" id="btnDescSanggu">☞ &nbsp 지표의 맥락 보기</button>
+          <button class="btn-desc btn-add" data-type="sanggu">＋ 평정 지표 추가하기</button>
         </div>
         <div class="card-body" id="bodySanggu"></div>
       </div>
+      <!-- 진행 상태 -->
+      <div class="progress-bar-bottom" id="progressBottom"></div>
       <!-- 설문 완료 페이지 -->
       <div class="completion-page" id="completionPage" style="display:none">
         <p class="completion-text">교육활동 평정 지표에 대한 1차 델파이 설문의 마지막 페이지입니다.</p>
@@ -350,7 +400,8 @@
     return parts.map(part => {
       const bp = part.indexOf('] ');
       if (bp !== -1) {
-        return `<span class="index-line" style="--hang:${bp+1}ch">${esc(part.trim())}</span>`;
+        const hang = (bp + 1) * 0.5;
+        return `<span class="index-line" style="--hang:${hang}ch">${esc(part.trim())}</span>`;
       }
       return `<span class="index-line">${esc(part.trim())}</span>`;
     }).join('');
@@ -368,7 +419,7 @@
     document.getElementById('headerElement').textContent = row.element_edu_act || '';
 
     // 교육
-    document.getElementById('labelEduElement').textContent = row.element_edu_act ? '- '+row.element_edu_act : '';
+    document.getElementById('labelEduElement').textContent = row.element_edu_act ? '(평정 요소) '+row.element_edu_act : '';
     document.getElementById('bodyEdu').innerHTML = fmtIdx(row.Index_edu_act);
     const catName = row.category || '';
     document.getElementById('btnDescEdu').dataset.desc  = row.descrpt_index_edu_act || '설명 없음';
@@ -376,14 +427,14 @@
       (catName ? catName : '') + (row.element_edu_act ? ' - '+row.element_edu_act : '') + '에 대한 교육활동 평정지표 설명';
 
     // 하화
-    document.getElementById('labelHahwaElement').textContent = row.element_hahwa_act ? '- '+row.element_hahwa_act : '';
+    document.getElementById('labelHahwaElement').textContent = row.element_hahwa_act ? '(평정 요소) '+row.element_hahwa_act : '';
     document.getElementById('bodyHahwa').innerHTML = fmtIdx(row.Index_hahwa_act);
     document.getElementById('btnDescHahwa').dataset.desc  = row.descrpt_index_hawha_act || '설명 없음';
     document.getElementById('btnDescHahwa').dataset.title =
       (catName ? catName : '') + (row.element_hahwa_act ? ' - '+row.element_hahwa_act : '') + '에 대한 하화활동 평정지표 설명';
 
     // 상구
-    document.getElementById('labelSangguElement').textContent = row.element_sanggu_act ? '- '+row.element_sanggu_act : '';
+    document.getElementById('labelSangguElement').textContent = row.element_sanggu_act ? '(평정 요소) '+row.element_sanggu_act : '';
     document.getElementById('bodySanggu').innerHTML = fmtIdx(row.Index_sanggu_act);
     document.getElementById('btnDescSanggu').dataset.desc  = row.descrpt_index_sanggu_act || '설명 없음';
     document.getElementById('btnDescSanggu').dataset.title =
@@ -393,10 +444,10 @@
 
     // 진행 상태 표시
     const total = allRows.length;
-    const padTotal = String(total).padStart(2, '0');
     const current = currentIndex + 1;
     document.getElementById('headerProgress').textContent =
-      `전체 ${padTotal}개 요소중 ${current}번째 요소 진행중...`;
+      `전체 ${String(total).padStart(2,'0')}개 요소중 ${current}번째 요소 진행중...`;
+    document.getElementById('progressBottom').textContent = `${current}/${total}`;
 
     // 네비게이션 표시/숨김
     document.getElementById('navPrevCol').style.visibility = (currentIndex === 0) ? 'hidden' : 'visible';
@@ -407,12 +458,14 @@
     // 설문/완료 페이지 표시
     document.getElementById('completionPage').style.display = 'none';
     document.querySelectorAll('.indicator-card').forEach(c => c.style.display = '');
+    document.getElementById('progressBottom').style.display = '';
   }
 
   /* 완료 페이지 표시 */
   function showCompletionPage() {
     document.querySelectorAll('.indicator-card').forEach(c => c.style.display = 'none');
     document.getElementById('completionPage').style.display = 'flex';
+    document.getElementById('progressBottom').style.display = 'none';
     document.getElementById('navNextCol').style.visibility = 'hidden';
     document.getElementById('navPrevCol').style.visibility = 'visible';
     document.getElementById('btnPrev').disabled = false;
@@ -486,7 +539,7 @@
   }
   function closeDescModal() { descOverlay.classList.remove('active'); descModal.classList.remove('active'); }
 
-  document.querySelectorAll('.btn-desc').forEach(btn => {
+  document.querySelectorAll('.btn-desc:not(.btn-add)').forEach(btn => {
     btn.addEventListener('click', () => openDescModal(btn.dataset.title, btn.dataset.desc));
   });
   document.getElementById('descModalClose').addEventListener('click', closeDescModal);
@@ -495,6 +548,7 @@
   // 드래그
   let isDrag=false, dOX=0, dOY=0;
   descHeader.addEventListener('mousedown', e => {
+    if (e.target.closest('.desc-modal-right')) return;
     isDrag=true; const r=descModal.getBoundingClientRect();
     dOX=e.clientX-r.left; dOY=e.clientY-r.top;
     descModal.style.transform='none'; descModal.style.left=r.left+'px'; descModal.style.top=r.top+'px';
@@ -503,6 +557,7 @@
   document.addEventListener('mousemove', e => { if(!isDrag)return; descModal.style.left=(e.clientX-dOX)+'px'; descModal.style.top=(e.clientY-dOY)+'px'; });
   document.addEventListener('mouseup', ()=>{ isDrag=false; });
   descHeader.addEventListener('touchstart', e => {
+    if (e.target.closest('.desc-modal-right')) return;
     isDrag=true; const t=e.touches[0], r=descModal.getBoundingClientRect();
     dOX=t.clientX-r.left; dOY=t.clientY-r.top;
     descModal.style.transform='none'; descModal.style.left=r.left+'px'; descModal.style.top=r.top+'px';
@@ -727,19 +782,58 @@
     if (e.key==='ArrowRight') navigate(1);
   });
 
-  /* ════════════════════ 글자 크기 조절 ════════════════════ */
+  /* ════════════════════ 글자 크기 조절 (메인) ════════════════════ */
   let fontScale = 100;
   const FONT_MIN = 70, FONT_MAX = 140, FONT_STEP = 10;
 
-  document.getElementById('btnFontUp').addEventListener('click', () => {
+  function applyFontScale() {
+    const container = document.querySelector('.cards-container');
+    const ratio = fontScale / 100;
+    container.style.zoom = ratio;
+    container.style.webkitTextSizeAdjust = fontScale + '%';
+    document.getElementById('fontScaleLabel').textContent = fontScale + '%';
+    document.getElementById('btnFontDown').disabled = (fontScale <= FONT_MIN);
+    document.getElementById('btnFontUp').disabled = (fontScale >= FONT_MAX);
+  }
+
+  document.getElementById('btnFontUp').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
     if (fontScale >= FONT_MAX) return;
     fontScale += FONT_STEP;
-    document.querySelector('.cards-container').style.fontSize = fontScale + '%';
+    applyFontScale();
   });
-  document.getElementById('btnFontDown').addEventListener('click', () => {
+  document.getElementById('btnFontDown').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
     if (fontScale <= FONT_MIN) return;
     fontScale -= FONT_STEP;
-    document.querySelector('.cards-container').style.fontSize = fontScale + '%';
+    applyFontScale();
+  });
+
+  /* ════════════════════ 글자 크기 조절 (모달) ════════════════════ */
+  let descFontScale = 100;
+  const DESC_FONT_MIN = 70, DESC_FONT_MAX = 160;
+
+  function applyDescFontScale() {
+    const body = document.getElementById('descModalBody');
+    const ratio = descFontScale / 100;
+    body.style.zoom = ratio;
+    body.style.webkitTextSizeAdjust = descFontScale + '%';
+    document.getElementById('descFontLabel').textContent = descFontScale + '%';
+    document.getElementById('descFontDown').disabled = (descFontScale <= DESC_FONT_MIN);
+    document.getElementById('descFontUp').disabled = (descFontScale >= DESC_FONT_MAX);
+  }
+
+  document.getElementById('descFontUp').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (descFontScale >= DESC_FONT_MAX) return;
+    descFontScale += FONT_STEP;
+    applyDescFontScale();
+  });
+  document.getElementById('descFontDown').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (descFontScale <= DESC_FONT_MIN) return;
+    descFontScale -= FONT_STEP;
+    applyDescFontScale();
   });
 
   loadData();

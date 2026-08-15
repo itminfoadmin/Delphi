@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 메뉴</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif;background:#f0f0f0;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px}
+    .card{background:#fff;border-radius:6px;width:520px;max-width:96vw;padding:48px 48px 40px;box-shadow:0 4px 24px rgba(0,0,0,.10);text-align:center;position:relative}
+    .btn-logout{position:absolute;top:16px;right:16px;font-size:13px;font-weight:500;color:#666;background:#fff;border:1px solid #ccc;border-radius:4px;padding:6px 16px;cursor:pointer;transition:all .2s}
+    .btn-logout:hover{background:#f5f5f5;border-color:#999;color:#333}
+    .card-title{font-size:20px;font-weight:700;color:#1e1e1e;margin-bottom:8px}
+    .card-sub{font-size:13px;color:#999;margin-bottom:36px}
+    .menu-list{display:flex;flex-direction:column;gap:14px}
+    .menu-btn{display:block;width:100%;padding:18px 24px;font-size:15px;font-weight:600;color:#333;background:#fafafa;border:1.5px solid #ddd;border-radius:6px;cursor:pointer;transition:all .2s;text-decoration:none;text-align:left;position:relative}
+    .menu-btn:hover{background:#f0f4ff;border-color:#4a6fa5;color:#4a6fa5}
+    .menu-btn .menu-arrow{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:18px;color:#ccc;transition:color .2s}
+    .menu-btn:hover .menu-arrow{color:#4a6fa5}
+    .menu-btn.menu-status{background:#eaeaea;border-color:#ccc}
+    .menu-btn.menu-status:hover{background:#e0e4ee;border-color:#4a6fa5;color:#4a6fa5}
+    .menu-label{font-size:12px;color:#999;font-weight:400;display:block;margin-top:4px}
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <button class="btn-logout" onclick="sessionStorage.clear();location.href='admin_login.html'">로그아웃</button>
+  <h1 class="card-title">관리자 메뉴</h1>
+  <p class="card-sub">관리할 항목을 선택해주세요.</p>
+
+  <div class="menu-list">
+    <a class="menu-btn menu-status" href="admin_mng-delphi_status.html">
+      델파이 설문 현황
+      <span class="menu-label">패널 현황 및 설문 진행 상태 관리</span>
+      <span class="menu-arrow">›</span>
+    </a>
+
+    <a class="menu-btn" href="admin_mng-1st_delphi.html">
+      첫번째 델파이 설문지 관리
+      <span class="menu-label">첫번째 델파이 설문을 위한 설문 관리 페이지</span>
+      <span class="menu-arrow">›</span>
+    </a>
+
+    <a class="menu-btn" href="admin_mng-2nd_delphi.html">
+      두번째 델파이 설문지 관리
+      <span class="menu-label">두번째 델파이 설문을 위한 설문 관리 페이지</span>
+      <span class="menu-arrow">›</span>
+    </a>
+
+    <a class="menu-btn" href="admin_mng-2nd_delphi.html">
+      세번째 델파이 설문지 관리
+      <span class="menu-label">세번째 델파이 설문을 위한 설문 관리 페이지</span>
+      <span class="menu-arrow">›</span>
+    </a>
+
+    <a class="menu-btn" href="admin_mng-2nd_delphi.html">
+      네번째 델파이 설문지 관리
+      <span class="menu-label">네번째 델파이 설문을 위한 설문 관리 페이지</span>
+      <span class="menu-arrow">›</span>
+    </a>
+
+    <a class="menu-btn" href="admin_mng-2nd_delphi.html">
+      다섯번째 델파이(가중치 설정) 설문지 관리
+      <span class="menu-label">다섯번째 델파이(가중치 설정) 설문을 위한 설문 관리 페이지</span>
+      <span class="menu-arrow">›</span>
+    </a>
+
+  </div>
+</div>
+
+</body>
+</html>
