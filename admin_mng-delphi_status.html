@@ -71,18 +71,47 @@
       background: var(--accent-lt); color: var(--ink); min-width: 70px;
     }
 
-    .btn-save-all { background: var(--accent); color: #fff; }
+    .btn-save-all { background: var(--accent); color: #fff; text-align: center; }
     .btn-save-all:hover { background: #3a5c8f; }
     .btn-save-all:disabled { opacity: .5; cursor: default; }
 
-    .hdr-select {
-      height: 34px; padding: 0 4px; font-size: 12px; font-weight: 700;
-      border: 1px solid var(--divider); border-radius: 4px;
-      background: var(--card-bg); cursor: pointer; outline: none; width: 100%;
+    /* ── 세그먼트 컨트롤 (헤더) ── */
+    .seg-ctrl {
+      display: flex; flex-direction: column; border: 1px solid var(--divider);
+      border-radius: 4px; overflow: hidden; width: 100%;
     }
-    .hdr-select.waiting    { color: var(--accent); }
-    .hdr-select.proceeding { color: var(--green); }
-    .hdr-select.complete   { color: var(--ink); }
+    .seg-ctrl .seg-label {
+      font-size: 11px; font-weight: 600; color: var(--ink-soft);
+      padding: 4px 0; text-align: center;
+      background: var(--accent-lt); border-bottom: 1px solid var(--divider);
+    }
+    .seg-ctrl .seg-btns { display: flex; }
+    .seg-ctrl .seg-btn {
+      flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 600;
+      cursor: pointer; border: none; background: var(--card-bg);
+      color: var(--ink-soft); transition: all .15s;
+    }
+    .seg-ctrl .seg-btn:not(:last-child) { border-right: 1px solid var(--divider); }
+    .seg-ctrl .seg-btn:hover { background: #f0f2f6; }
+    .seg-ctrl .seg-btn.active-wait { background: #dce6f3; color: var(--accent); }
+    .seg-ctrl .seg-btn.active-proc { background: #ddeee3; color: var(--green); }
+    .seg-ctrl .seg-btn.active-done { background: #e2e2ea; color: var(--ink); }
+
+    /* ── 세그먼트 컨트롤 (모달) ── */
+    .seg-ctrl-modal {
+      display: inline-flex; border: 1px solid var(--divider); border-radius: 4px;
+      overflow: hidden; width: 100%;
+    }
+    .seg-ctrl-modal .seg-btn {
+      flex: 1; padding: 10px 4px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; background: var(--card-bg);
+      color: var(--ink-soft); transition: all .15s;
+    }
+    .seg-ctrl-modal .seg-btn:not(:last-child) { border-right: 1px solid var(--divider); }
+    .seg-ctrl-modal .seg-btn:hover { background: #f0f2f6; }
+    .seg-ctrl-modal .seg-btn.active-wait { background: #dce6f3; color: var(--accent); }
+    .seg-ctrl-modal .seg-btn.active-proc { background: #ddeee3; color: var(--green); }
+    .seg-ctrl-modal .seg-btn.active-done { background: #e2e2ea; color: var(--ink); }
 
     /* ── 데이터 행 ── */
     .td-panel, .td-email {
@@ -274,11 +303,11 @@
       </div>
       <div class="field-wrap">
         <label>상태</label>
-        <select id="stSelect">
-          <option value="대기">대기</option>
-          <option value="진행중">진행중</option>
-          <option value="완료">완료</option>
-        </select>
+        <div class="seg-ctrl-modal" id="stSegCtrl">
+          <button type="button" class="seg-btn active-wait" data-val="대기">대기</button>
+          <button type="button" class="seg-btn" data-val="진행중">진행</button>
+          <button type="button" class="seg-btn" data-val="완료">완료</button>
+        </div>
       </div>
       <p class="modal-msg" id="stMsg"></p>
       <div class="modal-actions">
@@ -315,12 +344,12 @@
     <table id="mainTable">
       <thead>
         <tr>
-          <th class="th-title" colspan="2">Survey Process Control</th>
-          <th class="th-survey"><select class="hdr-select" id="hdrSel1"><option value="대기">1차 설문 대기</option><option value="진행중">1차 설문 진행중</option><option value="완료">1차 설문 완료</option></select></th>
-          <th class="th-survey"><select class="hdr-select" id="hdrSel2"><option value="대기">2차 설문 대기</option><option value="진행중">2차 설문 진행중</option><option value="완료">2차 설문 완료</option></select></th>
-          <th class="th-survey"><select class="hdr-select" id="hdrSel3"><option value="대기">3차 설문 대기</option><option value="진행중">3차 설문 진행중</option><option value="완료">3차 설문 완료</option></select></th>
-          <th class="th-survey"><select class="hdr-select" id="hdrSel4"><option value="대기">4차 설문 대기</option><option value="진행중">4차 설문 진행중</option><option value="완료">4차 설문 완료</option></select></th>
-          <th class="th-survey"><select class="hdr-select" id="hdrSel5"><option value="대기">5차 설문 대기</option><option value="진행중">5차 설문 진행중</option><option value="완료">5차 설문 완료</option></select></th>
+          <th class="th-title" colspan="2">Panel Information</th>
+          <th class="th-survey"><div class="seg-ctrl"><span class="seg-label">1차 설문</span><div class="seg-btns" id="hdrSeg1"><button type="button" class="seg-btn active-wait" data-val="대기">대기</button><button type="button" class="seg-btn" data-val="진행중">진행</button><button type="button" class="seg-btn" data-val="완료">완료</button></div></div></th>
+          <th class="th-survey"><div class="seg-ctrl"><span class="seg-label">2차 설문</span><div class="seg-btns" id="hdrSeg2"><button type="button" class="seg-btn active-wait" data-val="대기">대기</button><button type="button" class="seg-btn" data-val="진행중">진행</button><button type="button" class="seg-btn" data-val="완료">완료</button></div></div></th>
+          <th class="th-survey"><div class="seg-ctrl"><span class="seg-label">3차 설문</span><div class="seg-btns" id="hdrSeg3"><button type="button" class="seg-btn active-wait" data-val="대기">대기</button><button type="button" class="seg-btn" data-val="진행중">진행</button><button type="button" class="seg-btn" data-val="완료">완료</button></div></div></th>
+          <th class="th-survey"><div class="seg-ctrl"><span class="seg-label">4차 설문</span><div class="seg-btns" id="hdrSeg4"><button type="button" class="seg-btn active-wait" data-val="대기">대기</button><button type="button" class="seg-btn" data-val="진행중">진행</button><button type="button" class="seg-btn" data-val="완료">완료</button></div></div></th>
+          <th class="th-survey"><div class="seg-ctrl"><span class="seg-label">5차 설문</span><div class="seg-btns" id="hdrSeg5"><button type="button" class="seg-btn active-wait" data-val="대기">대기</button><button type="button" class="seg-btn" data-val="진행중">진행</button><button type="button" class="seg-btn" data-val="완료">완료</button></div></div></th>
           <th class="th-edit">수정/삭제</th>
         </tr>
       </thead>
@@ -389,7 +418,18 @@
     if (val==='완료')   return 'badge-complete';
     return 'badge-waiting';
   }
-  function syncHdrColor(sel) { sel.className = 'hdr-select ' + statusCls(sel.value); }
+  /* ── 세그먼트 활성 클래스 맵 ── */
+  const SEG_CLS = { '대기':'active-wait', '진행중':'active-proc', '완료':'active-done' };
+
+  function setSegValue(container, val) {
+    container.querySelectorAll('.seg-btn').forEach(b => {
+      b.className = 'seg-btn' + (b.dataset.val === val ? ' ' + (SEG_CLS[val]||'') : '');
+    });
+  }
+  function getSegValue(container) {
+    const active = container.querySelector('.seg-btn[class*="active-"]');
+    return active ? active.dataset.val : '대기';
+  }
 
   /* ── 헤더 뱃지 업데이트 ── */
   function updateHeaders(delphiNoRows) {
@@ -397,8 +437,8 @@
     delphiNoRows.forEach(r => { map[r['Delphi_no']] = r['check'] || '대기'; });
     DELPHI_KEYS.forEach((key, i) => {
       const check = map[key] || '대기';
-      const sel = document.getElementById('hdrSel' + (i+1));
-      if (sel) { sel.value = check; syncHdrColor(sel); }
+      const seg = document.getElementById('hdrSeg' + (i+1));
+      if (seg) setSegValue(seg, check);
     });
   }
 
@@ -446,13 +486,16 @@
     return tr;
   }
 
-  /* ── 헤더 드롭다운 이벤트 ── */
-  /* ── 드롭다운 변경 추적 ── */
+  /* ── 헤더 세그먼트 이벤트 ── */
   const hdrOriginal = {}; // { 1:'대기', 2:'진행중', ... } 로드 시 초기값 저장
 
   [1,2,3,4,5].forEach(r => {
-    const sel = document.getElementById('hdrSel' + r);
-    if (sel) sel.addEventListener('change', () => syncHdrColor(sel));
+    const seg = document.getElementById('hdrSeg' + r);
+    if (seg) seg.addEventListener('click', e => {
+      const btn = e.target.closest('.seg-btn');
+      if (!btn) return;
+      setSegValue(seg, btn.dataset.val);
+    });
   });
 
   /* ── 변경사항 없음 모달 ── */
@@ -465,10 +508,11 @@
     // 변경된 라운드 찾기
     const changed = [];
     [1,2,3,4,5].forEach(r => {
-      const sel = document.getElementById('hdrSel' + r);
-      if (!sel) return;
-      if (sel.value !== (hdrOriginal[r] || '')) {
-        changed.push({ round: r, value: sel.value });
+      const seg = document.getElementById('hdrSeg' + r);
+      if (!seg) return;
+      const val = getSegValue(seg);
+      if (val !== (hdrOriginal[r] || '')) {
+        changed.push({ round: r, value: val });
       }
     });
 
@@ -478,7 +522,7 @@
     }
 
     const btn = document.getElementById('btnSaveAll');
-    btn.disabled = true; btn.textContent = '저장 중…';
+    btn.disabled = true; btn.textContent = '설정 중...';
     try {
       for (const item of changed) {
         // 1) delphi_no 탭 저장
@@ -505,7 +549,7 @@
         hdrOriginal[item.round] = item.value;
       }
 
-      btn.textContent = '저장 완료 ✓';
+      btn.textContent = '설정 완료 ✓';
       setTimeout(() => { btn.textContent = '변경사항 저장'; btn.disabled = false; }, 1800);
     } catch(e) {
       alert('저장 실패: ' + e.message);
@@ -525,10 +569,10 @@
     try {
       const [panelRows, delphiNoRows] = await Promise.all([fetchCSV(PANEL_CSV), fetchCSV(DELPHI_NO_CSV)]);
       updateHeaders(delphiNoRows);
-      // 드롭다운 초기값 저장 (변경 감지용)
+      // 세그먼트 초기값 저장 (변경 감지용)
       [1,2,3,4,5].forEach(r => {
-        const sel = document.getElementById('hdrSel' + r);
-        if (sel) hdrOriginal[r] = sel.value;
+        const seg = document.getElementById('hdrSeg' + r);
+        if (seg) hdrOriginal[r] = getSegValue(seg);
       });
       const filtered = panelRows.filter(r => r['panel_no'] && r['panel_no'].trim() !== '');
       console.log('[loadAll] 첫 번째 패널:', filtered[0]);
@@ -633,12 +677,19 @@
   const stConfirm=document.getElementById('stConfirm');
   let stPanelNo=null, stRound=null, stSpan=null;
 
+  const stSegCtrl = document.getElementById('stSegCtrl');
+  stSegCtrl.addEventListener('click', e => {
+    const btn = e.target.closest('.seg-btn');
+    if (!btn) return;
+    setSegValue(stSegCtrl, btn.dataset.val);
+  });
+
   function openStModal(panelNo, round, currentVal, span) {
     stPanelNo=panelNo; stRound=round; stSpan=span;
     document.getElementById('stTitle').textContent = `${ROUND_LABELS[round-1]} 상태 수정`;
     document.getElementById('stNo').value = panelNo;
-    // 현재 상태값 드롭다운에 반영
-    document.getElementById('stSelect').value = currentVal || '대기';
+    // 현재 상태값 세그먼트에 반영
+    setSegValue(stSegCtrl, currentVal || '대기');
     stMsgEl.textContent=''; stMsgEl.className='modal-msg';
     stOverlay.classList.add('active');
   }
@@ -647,7 +698,7 @@
 
   stConfirm.addEventListener('click', async () => {
     if (!stPanelNo||!stRound) return;
-    const newStatus=document.getElementById('stSelect').value;
+    const newStatus=getSegValue(stSegCtrl);
     stConfirm.disabled=true; stConfirm.textContent='저장 중…'; stMsgEl.textContent='';
     try {
       const result=await gasCall({action:'updatePanelStatus',panel_no:stPanelNo,round:stRound,status:newStatus});
@@ -696,6 +747,12 @@
 
   /* 초기 로드 */
   loadAll();
+
+  /* 변경사항 저장 버튼 크기 고정 */
+  requestAnimationFrame(() => {
+    const btn = document.getElementById('btnSaveAll');
+    btn.style.width = btn.offsetWidth + 'px';
+  });
 </script>
 </body>
 </html>

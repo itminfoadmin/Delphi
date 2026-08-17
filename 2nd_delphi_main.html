@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2차 델파이 설문</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a2e;--ink-mid:#3d3d5c;--ink-soft:#6b6b8a;--accent:#4a6fa5;--accent-lt:#e8edf5;--divider:#d0d5e0;--bg:#f4f5f8;--card-bg:#fff}
+    body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px 60px}
+
+    /* ── 상단 헤더 ── */
+    .header-bar{width:100%;max-width:1246px;display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+    .id-badge{background:#555;color:#fff;font-size:20px;font-weight:600;padding:6px 22px;border-radius:4px;white-space:nowrap}
+    .header-title{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1.4;white-space:nowrap}
+    .header-progress{font-size:16px;font-weight:600;color:var(--ink-soft);white-space:nowrap;flex:1;min-width:0}
+    .header-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+    .font-ctrl{display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid var(--divider);border-radius:6px;overflow:hidden}
+    .btn-font{height:32px;padding:0 10px;font-weight:700;background:#fff;color:var(--ink-mid);border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:2px;position:relative}
+    .btn-font:hover{background:var(--accent-lt);color:var(--accent)}
+    .btn-font:active{background:var(--accent);color:#fff}
+    .btn-font:disabled{opacity:.35;cursor:default;background:#fff;color:var(--ink-mid)}
+    .btn-font-letter{line-height:1}
+    .btn-font-down .btn-font-letter{font-size:12px}
+    .btn-font-up .btn-font-letter{font-size:17px}
+    .btn-font-icon{font-size:13px;font-weight:400;margin-top:-1px}
+    .font-scale-label{font-size:11px;font-weight:600;color:var(--ink-soft);min-width:36px;text-align:center;padding:0 2px;border-left:1px solid var(--divider);border-right:1px solid var(--divider);height:32px;display:flex;align-items:center;justify-content:center;background:#fafbfc;user-select:none}
+    .panel-label{font-size:14px;color:var(--ink-soft);white-space:nowrap}
+    .btn-hdr{padding:10px 22px;font-size:14px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-save{background:var(--accent);color:#fff}
+    .btn-save:hover{background:#3a5c8f}
+    .btn-save:disabled{opacity:.5;cursor:default}
+    .btn-end{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
+    .btn-end:hover{background:#d5d5d5}
+
+    /* ── 메인 ── */
+    .main-area{width:100%;max-width:1246px;display:flex;align-items:center;gap:0}
+    .nav-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px}
+    .nav-label{font-size:12px;color:var(--ink-soft);font-weight:500}
+    .nav-arrow{width:56px;min-width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ink-soft);cursor:pointer;user-select:none;transition:color .2s,background .2s;border-radius:6px;background:transparent;border:none}
+    .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+    .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
+    .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+    .progress-bar-bottom{font-size:13px;color:var(--ink-soft);font-weight:500;text-align:center;padding:4px 2px 0}
+
+    /* ── 카드 ── */
+    .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
+    .card-edu{border-top:3px solid #4a6fa5}
+    .card-edu .card-header{background:#e8edf5}
+    .card-hahwa{border-top:3px solid #5a9a6e}
+    .card-hahwa .card-header{background:#e9f5ec}
+    .card-sanggu{border-top:3px solid #8b6fb0}
+    .card-sanggu .card-header{background:#f0eaf7}
+    .card-header{display:flex;align-items:center;padding:9px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);gap:12px;flex-wrap:wrap}
+    .card-header-title{font-size:17px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
+    .card-header-element{font-size:15px;font-weight:600;color:var(--accent);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .btn-desc{font-size:12px;font-weight:600;border-radius:4px;padding:4px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+    .card-edu .btn-desc{background:#fff;color:#4a6fa5;border:1.5px solid #4a6fa5}
+    .card-edu .btn-desc:hover{background:#4a6fa5;color:#fff}
+    .card-hahwa .btn-desc{background:#fff;color:#5a9a6e;border:1.5px solid #5a9a6e}
+    .card-hahwa .btn-desc:hover{background:#5a9a6e;color:#fff}
+    .card-sanggu .btn-desc{background:#fff;color:#8b6fb0;border:1.5px solid #8b6fb0}
+    .card-sanggu .btn-desc:hover{background:#8b6fb0;color:#fff}
+    .card-body{padding:20px 22px}
+
+    /* ── 지표 평정 항목 ── */
+    .index-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+    .index-item:first-child{padding-top:2px}
+    .index-item:last-child{border-bottom:none;padding-bottom:2px}
+    .index-left{flex:1;min-width:0}
+    .index-text{font-size:15px;color:var(--ink-mid);line-height:1.9;padding-left:var(--hang,2em);text-indent:calc(-1 * var(--hang,2em))}
+    .index-right{flex-shrink:0;display:flex;align-items:center;padding-top:4px}
+    .rating-row{display:flex;align-items:center}
+    .rating-group{display:flex;align-items:center;gap:0}
+
+    /* ── 원형 평정 버튼 ── */
+    .rating-btn{position:relative;width:26px;height:26px;border-radius:50%;border:1.5px solid #7c8599;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s ease;font-family:inherit;padding:0;z-index:1}
+    .rating-btn .r-num{font-size:12px;font-weight:600;color:#5a6070;line-height:1;transition:color .18s}
+    .rating-btn .r-lbl{display:none}
+    .rating-btn:hover{border-color:var(--accent);background:#f6f8fc;transform:scale(1.15);box-shadow:0 1px 6px rgba(74,111,165,.18)}
+    .rating-btn:hover .r-num{color:var(--accent)}
+    .rating-btn.selected{background:var(--accent);border-color:var(--accent);box-shadow:0 1px 8px rgba(74,111,165,.25)}
+    .rating-btn.selected .r-num{color:#fff;font-weight:700}
+    .card-edu .rating-btn.selected{background:#4a6fa5;border-color:#4a6fa5;box-shadow:0 1px 8px rgba(74,111,165,.25)}
+    .card-hahwa .rating-btn.selected{background:#5a9a6e;border-color:#5a9a6e;box-shadow:0 1px 8px rgba(90,154,110,.25)}
+    .card-sanggu .rating-btn.selected{background:#8b6fb0;border-color:#8b6fb0;box-shadow:0 1px 8px rgba(139,111,176,.25)}
+    .card-edu .rating-btn:hover{border-color:#4a6fa5}
+    .card-edu .rating-btn:hover .r-num{color:#4a6fa5}
+    .card-hahwa .rating-btn:hover{border-color:#5a9a6e}
+    .card-hahwa .rating-btn:hover .r-num{color:#5a9a6e}
+    .card-sanggu .rating-btn:hover{border-color:#8b6fb0}
+    .card-sanggu .rating-btn:hover .r-num{color:#8b6fb0}
+    .card-edu .rating-btn.selected:hover .r-num,
+    .card-hahwa .rating-btn.selected:hover .r-num,
+    .card-sanggu .rating-btn.selected:hover .r-num{color:#fff}
+
+    /* 점선 연결선 */
+    .rating-dot-line{width:14px;height:0;border-top:1.5px dotted #c8cdd6;flex-shrink:0}
+
+    /* 툴팁 */
+    .rating-btn::after{content:attr(title);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:rgba(30,30,50,.88);color:#fff;font-size:10.5px;font-weight:500;letter-spacing:.02em;padding:3px 9px;border-radius:3px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+    .rating-btn::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:3px solid transparent;border-top-color:rgba(30,30,50,.88);opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+    .rating-btn:hover::after,.rating-btn:hover::before{opacity:1}
+
+    /* 사유 입력 (1,2 선택 시만 표시) — 카드 전체 폭 */
+    .reason-row{display:none;width:100%;margin-top:4px}
+    .reason-row.show{display:flex}
+    .reason-row{align-items:flex-start;gap:8px}
+    .reason-label{font-size:12px;color:var(--ink-soft);font-weight:500;white-space:nowrap;padding-top:7px;min-width:32px}
+    .reason-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:7px 12px;font-size:13px;font-family:inherit;line-height:1.5;outline:none;transition:border-color .2s;resize:vertical;min-height:36px}
+    .reason-input:focus{border-color:var(--accent)}
+    .reason-input::placeholder{color:#b8bcc6}
+
+    /* 임시저장 표시 */
+    .save-indicator{font-size:12px;color:#5a9a6e;font-weight:500;margin-left:8px;opacity:0;transition:opacity .3s}
+    .save-indicator.show{opacity:1}
+
+    /* ══ 지표 설명 드래그 모달 ══ */
+    .desc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:1000}
+    .desc-overlay.active{display:block}
+    .desc-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:902px;max-width:96vw;max-height:80vh;background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.22);z-index:1001;display:none;flex-direction:column;overflow:hidden}
+    .desc-modal.active{display:flex}
+    .desc-modal-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none}
+    .desc-modal-header:active{cursor:grabbing}
+    .desc-modal-title{font-size:15px;font-weight:600;color:var(--ink);flex:1;min-width:0}
+    .desc-modal-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .desc-font-ctrl{display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid var(--divider);border-radius:5px;overflow:hidden}
+    .desc-font-btn{width:30px;height:26px;font-size:15px;font-weight:700;background:#fff;color:var(--ink-mid);border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+    .desc-font-btn:hover{background:var(--accent-lt);color:var(--accent)}
+    .desc-font-btn:active{background:var(--accent);color:#fff}
+    .desc-font-btn:disabled{opacity:.3;cursor:default;background:#fff;color:var(--ink-mid)}
+    .desc-font-label{font-size:10px;font-weight:600;color:var(--ink-soft);min-width:32px;text-align:center;border-left:1px solid var(--divider);border-right:1px solid var(--divider);height:26px;display:flex;align-items:center;justify-content:center;background:#fafbfc;user-select:none}
+    .desc-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .desc-modal-close:hover{background:#eee}
+    .desc-modal-body{padding:28px 32px;overflow-y:auto;font-size:14.5px;color:var(--ink-mid);line-height:2.0;word-break:keep-all;text-align:justify}
+    .desc-modal-body p{text-indent:1.5em;margin-bottom:12px}
+
+    /* ── 로딩 ── */
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;background:var(--accent);animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+
+    /* ── 모달 공통 ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}
+    .modal-overlay.active{display:flex}
+    .modal-box{background:#fff;border-radius:6px;padding:32px 36px 28px;width:672px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+    .modal-box h3{font-size:16px;color:var(--ink);margin-bottom:20px;font-weight:600}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .modal-actions button{flex:1;padding:12px 0;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;transition:opacity .2s}
+    .modal-actions button:hover{opacity:.85}
+    .modal-cancel{background:#fff;border:1.5px solid #ccc;color:#333}
+    .modal-confirm{background:var(--accent);border:none;color:#fff}
+    .end-modal-box{text-align:center}
+    .end-modal-box p{font-size:15px;color:#333;line-height:1.7;margin-bottom:24px}
+
+    /* ── 완료 페이지 ── */
+    .completion-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;text-align:center;padding:60px 40px}
+    .completion-text{font-size:18px;color:var(--ink-mid);line-height:2.0;margin-bottom:36px;word-break:keep-all}
+    .btn-completion{padding:16px 48px;font-size:16px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;transition:background .2s;box-shadow:0 2px 12px rgba(74,111,165,.3)}
+    .btn-completion:hover{background:#3a5c8f}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
+    .toast.show{opacity:1}
+
+
+    @media(max-width:768px){
+      .header-title{font-size:18px}
+      .nav-arrow{width:36px;min-width:36px;font-size:22px}
+      .header-bar{gap:10px}
+      .index-item{flex-direction:column;gap:8px}
+      .index-right{align-items:flex-start;width:100%}
+      .rating-btn{min-width:48px;padding:6px 8px}
+      .rating-btn .r-lbl{font-size:9px}
+      .reason-input{width:100%}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 데이터를 불러오는 중...</span>
+  </div>
+
+  <!-- 데이터 로드 실패 모달 -->
+  <div class="modal-overlay" id="retryModal">
+    <div class="modal-box end-modal-box">
+      <p id="retryMsg">설문 데이터를 불러오지 못했습니다.</p>
+      <div class="modal-actions">
+        <button class="modal-confirm" id="retryBtn">다시 시도</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 지표 설명 드래그 모달 -->
+  <div class="desc-overlay" id="descOverlay"></div>
+  <div class="desc-modal" id="descModal">
+    <div class="desc-modal-header" id="descModalHeader">
+      <span class="desc-modal-title" id="descModalTitle">요소 설명</span>
+      <div class="desc-modal-right">
+        <div class="desc-font-ctrl">
+          <button class="desc-font-btn" id="descFontDown" title="글자 축소">−</button>
+          <span class="desc-font-label" id="descFontLabel">100%</span>
+          <button class="desc-font-btn" id="descFontUp" title="글자 확대">+</button>
+        </div>
+        <button class="desc-modal-close" id="descModalClose">닫기</button>
+      </div>
+    </div>
+    <div class="desc-modal-body" id="descModalBody"></div>
+  </div>
+
+  <!-- 미평정 확인 모달 -->
+  <div class="modal-overlay" id="unratedNavModal">
+    <div class="modal-box end-modal-box">
+      <p id="unratedNavMsg">평정되지 않은 지표가 있습니다.<br>그래도 이동하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="unratedNavCancel">취소</button>
+        <button class="modal-confirm" id="unratedNavConfirm">이동</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설문 종료 확인 모달 -->
+  <div class="modal-overlay" id="endModal">
+    <div class="modal-box end-modal-box">
+      <p>전체 설문이 아직 완료되지 않았습니다.<br>완료되지 않은 설문은 이후에 다시 가능합니다.<br>설문을 종료하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="endModalCancel">취소</button>
+        <button class="modal-confirm" id="endModalConfirm">종료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 저장 확인 모달 -->
+  <div class="modal-overlay" id="saveConfirmModal">
+    <div class="modal-box end-modal-box">
+      <p id="saveConfirmMsg">현재 페이지의 평정을 저장하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="saveConfirmCancel">취소</button>
+        <button class="modal-confirm" id="saveConfirmOk">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설문 완료 안내 모달 -->
+  <div class="modal-overlay" id="doneModal">
+    <div class="modal-box end-modal-box">
+      <p>2차 델파이 설문이 완료되었습니다.<br>감사합니다.</p>
+      <div class="modal-actions">
+        <button class="modal-confirm" id="doneModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 안내 메시지 모달 -->
+  <div class="modal-overlay" id="infoModal">
+    <div class="modal-box end-modal-box">
+      <p id="infoModalMsg"></p>
+      <div class="modal-actions">
+        <button class="modal-confirm" id="infoModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 상단 헤더 -->
+  <div class="header-bar">
+    <div class="id-badge" id="idBadge">ID</div>
+    <div class="header-title" id="headerTitle">불러오는 중...</div>
+    
+    <div class="header-right">
+      <span class="panel-label" id="panelLabel">패널 : </span>
+      <div class="font-ctrl">
+        <button class="btn-font btn-font-down" id="btnFontDown" title="글자 축소"><span class="btn-font-icon">−</span><span class="btn-font-letter">A</span></button>
+        <span class="font-scale-label" id="fontScaleLabel">100%</span>
+        <button class="btn-font btn-font-up" id="btnFontUp" title="글자 확대"><span class="btn-font-letter">A</span><span class="btn-font-icon">+</span></button>
+      </div>
+      <button class="btn-hdr btn-save" id="btnSave">저장</button>
+      <button class="btn-hdr btn-end" id="btnEnd">나가기</button>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main-area">
+    <div class="nav-col" id="navPrevCol">
+      <button class="nav-arrow" id="btnPrev" title="이전">&#10094;</button>
+      <span class="nav-label">이전</span>
+    </div>
+    <div class="cards-container">
+      <!-- 교육활동 -->
+      <div class="indicator-card card-edu" id="cardEdu">
+        <div class="card-header">
+          <span class="card-header-title">교육활동 평정 지표</span>
+          <span class="card-header-element" id="labelEduElement"></span>
+          <button class="btn-desc" id="btnDescEdu">☞ &nbsp;요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodyEdu"></div>
+      </div>
+      <!-- 하화활동 -->
+      <div class="indicator-card card-hahwa" id="cardHahwa">
+        <div class="card-header">
+          <span class="card-header-title">하화활동 평정 지표</span>
+          <span class="card-header-element" id="labelHahwaElement"></span>
+          <button class="btn-desc" id="btnDescHahwa">☞ &nbsp;요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodyHahwa"></div>
+      </div>
+      <!-- 상구활동 -->
+      <div class="indicator-card card-sanggu" id="cardSanggu">
+        <div class="card-header">
+          <span class="card-header-title">상구활동 평정 지표</span>
+          <span class="card-header-element" id="labelSangguElement"></span>
+          <button class="btn-desc" id="btnDescSanggu">☞ &nbsp;요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodySanggu"></div>
+      </div>
+      <!-- 진행 상태 -->
+      <div class="progress-bar-bottom" id="progressBottom"></div>
+      <!-- 설문 완료 페이지 -->
+      <div class="completion-page" id="completionPage" style="display:none">
+        <p class="completion-text">교육활동 지표 적절성에 대한 2차 델파이 설문의 마지막 페이지입니다.</p>
+        <p class="completion-text" style="margin-top:0">설문을 완료하시겠습니까?</p>
+        <button class="btn-completion" id="btnComplete">설문 완료</button>
+      </div>
+    </div>
+    <div class="nav-col" id="navNextCol">
+      <button class="nav-arrow" id="btnNext" title="다음">&#10095;</button>
+      <span class="nav-label">다음</span>
+    </div>
+  </div>
+
+<script>
+  /* ════════════════════ 설정 ════════════════════ */
+  // ※ GAS_URL: 평정 결과를 시트에 기록하는 Google Apps Script 웹앱 주소
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGz8ajx0fQU6YGQAe2f4vPMtWgHyHg21XkCmZSj5NITyvkD8jgBrmurpiqRCDwFdo/exec';
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+
+  const SHEET_ID = '1YhffsxsOaEflHiKI9QNLeUcCBPxZos_KJCOdpbx9kEk';
+  /* CSV URL은 폴백용으로 보관 */
+  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSZ7A3YBvKX7FnI0JZMLQhTj-wVpC1cS8zM4mVyJGkiVIWzZSASDuJf56zJDH3rSBGeSafUQgd8nQE1/pub';
+
+  const RATING_LABELS = ['매우\n부적절','부적절','보통','적절','매우\n적절'];
+
+  const panelEmail = sessionStorage.getItem('panelEmail') || '';
+  if (!panelEmail) location.href = 'index.html';
+  document.getElementById('panelLabel').textContent = '패널 : ' + panelEmail;
+
+  /* 패널 번호: GAS에서 Basic_Data 조회하여 설정 */
+  let panelColValue = '';  // 'panel_01' ~ 'panel_15'
+
+  function getPanelCol() {
+    return panelColValue;
+  }
+
+
+  let idRows      = [];   // id 탭 데이터
+  let eduIndices   = {};   // { ID: [ {index, row#, ...} ] }
+  let hahwaIndices = {};
+  let sangguIndices= {};
+  let currentIndex  = 0;
+
+  // 평정 상태를 메모리에 보관 (pageId-type-indexRow → {rating, reason})
+  let responses = {};
+
+  /* ── 유틸 ── */
+  function showToast(m, d=2000) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d); }
+  function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('active',v); }
+  function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  /* ════════════════════ CSV 파싱 ════════════════════ */
+  function parseCSV(text) {
+    const rows = [];
+    let cur = '', inQ = false, row = [];
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQ) {
+        if (c === '"' && text[i+1] === '"') { cur += '"'; i++; }
+        else if (c === '"') inQ = false;
+        else cur += c;
+      } else {
+        if (c === '"') inQ = true;
+        else if (c === ',') { row.push(cur); cur = ''; }
+        else if (c === '\n' || (c === '\r' && text[i+1] === '\n')) {
+          row.push(cur); cur = ''; rows.push(row); row = [];
+          if (c === '\r') i++;
+        } else if (c === '\r') {
+          row.push(cur); cur = ''; rows.push(row); row = [];
+        } else cur += c;
+      }
+    }
+    if (cur || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+
+  function csvToObjects(text, headerRowIdx) {
+    const raw = parseCSV(text);
+    if (raw.length <= headerRowIdx) return [];
+    // 헤더: 지정 행 사용 (0-based index)
+    const hdr = raw[headerRowIdx].map(h => h.trim());
+    const out = [];
+    for (let i = headerRowIdx + 1; i < raw.length; i++) {
+      const obj = {};
+      hdr.forEach((h, j) => { obj[h] = (raw[i][j] || '').trim(); });
+      if (obj[hdr[0]]) out.push(obj);  // ID 비어있으면 스킵
+    }
+    return out;
+  }
+
+  /* id 탭: 헤더가 row 1 (0-based 0) */
+  function parseIdTab(text) {
+    return csvToObjects(text, 0);
+  }
+
+  /* index 탭: gviz/tq는 병합 헤더를 별도 행으로 반환할 수 있음 
+     → "ID" 컬럼이 있는 행을 헤더로 자동 감지 */
+  function parseIndexTab(text) {
+    const raw = parseCSV(text);
+    if (raw.length === 0) return [];
+    // "ID"가 포함된 첫 번째 행을 헤더로 사용
+    let headerIdx = 0;
+    for (let i = 0; i < Math.min(raw.length, 5); i++) {
+      const row = raw[i].map(c => c.trim());
+      if (row.includes('ID') && row.includes('index')) { headerIdx = i; break; }
+      if (row.includes('ID')) { headerIdx = i; break; }
+    }
+    const hdr = raw[headerIdx].map(h => h.trim());
+    // 중복 헤더 처리: gviz가 같은 이름의 컬럼에 자동 번호를 붙이지 않으므로 수동 처리
+    const seen = {};
+    const uniqueHdr = hdr.map(h => {
+      if (!seen[h]) { seen[h] = 1; return h; }
+      seen[h]++;
+      return h + '_' + (seen[h] - 1);  // panel_01, panel_01_1 (reason 영역)
+    });
+    const out = [];
+    for (let i = headerIdx + 1; i < raw.length; i++) {
+      const obj = {};
+      uniqueHdr.forEach((h, j) => { obj[h] = (raw[i][j] || '').trim(); });
+      if (obj[uniqueHdr[0]]) out.push(obj);
+    }
+    return out;
+  }
+
+  /* index 배열을 ID별로 그룹핑 */
+  function groupById(arr) {
+    const map = {};
+    arr.forEach((row, i) => {
+      const id = row.ID || '';
+      if (!id) return;
+      if (!map[id]) map[id] = [];
+      row._csvRow = i; // 원본 CSV 행 번호 보관
+      map[id].push(row);
+    });
+    return map;
+  }
+
+  /* ════════════════════ 데이터 로드 ════════════════════ */
+  const retryModal = document.getElementById('retryModal');
+  const retryMsg   = document.getElementById('retryMsg');
+  document.getElementById('retryBtn').addEventListener('click', () => {
+    retryModal.classList.remove('active');
+    loadData();
+  });
+
+  async function fetchCSV(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.text();
+  }
+
+  async function loadData() {
+    showLoading(true);
+    try {
+      /* 1단계: BASIC_GAS에서 패널 정보 조회 (Basic_Data 시트 접근 가능) */
+      let panelCol = '';
+      let panelIdx = 0;
+      try {
+        const panelRes = await fetch(BASIC_GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+        });
+        const panelText = await panelRes.text();
+        const panelData = JSON.parse(panelText);
+        if (panelData.status === 'ok' && panelData.panelCol) {
+          panelCol = panelData.panelCol;
+          panelIdx = panelData.panelIndex || 0;
+          console.log('[loadData] BASIC_GAS 패널 조회 성공:', panelCol);
+        } else {
+          console.warn('[loadData] BASIC_GAS 패널 조회 실패:', panelData.message);
+        }
+      } catch(pe) {
+        console.warn('[loadData] BASIC_GAS 패널 조회 에러:', pe.message);
+      }
+
+      /* 2단계: init 호출 (패널 정보 포함) */
+      let initUrl = GAS_URL + '?action=init&email=' + encodeURIComponent(panelEmail);
+      if (panelCol) {
+        initUrl += '&panelCol=' + encodeURIComponent(panelCol) + '&panelIndex=' + panelIdx;
+      }
+      const res = await fetch(initUrl);
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { throw new Error('GAS 응답 파싱 실패'); }
+      if (data.status !== 'ok') throw new Error(data.message || '데이터 로드 실패');
+
+      console.log('[init] 패널:', data.panel_no, data.panelCol);
+
+      /* 패널 번호 설정 */
+      panelColValue = data.panelCol || panelCol || '';
+      if (!panelColValue) {
+        console.warn('[init] 패널 컬럼을 찾을 수 없습니다.');
+      }
+
+      /* id 탭 */
+      idRows = data.idRows || [];
+
+      /* index 탭들 → ID별 그룹핑 */
+      eduIndices    = groupByIdFromGAS(data.eduRows || []);
+      hahwaIndices  = groupByIdFromGAS(data.hahwaRows || []);
+      sangguIndices = groupByIdFromGAS(data.sangguRows || []);
+      console.log('[init] id:', idRows.length, 'edu:', (data.eduRows||[]).length, 'hahwa:', (data.hahwaRows||[]).length, 'sanggu:', (data.sangguRows||[]).length);
+
+      /* 기존 응답 복원 */
+      if (data.savedRatings) {
+        console.log('[init] savedRatings 키:', Object.keys(data.savedRatings));
+        Object.keys(data.savedRatings).forEach(k => {
+          console.log('[init] savedRatings[' + k + ']:', (data.savedRatings[k] || []).length, '건');
+        });
+        restoreSavedFromInit(data.savedRatings);
+      } else {
+        console.log('[init] savedRatings 없음');
+      }
+
+      if (idRows.length === 0) {
+        retryMsg.textContent = '설문 데이터가 없습니다. 시트를 확인해주세요.';
+        retryModal.classList.add('active');
+      } else {
+        renderPage();
+      }
+    } catch(e) {
+      console.error('[loadData 에러]', e);
+      retryMsg.textContent = '데이터 로드 실패: ' + e.message;
+      retryModal.classList.add('active');
+    }
+    finally { showLoading(false); }
+  }
+
+  /* init 응답에서 기존 응답 복원 */
+  function restoreSavedFromInit(savedRatings) {
+    const sheetTypeMap = { 'edu-act_index':'edu', 'hahwa-act_index':'hahwa', 'sanggu-act_index':'sanggu' };
+    let totalRestored = 0;
+
+    Object.keys(savedRatings).forEach(sheetKey => {
+      const type = sheetTypeMap[sheetKey];
+      if (!type) return;
+      const entries = savedRatings[sheetKey];
+      console.log('[restore]', sheetKey, '→ 저장된 항목:', entries.length);
+
+      entries.forEach(entry => {
+        const pageIdx = idRows.findIndex(r => r.ID === entry.id);
+        if (pageIdx < 0) { console.log('[restore] ID 못찾음:', entry.id); return; }
+
+        const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+        const list = map[entry.id] || [];
+
+        // 1차: _rowNum으로 매칭
+        let iIdx = list.findIndex(item => item._rowNum === entry.row);
+
+        // 2차: _rowNum이 안 맞으면 위치 기반 매칭
+        if (iIdx < 0) {
+          // 같은 ID의 항목들을 row 순서대로 정렬하여 위치 매칭
+          const sameIdEntries = entries.filter(e => e.id === entry.id).sort((a,b) => a.row - b.row);
+          const posInSaved = sameIdEntries.indexOf(entry);
+          if (posInSaved >= 0 && posInSaved < list.length) {
+            iIdx = posInSaved;
+          }
+        }
+
+        if (iIdx < 0) { console.log('[restore] 지표 매칭 실패:', entry.id, 'row:', entry.row); return; }
+
+        const key = pageIdx + '-' + type + '-' + iIdx;
+        responses[key] = { rating: entry.rating, reason: entry.reason || '' };
+        totalRestored++;
+      });
+    });
+
+    console.log('[restore] 총 복원된 평정:', totalRestored);
+  }
+
+  /* GAS에서 받은 배열을 ID별로 그룹핑 */
+  function groupByIdFromGAS(arr) {
+    const map = {};
+    arr.forEach((row, i) => {
+      const id = row.ID || '';
+      if (!id) return;
+      if (!map[id]) map[id] = [];
+      row._csvRow = i;
+      map[id].push(row);
+    });
+    return map;
+  }
+
+  /* ════════════════════ 페이지 렌더링 ════════════════════ */
+  function renderPage() {
+    if (!idRows.length) return;
+    const row = idRows[currentIndex];
+    const id = row.ID || '';
+
+    // ── 헤더 ──
+    document.getElementById('idBadge').textContent = id.replace(/^ID[_\-\s]*/i, '');
+    document.getElementById('headerTitle').textContent = row.category || '';
+      `전체 ${String(idRows.length).padStart(2,'0')}개 항목 중 ${currentIndex+1}번째 진행중...`;
+
+    // ── 교육활동 ──
+    renderCard('edu', row, 'element_edu-act', 'descript_edu-act', eduIndices, 'labelEduElement', 'bodyEdu', 'btnDescEdu', 'cardEdu');
+    // ── 하화활동 ──
+    renderCard('hahwa', row, 'element_hahwa-act', 'descript_hahwa-act', hahwaIndices, 'labelHahwaElement', 'bodyHahwa', 'btnDescHahwa', 'cardHahwa');
+    // ── 상구활동 ──
+    renderCard('sanggu', row, 'element_sanggu-act', 'descript_sanggu-act', sangguIndices, 'labelSangguElement', 'bodySanggu', 'btnDescSanggu', 'cardSanggu');
+
+    // 진행 상태
+    document.getElementById('progressBottom').textContent = `${currentIndex+1}/${idRows.length}`;
+
+    // 네비게이션
+    document.getElementById('navPrevCol').style.visibility = (currentIndex === 0) ? 'hidden' : 'visible';
+    document.getElementById('btnPrev').disabled = (currentIndex === 0);
+    document.getElementById('navNextCol').style.visibility = 'visible';
+    document.getElementById('btnNext').disabled = false;
+
+    // 설문/완료 페이지 표시
+    document.getElementById('completionPage').style.display = 'none';
+    document.querySelectorAll('.indicator-card').forEach(c => c.style.display = '');
+    document.getElementById('progressBottom').style.display = '';
+    
+
+    
+  }
+
+  function renderCard(type, idRow, elemKey, descKey, indicesMap, labelElId, bodyElId, descBtnId, cardElId) {
+    const id = idRow.ID;
+    const elemName = idRow[elemKey] || '';
+    const elemDesc = idRow[descKey] || '';
+    const list = indicesMap[id] || [];
+
+    // 요소 라벨
+    document.getElementById(labelElId).textContent = elemName ? '(평정 요소) ' + elemName : '';
+
+    // 설명 버튼
+    const descBtn = document.getElementById(descBtnId);
+    const catName = idRow.category || '';
+    descBtn.dataset.desc  = elemDesc || '설명 없음';
+    descBtn.dataset.title = (catName ? catName + ' - ' : '') + elemName + ' 요소 설명';
+
+    // 카드 표시/숨김
+    const card = document.getElementById(cardElId);
+    if (list.length === 0 && !elemName) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
+
+    // 지표 목록 렌더
+    const body = document.getElementById(bodyElId);
+    if (list.length === 0) {
+      body.innerHTML = '<div style="padding:12px 0;color:var(--ink-soft);font-size:14px;">해당 요소에 대한 지표가 없습니다.</div>';
+      return;
+    }
+
+    let html = '';
+    list.forEach((item, iIdx) => {
+      const key = currentIndex + '-' + type + '-' + iIdx;
+      const saved = responses[key] || {};
+      const indexText = item.index || '';
+
+      // 내어쓰기 계산
+      const bp = indexText.indexOf('] ');
+      const hang = bp !== -1 ? (bp + 1) * 0.5 : 2;
+
+      const showReason = saved.rating === 1 || saved.rating === 2;
+
+      // 내어쓰기 +3ch 추가
+      const hangVal = hang + 4;
+
+      html += `<div class="index-item" data-key="${key}">`;
+      html += `  <div class="index-left">`;
+      html += `    <div class="index-text" style="--hang:${hangVal}ch">${esc(indexText)}</div>`;
+      html += `  </div>`;
+      html += `  <div class="index-right">`;
+      html += `    <div class="rating-row">`;
+      html += `      <div class="rating-group">`;
+      for (let r = 1; r <= 5; r++) {
+        const sel = saved.rating === r ? ' selected' : '';
+        const tooltip = RATING_LABELS[r-1].replace('\n',' ');
+        if (r > 1) html += `<span class="rating-dot-line"></span>`;
+        html += `<button class="rating-btn${sel}" data-key="${key}" data-val="${r}" title="${tooltip}">`;
+        html += `  <span class="r-num">${r}</span><span class="r-lbl"></span>`;
+        html += `</button>`;
+      }
+      html += `      </div>`;
+      html += `    </div>`;
+      html += `  </div>`;
+      html += `  <div class="reason-row${showReason ? ' show' : ''}" data-reason="${key}">`;
+      html += `    <span class="reason-label">사유</span>`;
+      const reasonPH = saved.rating === 1 ? '매우 부적절로 판단하신 이유를 기술해주세요.' : '부적절로 판단하신 이유를 기술해주세요.';
+      html += `    <textarea class="reason-input" data-key="${key}" placeholder="${reasonPH}">${esc(saved.reason || '')}</textarea>`;
+      html += `  </div>`;
+      html += `</div>`;
+    });
+
+    body.innerHTML = html;
+
+    // 이벤트 바인딩: 평정 버튼
+    body.querySelectorAll('.rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.key;
+        const v = parseInt(btn.dataset.val, 10);
+        if (!responses[k]) responses[k] = {};
+        const group = btn.closest('.rating-group');
+        const reasonRow = body.querySelector(`.reason-row[data-reason="${k}"]`);
+
+        if (responses[k].rating === v) {
+          // 이미 선택된 점수 → 선택 해제 (0으로 표시하여 저장 시 공백 처리)
+          responses[k].rating = 0;
+          btn.classList.remove('selected');
+          if (reasonRow) reasonRow.classList.remove('show');
+        } else {
+          // 새 점수 선택
+          responses[k].rating = v;
+          group.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          if (reasonRow) {
+            if (v <= 2) {
+              reasonRow.classList.add('show');
+              const ta = reasonRow.querySelector('.reason-input');
+              if (ta) ta.placeholder = v === 1 ? '매우 부적절로 판단하신 이유를 기술해주세요.' : '부적절로 판단하신 이유를 기술해주세요.';
+            }
+            else { reasonRow.classList.remove('show'); }
+          }
+        }
+      });
+    });
+
+    // 이벤트 바인딩: 사유 입력
+    body.querySelectorAll('.reason-input').forEach(ta => {
+      ta.addEventListener('input', () => {
+        const k = ta.dataset.key;
+        if (!responses[k]) responses[k] = {};
+        responses[k].reason = ta.value;
+      });
+    });
+  }
+
+  /* (미응답 요약 제거됨) */
+
+  /* ════════════════════ 완료 페이지 ════════════════════ */
+  let onCompletionPage = false;
+
+  function showCompletionPage() {
+    document.querySelectorAll('.indicator-card').forEach(c => c.style.display = 'none');
+    document.getElementById('completionPage').style.display = 'flex';
+    document.getElementById('progressBottom').style.display = 'none';
+    
+    document.getElementById('navNextCol').style.visibility = 'hidden';
+    document.getElementById('navPrevCol').style.visibility = 'visible';
+    document.getElementById('btnPrev').disabled = false;
+  }
+
+  /* ════════════════════ 저장 (GAS) ════════════════════ */
+  async function gasCall(payload) {
+    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+    const t = await res.text();
+    try { return JSON.parse(t); } catch { return { status:'error', message:'GAS 응답 파싱 실패: '+t }; }
+  }
+
+  async function saveCurrentPage() {
+    const id = idRows[currentIndex].ID;
+    const col = getPanelCol();
+    if (!col) { showToast('패널 번호가 설정되지 않았습니다.', 3000); return; }
+
+    const payload = {
+      action: 'saveRatings',
+      panelCol: col,
+      panelEmail: panelEmail,
+      pageId: id,
+      ratings: []
+    };
+
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+      const list = map[id] || [];
+      list.forEach((item, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        const resp = responses[key];
+        if (resp && resp.rating !== undefined) {
+          payload.ratings.push({
+            sheet: sheetName,
+            rowNum: item._rowNum || (DATA_START_ROW + item._csvRow),
+            rating: resp.rating,
+            reason: resp.reason || ''
+          });
+        }
+      });
+    });
+
+    if (payload.ratings.length === 0) {
+      showToast('평정된 항목이 없습니다.', 2000);
+      return;
+    }
+
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true; btn.textContent = '저장 중…';
+    try {
+      const result = await gasCall(payload);
+      if (result.status !== 'ok') throw new Error(result.message || '저장 실패');
+      showToast('저장되었습니다.');
+    } catch(e) {
+      showToast('저장 오류: ' + e.message, 4000);
+    } finally {
+      btn.disabled = false; btn.textContent = '저장';
+    }
+  }
+
+  document.getElementById('btnSave').addEventListener('click', () => {
+    saveCurrentPage();
+  });
+
+  /* ════════════════════ 설문 완료 ════════════════════ */
+  const doneModal = document.getElementById('doneModal');
+
+  document.getElementById('btnComplete').addEventListener('click', async () => {
+    // 미평정 확인
+    let totalUnrated = 0;
+    idRows.forEach((row, pageIdx) => {
+      ['edu','hahwa','sanggu'].forEach(type => {
+        const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+        const list = map[row.ID] || [];
+        list.forEach((_, iIdx) => {
+          const key = pageIdx + '-' + type + '-' + iIdx;
+          if (!responses[key] || !responses[key].rating) totalUnrated++;
+        });
+      });
+    });
+
+    if (totalUnrated > 0) {
+      showInfoModal(`아직 ${totalUnrated}개 지표가 미평정 상태입니다.\n모든 지표를 평정한 후 완료해주세요.`);
+      return;
+    }
+
+    const btn = document.getElementById('btnComplete');
+    btn.disabled = true; btn.textContent = '처리 중…';
+    try {
+      // 전체 응답 저장
+      const col = getPanelCol();
+      const allRatings = [];
+      idRows.forEach((row, pageIdx) => {
+        ['edu','hahwa','sanggu'].forEach(type => {
+          const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+          const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+          const list = map[row.ID] || [];
+          list.forEach((item, iIdx) => {
+            const key = pageIdx + '-' + type + '-' + iIdx;
+            const resp = responses[key];
+            if (resp && resp.rating !== undefined) {
+              allRatings.push({
+                sheet: sheetName,
+                csvRow: item._csvRow,
+                rowNum: item._rowNum || 0,
+                rating: resp.rating,
+                reason: resp.reason || ''
+              });
+            }
+          });
+        });
+      });
+
+      const saveResult = await gasCall({
+        action: 'saveAllRatings',
+        panelCol: col,
+        panelEmail: panelEmail,
+        ratings: allRatings
+      });
+      if (saveResult.status !== 'ok') throw new Error(saveResult.message || '저장 실패');
+
+      // 완료 상태 기록
+      const compResult = await fetch(BASIC_GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'completeSurvey',
+          email: panelEmail,
+          round: 2
+        })
+      });
+      const compText = await compResult.text();
+      let compParsed;
+      try { compParsed = JSON.parse(compText); } catch { compParsed = { status:'error', message: compText }; }
+      if (compParsed.status !== 'ok') {
+        showToast('완료 처리 오류: ' + (compParsed.message || '알 수 없는 오류'), 4000);
+        btn.disabled = false; btn.textContent = '설문 완료';
+        return;
+      }
+    } catch(e) {
+      console.error('[completeSurvey 에러]', e);
+      showToast('서버 통신 오류: ' + e.message, 4000);
+      btn.disabled = false; btn.textContent = '설문 완료';
+      return;
+    }
+    btn.disabled = false; btn.textContent = '설문 완료';
+    doneModal.classList.add('active');
+  });
+
+  document.getElementById('doneModalOk').addEventListener('click', () => {
+    location.href = 'select_delphi.html';
+  });
+
+  /* ════════════════════ 네비게이션 ════════════════════ */
+  /* 현재 페이지에 평정된 항목이 있는지 확인 */
+  function hasRatingsOnCurrentPage() {
+    if (!idRows.length) return false;
+    const id = idRows[currentIndex].ID;
+    let found = false;
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const list = map[id] || [];
+      list.forEach((_, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        if (responses[key] && responses[key].rating !== undefined) found = true;
+      });
+    });
+    return found;
+  }
+
+  /* 현재 페이지에 미평정 지표 수 */
+  function countUnratedOnCurrentPage() {
+    if (!idRows.length) return 0;
+    const id = idRows[currentIndex].ID;
+    let unrated = 0;
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const list = map[id] || [];
+      list.forEach((_, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        if (!responses[key] || !responses[key].rating) unrated++;
+      });
+    });
+    return unrated;
+  }
+
+  /* 자동 저장 (변경사항 있을 때만, 토스트로 알림) */
+  async function autoSaveCurrentPage() {
+    if (!hasRatingsOnCurrentPage()) return;
+    const col = getPanelCol();
+    if (!col) return;
+    const id = idRows[currentIndex].ID;
+    const payload = { action:'saveRatings', panelCol:col, panelEmail:panelEmail, pageId:id, ratings:[] };
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+      const list = map[id] || [];
+      list.forEach((item, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        const resp = responses[key];
+        if (resp && resp.rating !== undefined) {
+          payload.ratings.push({ sheet:sheetName, rowNum:item._rowNum||(3+item._csvRow), rating:resp.rating, reason:resp.reason||'' });
+        }
+      });
+    });
+    if (payload.ratings.length === 0) return;
+    try {
+      await gasCall(payload);
+      showToast('자동 저장됨', 1200);
+    } catch(e) { console.warn('[autoSave 에러]', e); }
+  }
+
+  /* 미평정 확인 모달 */
+  const unratedNavModal = document.getElementById('unratedNavModal');
+  let pendingNavDir = 0;
+
+  document.getElementById('unratedNavCancel').addEventListener('click', () => {
+    unratedNavModal.classList.remove('active');
+    pendingNavDir = 0;
+  });
+  unratedNavModal.addEventListener('click', e => { if (e.target === unratedNavModal) { unratedNavModal.classList.remove('active'); pendingNavDir = 0; } });
+  document.getElementById('unratedNavConfirm').addEventListener('click', async () => {
+    unratedNavModal.classList.remove('active');
+    await doNavigate(pendingNavDir);
+    pendingNavDir = 0;
+  });
+
+  /* 실제 이동 수행 */
+  async function doNavigate(dir) {
+    // 자동 저장
+    await autoSaveCurrentPage();
+
+    if (onCompletionPage && dir === -1) {
+      onCompletionPage = false;
+      renderPage();
+      window.scrollTo({ top:0, behavior:'smooth' });
+      return;
+    }
+    if (dir === 1 && currentIndex >= idRows.length - 1 && !onCompletionPage) {
+      onCompletionPage = true;
+      showCompletionPage();
+      window.scrollTo({ top:0, behavior:'smooth' });
+      return;
+    }
+    const ni = currentIndex + dir;
+    if (ni < 0 || ni >= idRows.length) return;
+    onCompletionPage = false;
+    currentIndex = ni;
+    renderPage();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  /* 네비게이션 진입점: 미평정 확인 후 이동 */
+  async function navigate(dir) {
+    // 완료 페이지에서 뒤로 갈 때는 바로 이동
+    if (onCompletionPage && dir === -1) { await doNavigate(dir); return; }
+
+    // 미평정 확인
+    const unrated = countUnratedOnCurrentPage();
+    if (unrated > 0 && !onCompletionPage) {
+      document.getElementById('unratedNavMsg').innerHTML =
+        `현재 페이지에 <strong>${unrated}개</strong> 미평정 지표가 있습니다.<br>그래도 이동하시겠습니까?`;
+      pendingNavDir = dir;
+      unratedNavModal.classList.add('active');
+      return;
+    }
+
+    await doNavigate(dir);
+  }
+
+  document.getElementById('btnPrev').addEventListener('click', ()=>navigate(-1));
+  document.getElementById('btnNext').addEventListener('click', ()=>navigate(1));
+
+  document.addEventListener('keydown', e => {
+    if (descModal.classList.contains('active') || endModal.classList.contains('active')
+        || document.getElementById('saveConfirmModal').classList.contains('active')
+        || document.getElementById('infoModal').classList.contains('active')
+        || unratedNavModal.classList.contains('active')) {
+      if (e.key==='Escape') { closeDescModal(); endModal.classList.remove('active');
+        document.getElementById('saveConfirmModal').classList.remove('active');
+        document.getElementById('infoModal').classList.remove('active');
+        unratedNavModal.classList.remove('active'); pendingNavDir=0; }
+      return;
+    }
+    if (e.key==='ArrowLeft')  navigate(-1);
+    if (e.key==='ArrowRight') navigate(1);
+  });
+
+  /* ════════════════════ 지표 설명 드래그 모달 ════════════════════ */
+  const descOverlay = document.getElementById('descOverlay');
+  const descModal   = document.getElementById('descModal');
+  const descHeader  = document.getElementById('descModalHeader');
+
+  function openDescModal(title, text) {
+    document.getElementById('descModalTitle').textContent = title;
+    const body = document.getElementById('descModalBody');
+    const paras = text.split(/\n+/).filter(p=>p.trim());
+    body.innerHTML = paras.length <= 1
+      ? '<p>'+esc(text)+'</p>'
+      : paras.map(p=>'<p>'+esc(p.trim())+'</p>').join('');
+    descModal.style.cssText = 'top:50%;left:50%;transform:translate(-50%,-50%)';
+    descOverlay.classList.add('active');
+    descModal.classList.add('active');
+  }
+  function closeDescModal() { descOverlay.classList.remove('active'); descModal.classList.remove('active'); }
+
+  document.querySelectorAll('.btn-desc').forEach(btn => {
+    btn.addEventListener('click', () => openDescModal(btn.dataset.title || '요소 설명', btn.dataset.desc || '설명 없음'));
+  });
+  document.getElementById('descModalClose').addEventListener('click', closeDescModal);
+  descOverlay.addEventListener('click', closeDescModal);
+
+  // 드래그
+  let isDrag=false, dOX=0, dOY=0;
+  descHeader.addEventListener('mousedown', e => {
+    if (e.target.closest('.desc-modal-right')) return;
+    isDrag=true; const r=descModal.getBoundingClientRect();
+    dOX=e.clientX-r.left; dOY=e.clientY-r.top;
+    descModal.style.transform='none'; descModal.style.left=r.left+'px'; descModal.style.top=r.top+'px';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => { if(!isDrag)return; descModal.style.left=(e.clientX-dOX)+'px'; descModal.style.top=(e.clientY-dOY)+'px'; });
+  document.addEventListener('mouseup', ()=>{ isDrag=false; });
+  descHeader.addEventListener('touchstart', e => {
+    if (e.target.closest('.desc-modal-right')) return;
+    isDrag=true; const t=e.touches[0], r=descModal.getBoundingClientRect();
+    dOX=t.clientX-r.left; dOY=t.clientY-r.top;
+    descModal.style.transform='none'; descModal.style.left=r.left+'px'; descModal.style.top=r.top+'px';
+  }, {passive:true});
+  document.addEventListener('touchmove', e => { if(!isDrag)return; const t=e.touches[0]; descModal.style.left=(t.clientX-dOX)+'px'; descModal.style.top=(t.clientY-dOY)+'px'; }, {passive:true});
+  document.addEventListener('touchend', ()=>{ isDrag=false; });
+
+  /* ════════════════════ 안내 모달 ════════════════════ */
+  const infoModal = document.getElementById('infoModal');
+  function showInfoModal(msg) {
+    document.getElementById('infoModalMsg').innerHTML = msg.replace(/\n/g, '<br>');
+    infoModal.classList.add('active');
+  }
+  document.getElementById('infoModalOk').addEventListener('click', () => infoModal.classList.remove('active'));
+  infoModal.addEventListener('click', e => { if (e.target === infoModal) infoModal.classList.remove('active'); });
+
+  /* ════════════════════ 종료 ════════════════════ */
+  const endModal = document.getElementById('endModal');
+  document.getElementById('btnEnd').addEventListener('click', ()=> endModal.classList.add('active'));
+  document.getElementById('endModalCancel').addEventListener('click', ()=> endModal.classList.remove('active'));
+  endModal.addEventListener('click', e=>{ if(e.target===endModal) endModal.classList.remove('active'); });
+  document.getElementById('endModalConfirm').addEventListener('click', ()=> {
+    location.href = 'select_delphi.html';
+  });
+
+  /* ════════════════════ 글자 크기 조절 (메인) ════════════════════ */
+  let fontScale = 100;
+  const FONT_MIN = 70, FONT_MAX = 140, FONT_STEP = 10;
+
+  function applyFontScale() {
+    const container = document.querySelector('.cards-container');
+    const ratio = fontScale / 100;
+    container.style.zoom = ratio;
+    container.style.webkitTextSizeAdjust = fontScale + '%';
+    document.getElementById('fontScaleLabel').textContent = fontScale + '%';
+    document.getElementById('btnFontDown').disabled = (fontScale <= FONT_MIN);
+    document.getElementById('btnFontUp').disabled = (fontScale >= FONT_MAX);
+  }
+
+  document.getElementById('btnFontUp').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (fontScale >= FONT_MAX) return;
+    fontScale += FONT_STEP;
+    applyFontScale();
+  });
+  document.getElementById('btnFontDown').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (fontScale <= FONT_MIN) return;
+    fontScale -= FONT_STEP;
+    applyFontScale();
+  });
+
+  /* ════════════════════ 글자 크기 조절 (모달) ════════════════════ */
+  let descFontScale = 100;
+  const DESC_FONT_MIN = 70, DESC_FONT_MAX = 160;
+
+  function applyDescFontScale() {
+    const body = document.getElementById('descModalBody');
+    const ratio = descFontScale / 100;
+    body.style.zoom = ratio;
+    body.style.webkitTextSizeAdjust = descFontScale + '%';
+    document.getElementById('descFontLabel').textContent = descFontScale + '%';
+    document.getElementById('descFontDown').disabled = (descFontScale <= DESC_FONT_MIN);
+    document.getElementById('descFontUp').disabled = (descFontScale >= DESC_FONT_MAX);
+  }
+
+  document.getElementById('descFontUp').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (descFontScale >= DESC_FONT_MAX) return;
+    descFontScale += FONT_STEP;
+    applyDescFontScale();
+  });
+  document.getElementById('descFontDown').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (descFontScale <= DESC_FONT_MIN) return;
+    descFontScale -= FONT_STEP;
+    applyDescFontScale();
+  });
+
+  loadData();
+</script>
+</body>
+</html>

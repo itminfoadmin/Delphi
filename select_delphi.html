@@ -19,15 +19,21 @@
     .top-bar {
       width: 100%; max-width: 640px;
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 24px; gap: 8px;
     }
-    .top-email { font-size: 14px; color: #555; }
-    .btn-logout {
+    .top-email { font-size: 14px; color: #555; flex: 1; }
+    .btn-refresh {
       font-size: 13px; padding: 6px 16px;
       background: #fff; border: 1px solid #bbb; border-radius: 4px;
       cursor: pointer; transition: background .15s;
     }
-    .btn-logout:hover { background: #e8e8e8; }
+    .btn-refresh:hover { background: #e8e8e8; }
+    .btn-logout {
+      font-size: 13px; padding: 6px 16px;
+      background: #1e1e1e; border: none; border-radius: 4px;
+      color: #fff; cursor: pointer; transition: background .15s;
+    }
+    .btn-logout:hover { background: #333; }
 
     /* 카드 */
     .card {
@@ -122,6 +128,7 @@
 
   <div class="top-bar">
     <span class="top-email" id="topEmail"></span>
+    <button class="btn-refresh" id="btnRefresh">새로고침</button>
     <button class="btn-logout" id="btnLogout">로그아웃</button>
   </div>
 
@@ -141,10 +148,10 @@
 
   const ROUND_INFO = [
     { key: '1st_delphi', label: '1차 델파이 설문', page: '1st_delphi_intro.html', statusKey: '1st_delphi_status' },
-    { key: '2nd_delphi', label: '2차 델파이 설문', page: '2nd_delphi.html',       statusKey: '2nd_delphi_status' },
-    { key: '3rd_delphi', label: '3차 델파이 설문', page: '3rd_delphi.html',       statusKey: '3rd_delphi_status' },
-    { key: '4th_delphi', label: '4차 델파이 설문', page: '4th_delphi.html',       statusKey: '4th_delphi_status' },
-    { key: '5th_delphi', label: '5차 델파이 설문', page: '5th_delphi.html',       statusKey: '5th_delphi_status' },
+    { key: '2nd_delphi', label: '2차 델파이 설문', page: '2nd_delphi_intro.html',       statusKey: '2nd_delphi_status' },
+    { key: '3rd_delphi', label: '3차 델파이 설문', page: '3rd_delphi_intro.html',       statusKey: '3rd_delphi_status' },
+    { key: '4th_delphi', label: '4차 델파이 설문', page: '4th_delphi_intro.html',       statusKey: '4th_delphi_status' },
+    { key: '5th_delphi', label: '5차 델파이 설문', page: '5th_delphi_intro.html',       statusKey: '5th_delphi_status' },
   ];
 
   /* 세션 확인 */
@@ -209,9 +216,10 @@
   async function loadDelphi() {
     const list = document.getElementById('delphiList');
     try {
+      const cacheBust = '&_t=' + Date.now();
       const [delphiRes, panelRes] = await Promise.all([
-        fetch(DELPHI_NO_CSV),
-        fetch(PANEL_CSV)
+        fetch(DELPHI_NO_CSV + cacheBust),
+        fetch(PANEL_CSV + cacheBust)
       ]);
       const delphiText = await delphiRes.text();
       const panelText  = await panelRes.text();
@@ -244,8 +252,8 @@
 
   loadDelphi();
 
-  /* 1분(60초)마다 자동 갱신 */
-  setInterval(loadDelphi, 60000);
+  /* 새로고침 버튼 */
+  document.getElementById('btnRefresh').addEventListener('click', () => loadDelphi());
 </script>
 </body>
 </html>
