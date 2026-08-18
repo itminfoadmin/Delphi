@@ -25,11 +25,17 @@
 <body>
 
 <div class="card">
-  <button class="btn-logout" onclick="sessionStorage.clear();location.href='admin_login.html'">로그아웃</button>
+  <button class="btn-logout" onclick="sessionStorage.clear();location.href='index.html'">로그아웃</button>
   <h1 class="card-title">관리자 메뉴</h1>
   <p class="card-sub">관리할 항목을 선택해주세요.</p>
 
   <div class="menu-list">
+    <a class="menu-btn menu-status" href="admin_mng-delphi_period.html">
+      델파이 설문 일정 관리
+      <span class="menu-label">각 차수 설문의 시작·종료 일자 설정</span>
+      <span class="menu-arrow">›</span>
+    </a>
+
     <a class="menu-btn menu-status" href="admin_mng-delphi_status.html">
       델파이 설문 현황
       <span class="menu-label">패널 현황 및 설문 진행 상태 관리</span>

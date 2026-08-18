@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2차 델파이 설문</title>
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+  <link rel="dns-prefetch" href="https://script.google.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -483,65 +486,81 @@
   async function loadData() {
     showLoading(true);
     try {
-      /* 1단계: BASIC_GAS에서 패널 정보 조회 (Basic_Data 시트 접근 가능) */
+      /* sessionStorage 캐시 확인 (5분 유효) */
+      const cacheKey = '2nd_delphi_cache_' + panelEmail;
+      const cacheTimeKey = '2nd_delphi_cache_time_' + panelEmail;
+      const cached = sessionStorage.getItem(cacheKey);
+      const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
+      const CACHE_TTL = 5 * 60 * 1000;
+
       let panelCol = '';
       let panelIdx = 0;
-      try {
-        const panelRes = await fetch(BASIC_GAS_URL, {
+      let surveyData, savedRatingsData;
+
+      if (cached && (Date.now() - cachedTime < CACHE_TTL)) {
+        /* ── 캐시 히트 ── */
+        const c = JSON.parse(cached);
+        panelCol = c.panelCol || '';
+        panelIdx = c.panelIdx || 0;
+        surveyData = c.surveyData;
+        savedRatingsData = c.savedRatingsData;
+        console.log('[loadData] 캐시에서 로드');
+      } else {
+        /* ── 3개 동시 호출 ── */
+        // 1) 패널 조회 (BASIC_GAS)
+        const panelP = fetch(BASIC_GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
-        });
-        const panelText = await panelRes.text();
-        const panelData = JSON.parse(panelText);
-        if (panelData.status === 'ok' && panelData.panelCol) {
-          panelCol = panelData.panelCol;
-          panelIdx = panelData.panelIndex || 0;
-          console.log('[loadData] BASIC_GAS 패널 조회 성공:', panelCol);
-        } else {
-          console.warn('[loadData] BASIC_GAS 패널 조회 실패:', panelData.message);
+        }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
+          .catch(() => ({ status:'error' }));
+
+        // 2) 설문 데이터 (GAS - 가벼운 getAllData)
+        const dataP = fetch(GAS_URL + '?action=getAllData')
+          .then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{throw new Error('파싱 실패')} });
+
+        // 패널 + 데이터 동시 대기
+        const [panelResult, dataResult] = await Promise.all([panelP, dataP]);
+
+        if (panelResult.status === 'ok' && panelResult.panelCol) {
+          panelCol = panelResult.panelCol;
+          panelIdx = panelResult.panelIndex || 0;
         }
-      } catch(pe) {
-        console.warn('[loadData] BASIC_GAS 패널 조회 에러:', pe.message);
+        surveyData = dataResult;
+
+        // 3) 저장값 조회 (패널 확인 후 즉시 — 데이터와 겹쳐서 빠름)
+        savedRatingsData = { savedRatings: {} };
+        if (panelCol && panelIdx > 0) {
+          try {
+            const srUrl = GAS_URL + '?action=getSavedRatings&panelCol=' + encodeURIComponent(panelCol) + '&panelIndex=' + panelIdx;
+            const srRes = await fetch(srUrl);
+            const srText = await srRes.text();
+            savedRatingsData = JSON.parse(srText);
+          } catch(e) { console.warn('[loadData] savedRatings 조회 실패:', e); }
+        }
+
+        // 캐시 저장
+        sessionStorage.setItem(cacheKey, JSON.stringify({ panelCol, panelIdx, surveyData, savedRatingsData }));
+        sessionStorage.setItem(cacheTimeKey, String(Date.now()));
       }
 
-      /* 2단계: init 호출 (패널 정보 포함) */
-      let initUrl = GAS_URL + '?action=init&email=' + encodeURIComponent(panelEmail);
-      if (panelCol) {
-        initUrl += '&panelCol=' + encodeURIComponent(panelCol) + '&panelIndex=' + panelIdx;
-      }
-      const res = await fetch(initUrl);
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); } catch { throw new Error('GAS 응답 파싱 실패'); }
-      if (data.status !== 'ok') throw new Error(data.message || '데이터 로드 실패');
-
-      console.log('[init] 패널:', data.panel_no, data.panelCol);
+      if (surveyData.status !== 'ok') throw new Error(surveyData.message || '데이터 로드 실패');
 
       /* 패널 번호 설정 */
-      panelColValue = data.panelCol || panelCol || '';
-      if (!panelColValue) {
-        console.warn('[init] 패널 컬럼을 찾을 수 없습니다.');
-      }
+      panelColValue = panelCol || '';
 
       /* id 탭 */
-      idRows = data.idRows || [];
+      idRows = surveyData.idRows || [];
 
-      /* index 탭들 → ID별 그룹핑 */
-      eduIndices    = groupByIdFromGAS(data.eduRows || []);
-      hahwaIndices  = groupByIdFromGAS(data.hahwaRows || []);
-      sangguIndices = groupByIdFromGAS(data.sangguRows || []);
-      console.log('[init] id:', idRows.length, 'edu:', (data.eduRows||[]).length, 'hahwa:', (data.hahwaRows||[]).length, 'sanggu:', (data.sangguRows||[]).length);
+      /* index 탭들 */
+      eduIndices    = groupByIdFromGAS(surveyData.eduRows || []);
+      hahwaIndices  = groupByIdFromGAS(surveyData.hahwaRows || []);
+      sangguIndices = groupByIdFromGAS(surveyData.sangguRows || []);
+      console.log('[init] id:', idRows.length, 'edu:', (surveyData.eduRows||[]).length, 'hahwa:', (surveyData.hahwaRows||[]).length, 'sanggu:', (surveyData.sangguRows||[]).length);
 
       /* 기존 응답 복원 */
-      if (data.savedRatings) {
-        console.log('[init] savedRatings 키:', Object.keys(data.savedRatings));
-        Object.keys(data.savedRatings).forEach(k => {
-          console.log('[init] savedRatings[' + k + ']:', (data.savedRatings[k] || []).length, '건');
-        });
-        restoreSavedFromInit(data.savedRatings);
-      } else {
-        console.log('[init] savedRatings 없음');
+      if (savedRatingsData && savedRatingsData.savedRatings) {
+        restoreSavedFromInit(savedRatingsData.savedRatings);
       }
 
       if (idRows.length === 0) {

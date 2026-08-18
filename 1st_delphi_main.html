@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1차 델파이 설문</title>
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+  <link rel="dns-prefetch" href="https://script.google.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -372,10 +375,38 @@
   async function loadData() {
     showLoading(true);
     try {
-      const [dataRes, addRes] = await Promise.all([
-        gasCall({ action:'getData' }),
-        gasCall({ action:'getAdditions', panel: panelNo || panelEmail })
-      ]);
+      /* sessionStorage 캐시 확인 (5분 유효) */
+      const cacheKey = '1st_delphi_cache';
+      const cacheTimeKey = '1st_delphi_cache_time';
+      const cached = sessionStorage.getItem(cacheKey);
+      const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
+      const CACHE_TTL = 5 * 60 * 1000; // 5분
+
+      let dataRes, addRes;
+      if (cached && (Date.now() - cachedTime < CACHE_TTL)) {
+        /* 캐시 사용 → 즉시 표시 후 백그라운드 갱신 */
+        const c = JSON.parse(cached);
+        dataRes = c.dataRes;
+        addRes = c.addRes;
+        console.log('[loadData] 캐시에서 로드 (백그라운드 갱신 시작)');
+        // 백그라운드에서 최신 데이터 갱신
+        Promise.all([
+          gasCall({ action:'getData' }),
+          gasCall({ action:'getAdditions', panel: panelNo || panelEmail })
+        ]).then(([d, a]) => {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ dataRes: d, addRes: a }));
+          sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+        }).catch(() => {});
+      } else {
+        /* 캐시 없음 → 병렬 호출 */
+        [dataRes, addRes] = await Promise.all([
+          gasCall({ action:'getData' }),
+          gasCall({ action:'getAdditions', panel: panelNo || panelEmail })
+        ]);
+        sessionStorage.setItem(cacheKey, JSON.stringify({ dataRes, addRes }));
+        sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+      }
+
       if (dataRes.status !== 'ok') throw new Error(dataRes.message);
       allRows = dataRes.rows || [];
       allAdditions = (addRes.status === 'ok' ? addRes.additions : []) || [];

@@ -139,7 +139,7 @@
     <hr class="divider" />
 
     <div class="body-text">
-      <p>&nbsp <strong>※ 설문 기간 : 2027년 1월 20일 ~ 2월 10일</strong></p>
+      <p>&nbsp <strong>※ 설문 기간 : <span id="periodText">불러오는 중...</span></strong></p>
       <p>&nbsp 2차 설문은 선행연구(김종수, 이지산, 2025, 2026a, 2026b)에서 탐색된 교육활동 평정 지표와 지난 1차 델파이 설문을 통해 추가적으로 수집된 평정 지표를 종합한 <strong>교육활동·하화활동·상구활동 평정 지표의 적절성</strong>에 대한 설문입니다.</p>
 
       <p>&nbsp 여기서는 1차 델파이 설문과 마찬가지로 <strong>교육활동 평정 지표</strong>, <strong>하화활동 평정 지표</strong>, <strong>상구활동 평정 지표</strong>가 상위 범주 및 요소 별로 묶여서 제시되며, 해당 지표 상위의 요소별로 지표들의 맥락을 확인하실 수 있습니다.교육활동, 하화활동, 상구활동을 평정함에 있어서의 각 지표의 적절성 정도를 판단하시어 <strong>매우 부적절(1점)부터 매우 적절(5점)까지 선택</strong>하실 수 있으며, 선택은 2차 델파이 설문 완료 전까지 수정이 가능합니다. 단, <strong>매우 부적절(1점)</strong>와 <strong>부적절(2점)</strong>를 선택한 경우에 추후 3차 델파이 설문을 위해 <strong>판단의 근거를 입력</strong>하게 구성되어 있습니다. </p> 
@@ -155,6 +155,39 @@
       <button class="btn btn-start" onclick="location.href='2nd_delphi_main.html'">설문 시작</button>
     </div>
   </div>
+
+<script>
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+  const PERIOD_KEY = '2nd_delphi';
+
+  function shortDate(str) {
+    if (!str) return '';
+    const m = str.match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
+    if (m) return m[1] + '년 ' + m[2].padStart(2,'0') + '월 ' + m[3].padStart(2,'0') + '일';
+    return str;
+  }
+
+  fetch(BASIC_GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'getDelphiPeriods' })
+  }).then(r => r.text()).then(t => {
+    const data = JSON.parse(t);
+    if (data.status === 'ok' && data.periods) {
+      const p = data.periods.find(r => r.no === PERIOD_KEY);
+      if (p && (p.start || p.end)) {
+        document.getElementById('periodText').textContent =
+          (shortDate(p.start) || '미정') + ' ~ ' + (shortDate(p.end) || '미정');
+      } else {
+        document.getElementById('periodText').textContent = '미정';
+      }
+    } else {
+      document.getElementById('periodText').textContent = '미정';
+    }
+  }).catch(() => {
+    document.getElementById('periodText').textContent = '미정';
+  });
+</script>
 
 </body>
 </html>
