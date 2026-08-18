@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2차 설문 안내</title>
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+  <link rel="dns-prefetch" href="https://script.google.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,14 +43,28 @@
       box-shadow: 0 2px 16px rgba(26,26,46,.08), 0 1px 4px rgba(26,26,46,.06);
     }
 
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
     .card-title {
       font-family: 'Noto Serif KR', serif;
       font-size: 28px;
       font-weight: 700;
       color: var(--ink);
-      margin-bottom: 32px;
+      margin-bottom: 0;
       line-height: 1.3;
     }
+
+    .btn-back {
+      background: #fff;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+    }
+    .btn-back:hover { background: var(--accent-lt); }
 
     .divider {
       border: none;
@@ -130,16 +147,47 @@
       border-color: #3a5c8f;
       box-shadow: 0 4px 12px rgba(74,111,165,.40);
     }
+
+    /* ── 로딩 ── */
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;background:var(--accent);animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+
+    .btn-top-back {
+      min-width: auto;
+      padding: 4.5px 18px;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h1 class="card-title">2차 델파이 설문</h1>
+  <div class="loading-overlay active" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문을 준비하는 중...</span>
+  </div>
+
+  <div class="card" id="mainCard" style="display:none;">
+    <div class="top-bar">
+      <h1 class="card-title">2차 델파이 설문</h1>
+      <button class="btn btn-back btn-top-back" onclick="location.href='select_delphi.html'">이전으로 돌아가기</button>
+    </div>
     <hr class="divider" />
 
     <div class="body-text">
-      <p>&nbsp <strong>※ 설문 기간 : <span id="periodText">불러오는 중...</span></strong></p>
+      <p>&nbsp <strong id="scheduleText">※ 설문 기간 : 불러오는 중...</strong></p>
       <p>&nbsp 2차 설문은 선행연구(김종수, 이지산, 2025, 2026a, 2026b)에서 탐색된 교육활동 평정 지표와 지난 1차 델파이 설문을 통해 추가적으로 수집된 평정 지표를 종합한 <strong>교육활동·하화활동·상구활동 평정 지표의 적절성</strong>에 대한 설문입니다.</p>
 
       <p>&nbsp 여기서는 1차 델파이 설문과 마찬가지로 <strong>교육활동 평정 지표</strong>, <strong>하화활동 평정 지표</strong>, <strong>상구활동 평정 지표</strong>가 상위 범주 및 요소 별로 묶여서 제시되며, 해당 지표 상위의 요소별로 지표들의 맥락을 확인하실 수 있습니다.교육활동, 하화활동, 상구활동을 평정함에 있어서의 각 지표의 적절성 정도를 판단하시어 <strong>매우 부적절(1점)부터 매우 적절(5점)까지 선택</strong>하실 수 있으며, 선택은 2차 델파이 설문 완료 전까지 수정이 가능합니다. 단, <strong>매우 부적절(1점)</strong>와 <strong>부적절(2점)</strong>를 선택한 경우에 추후 3차 델파이 설문을 위해 <strong>판단의 근거를 입력</strong>하게 구성되어 있습니다. </p> 
@@ -158,35 +206,59 @@
 
 <script>
   const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
-  const PERIOD_KEY = '2nd_delphi';
+  const ROUND = '2nd_delphi';
 
-  function shortDate(str) {
-    if (!str) return '';
-    const m = str.match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
-    if (m) return m[1] + '년 ' + m[2].padStart(2,'0') + '월 ' + m[3].padStart(2,'0') + '일';
-    return str;
+  function showPage() {
+    document.getElementById('mainCard').style.display = '';
+    document.getElementById('loadingOverlay').classList.remove('active');
   }
 
-  fetch(BASIC_GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: 'getDelphiPeriods' })
-  }).then(r => r.text()).then(t => {
-    const data = JSON.parse(t);
-    if (data.status === 'ok' && data.periods) {
-      const p = data.periods.find(r => r.no === PERIOD_KEY);
-      if (p && (p.start || p.end)) {
-        document.getElementById('periodText').textContent =
-          (shortDate(p.start) || '미정') + ' ~ ' + (shortDate(p.end) || '미정');
-      } else {
-        document.getElementById('periodText').textContent = '미정';
-      }
-    } else {
-      document.getElementById('periodText').textContent = '미정';
+  // 8초 안에 응답이 없으면 강제로 페이지 표시
+  const safetyTimer = setTimeout(() => {
+    console.warn('[타임아웃] 8초 초과 — 페이지 강제 표시');
+    const el = document.getElementById('scheduleText');
+    if (el.textContent.indexOf('불러오는 중') !== -1) {
+      el.textContent = '※ 설문 기간 : 설문 진행중...';
     }
-  }).catch(() => {
-    document.getElementById('periodText').textContent = '미정';
-  });
+    showPage();
+  }, 8000);
+
+  async function loadSchedule() {
+    try {
+      const res = await fetch(BASIC_GAS_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'getDelphiPeriods' })
+      });
+      const text = await res.text();
+      console.log('[getDelphiPeriods 응답 원문]', text);
+      let result;
+      try { result = JSON.parse(text); } catch { result = { status: 'error' }; }
+      console.log('[getDelphiPeriods 결과]', result);
+
+      const el = document.getElementById('scheduleText');
+      if (result.status === 'ok' && Array.isArray(result.periods)) {
+        const p = result.periods.find(item => String(item.no).trim() === ROUND);
+        if (p && p.start && p.end) {
+          el.textContent = '※ 설문 기간 : ' + p.start + ' ~ ' + p.end;
+        } else if (p && p.start) {
+          el.textContent = '※ 설문 기간 : ' + p.start + ' ~';
+        } else {
+          el.textContent = '※ 설문 기간 : 미정';
+        }
+      } else {
+        el.textContent = '※ 설문 기간 : 설문 진행중...';
+      }
+    } catch (e) {
+      console.error('[getDelphiPeriods 에러]', e);
+      document.getElementById('scheduleText').textContent = '※ 설문 기간 : 설문 진행중...';
+    } finally {
+      clearTimeout(safetyTimer);
+      showPage();
+    }
+  }
+  loadSchedule();
 </script>
 
 </body>

@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>델파이 설문 선택</title>
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+  <link rel="dns-prefetch" href="https://docs.google.com" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -61,7 +64,6 @@
     .delphi-label {
       flex: 1; font-size: 16px; font-weight: bold; color: #222;
     }
-    .delphi-period {
       font-size: 12px; font-weight: 400; color: #888; margin-left: 6px;
     }
 
@@ -91,7 +93,9 @@
     .btn-enter.disabled-btn{ background: #eee; border: 1px solid #ccc; color: #aaa; cursor: default; }
 
     /* 로딩 */
-    .loading { text-align: center; color: #aaa; font-size: 14px; padding: 40px 0; }
+    .loading { text-align: center; color: #aaa; font-size: 14px; padding: 40px 0; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .spinner { width:32px; height:32px; border:3px solid #e0e0e0; border-top:3px solid #4a6fa5; border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
     /* 로그아웃 확인 모달 */
     .overlay {
@@ -138,7 +142,7 @@
   <div class="card">
     <p class="card-title">델파이 설문 선택</p>
     <div class="delphi-list" id="delphiList">
-      <p class="loading">설문 정보를 불러오는 중...</p>
+      <div class="loading" id="loadingArea"><div class="spinner"></div><span>설문 정보를 불러오는 중...</span></div>
     </div>
   </div>
 
@@ -148,7 +152,6 @@
   ════════════════════════════════ */
   const DELPHI_NO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1701744269&single=true&output=csv';
   const PANEL_CSV    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
-  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
 
   const ROUND_INFO = [
     { key: '1st_delphi', label: '1차 델파이 설문', page: '1st_delphi_intro.html', statusKey: '1st_delphi_status' },
@@ -217,43 +220,41 @@
   }
 
   /* 날짜 → 간단 형식 (2025.08.24.) */
-  function shortDate(str) {
-    if (!str) return '';
-    const m = str.match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
-    if (m) return m[1] + '.' + m[2].padStart(2,'0') + '.' + m[3].padStart(2,'0') + '.';
-    return str;
-  }
 
   /* 설문 목록 렌더링 */
   async function loadDelphi() {
     const list = document.getElementById('delphiList');
-    try {
-      const cacheBust = '&_t=' + Date.now();
-      const [delphiRes, panelRes, periodRes] = await Promise.all([
-        fetch(DELPHI_NO_CSV + cacheBust),
-        fetch(PANEL_CSV + cacheBust),
-        fetch(BASIC_GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'getDelphiPeriods' })
-        }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} }).catch(() => ({status:'error'}))
-      ]);
-      const delphiText = await delphiRes.text();
-      const panelText  = await panelRes.text();
-      const delphiRows = parseCSV(delphiText);
-      const panelRows  = parseCSV(panelText);
+    list.innerHTML = '<div class="loading"><div class="spinner"></div><span>설문 정보를 불러오는 중...</span></div>';
 
-      // delphi_no → check 매핑
+    try {
+      /* sessionStorage 캐시 (3분) */
+      const cacheKey = 'select_delphi_cache';
+      const cacheTimeKey = 'select_delphi_cache_time';
+      const cached = sessionStorage.getItem(cacheKey);
+      const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
+      const CACHE_TTL = 3 * 60 * 1000;
+
+      let delphiRows, panelRows;
+
+      if (cached && (Date.now() - cachedTime < CACHE_TTL)) {
+        const c = JSON.parse(cached);
+        delphiRows = c.delphiRows;
+        panelRows = c.panelRows;
+      } else {
+        const cacheBust = '&_t=' + Date.now();
+        const [delphiRes, panelRes] = await Promise.all([
+          fetch(DELPHI_NO_CSV + cacheBust).then(r => r.text()),
+          fetch(PANEL_CSV + cacheBust).then(r => r.text())
+        ]);
+        delphiRows = parseCSV(delphiRes);
+        panelRows = parseCSV(panelRes);
+        sessionStorage.setItem(cacheKey, JSON.stringify({ delphiRows, panelRows }));
+        sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+      }
+
       const map = {};
       delphiRows.forEach(r => { map[r['Delphi_no']] = r['check'] || '대기'; });
 
-      // 기간 매핑
-      const periodMap = {};
-      if (periodRes.status === 'ok' && periodRes.periods) {
-        periodRes.periods.forEach(p => { periodMap[p.no] = p; });
-      }
-
-      // 패널 이메일로 해당 패널 행 찾기
       const myPanel = panelRows.find(r =>
         (r['e-mail'] || '').trim() === panelEmail.trim()
       ) || {};
@@ -261,29 +262,26 @@
       list.innerHTML = ROUND_INFO.map(info => {
         const check = map[info.key] || '대기';
         const myStatus = myPanel[info.statusKey] || '대기';
-        const period = periodMap[info.key];
-        let periodStr = '';
-        if (period && (period.start || period.end)) {
-          const s = shortDate(period.start) || '?';
-          const e = shortDate(period.end) || '?';
-          periodStr = `<span class="delphi-period">(${s} ~ ${e})</span>`;
-        }
         return `
           <div class="delphi-item">
-            <span class="delphi-label">${info.label}${periodStr}</span>
+            <span class="delphi-label">${info.label}</span>
             ${panelStatusHtml(myStatus)}
             ${enterBtn(myStatus, info.page)}
           </div>`;
       }).join('');
     } catch(e) {
-      list.innerHTML = `<p class="loading">로드 실패: ${e.message}</p>`;
+      list.innerHTML = `<div class="loading"><span>로드 실패: ${e.message}</span></div>`;
     }
   }
 
   loadDelphi();
 
   /* 새로고침 버튼 */
-  document.getElementById('btnRefresh').addEventListener('click', () => loadDelphi());
+  document.getElementById('btnRefresh').addEventListener('click', () => {
+    sessionStorage.removeItem('select_delphi_cache');
+    sessionStorage.removeItem('select_delphi_cache_time');
+    loadDelphi();
+  });
 </script>
 </body>
 </html>

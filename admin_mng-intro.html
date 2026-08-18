@@ -20,12 +20,34 @@
     .menu-btn.menu-status{background:#eaeaea;border-color:#ccc}
     .menu-btn.menu-status:hover{background:#e0e4ee;border-color:#4a6fa5;color:#4a6fa5}
     .menu-label{font-size:12px;color:#999;font-weight:400;display:block;margin-top:4px}
+
+    /* 로그아웃 확인 모달 */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1000;align-items:center;justify-content:center}
+    .overlay.active{display:flex}
+    .lo-modal{background:#fff;border-radius:6px;padding:36px 40px 28px;width:320px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.18);text-align:center}
+    .lo-modal p{font-size:15px;color:#333;line-height:1.7;margin-bottom:28px}
+    .lo-actions{display:flex;gap:10px}
+    .lo-actions button{flex:1;padding:11px 0;font-size:14px;font-weight:bold;border-radius:4px;cursor:pointer;transition:opacity .2s}
+    .lo-actions button:hover{opacity:.85}
+    .lo-cancel{background:#fff;border:1.5px solid #ccc;color:#333}
+    .lo-confirm{background:#1e1e1e;border:none;color:#fff}
   </style>
 </head>
 <body>
 
+<!-- 로그아웃 확인 모달 -->
+<div class="overlay" id="loOverlay">
+  <div class="lo-modal">
+    <p>로그아웃 하시겠습니까?</p>
+    <div class="lo-actions">
+      <button class="lo-cancel" id="loCancel">취소</button>
+      <button class="lo-confirm" id="loConfirm">로그아웃</button>
+    </div>
+  </div>
+</div>
+
 <div class="card">
-  <button class="btn-logout" onclick="sessionStorage.clear();location.href='index.html'">로그아웃</button>
+  <button class="btn-logout" id="btnLogout">로그아웃</button>
   <h1 class="card-title">관리자 메뉴</h1>
   <p class="card-sub">관리할 항목을 선택해주세요.</p>
 
@@ -74,6 +96,14 @@
 
   </div>
 </div>
+
+<script>
+  const loOverlay = document.getElementById('loOverlay');
+  document.getElementById('btnLogout').addEventListener('click', () => loOverlay.classList.add('active'));
+  document.getElementById('loCancel').addEventListener('click', () => loOverlay.classList.remove('active'));
+  document.getElementById('loConfirm').addEventListener('click', () => { sessionStorage.clear(); location.href = 'index.html'; });
+  loOverlay.addEventListener('click', e => { if (e.target === loOverlay) loOverlay.classList.remove('active'); });
+</script>
 
 </body>
 </html>

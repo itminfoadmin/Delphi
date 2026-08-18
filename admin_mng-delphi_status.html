@@ -42,8 +42,6 @@
     .btn-reload:hover { background: #3a5c8f; }
     .btn-back { background: #e8e8e8; color: var(--ink); border: 1.5px solid var(--divider) !important; }
     .btn-back:hover { background: #d5d5d5; }
-    .btn-logout { background: #fff; color: var(--ink-mid); border: 1.5px solid var(--divider) !important; }
-    .btn-logout:hover { background: #f5f5f5; border-color: #999 !important; }
 
     /* ── 테이블 ── */
     .table-wrap { overflow-x: auto; max-width: 1134px; margin: 0 auto; }
@@ -238,17 +236,6 @@
     </div>
   </div>
 
-  <!-- 로그아웃 모달 -->
-  <div class="overlay" id="loOverlay">
-    <div class="lo-modal">
-      <p>로그아웃 하시겠습니까?</p>
-      <div class="modal-actions">
-        <button class="btn-m-cancel"  id="loCancel">취소</button>
-        <button class="btn-m-confirm" id="loConfirm">로그아웃</button>
-      </div>
-    </div>
-  </div>
-
   <!-- 패널 추가 모달 -->
   <div class="overlay" id="addOverlay">
     <div class="modal-box">
@@ -336,7 +323,6 @@
     <button class="btn-hdr btn-reload" id="btnReload">새로고침</button>
     <button class="btn-hdr btn-save-all" id="btnSaveAll">변경사항 저장</button>
     <button class="btn-hdr btn-back" id="btnBack">관리자 메뉴로 가기</button>
-    <button class="btn-hdr btn-logout" id="btnLogout">로그아웃</button>
   </div>
 
   <!-- 메인 테이블 -->
@@ -588,12 +574,6 @@
     }
   }
 
-  /* ── 로그아웃 ── */
-  const loOverlay = document.getElementById('loOverlay');
-  document.getElementById('btnLogout').addEventListener('click', () => loOverlay.classList.add('active'));
-  document.getElementById('loCancel').addEventListener('click',  () => loOverlay.classList.remove('active'));
-  document.getElementById('loConfirm').addEventListener('click', () => { sessionStorage.clear(); location.href='index.html'; });
-  loOverlay.addEventListener('click', e => { if(e.target===loOverlay) loOverlay.classList.remove('active'); });
 
   /* ── Reload ── */
   document.getElementById('btnReload').addEventListener('click', () => loadAll());
