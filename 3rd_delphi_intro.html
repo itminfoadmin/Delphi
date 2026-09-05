@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3차 설문 안내</title>
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+  <link rel="dns-prefetch" href="https://script.google.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #1a1a2e;
+      --ink-mid:  #3d3d5c;
+      --ink-soft: #6b6b8a;
+      --accent:   #4a6fa5;
+      --accent-lt:#e8edf5;
+      --divider:  #d0d5e0;
+      --bg:       #f4f5f8;
+      --card-bg:  #ffffff;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 4px;
+      border-top: 4px solid var(--accent);
+      max-width: 900px;
+      width: 100%;
+      padding: 36px 56px 40px;
+      box-shadow: 0 2px 16px rgba(26,26,46,.08), 0 1px 4px rgba(26,26,46,.06);
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .card-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0;
+      line-height: 1.3;
+    }
+
+    .btn-back {
+      background: #fff;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+    }
+    .btn-back:hover { background: var(--accent-lt); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--divider);
+      margin-bottom: 32px;
+    }
+
+    .body-text {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 15px;
+      line-height: 2.1;
+      color: var(--ink-mid);
+      word-break: keep-all;
+      text-align: justify;
+    }
+
+    .body-text p {
+      margin-bottom: 22px;
+      padding-left: 1em;
+      text-indent: -1em;
+    }
+    .body-text p::before {
+      content: '';
+      display: inline-block;
+      width: 1em;
+    }
+    .body-text p:last-child { margin-bottom: 0; }
+
+    .body-text strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .notice-box {
+      margin-top: 28px;
+      background: var(--accent-lt);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 4px 4px 0;
+      padding: 14px 18px;
+      font-size: 14.5px;
+      color: var(--ink-mid);
+      line-height: 1.8;
+    }
+
+    /* 버튼 영역 — 카드 안으로 이동 */
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      min-width: 190px;
+      padding: 15px 28px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all .2s;
+      letter-spacing: .02em;
+    }
+
+    .btn-guide {
+      background: #fff;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+    }
+    .btn-guide:hover { background: var(--accent-lt); }
+
+    .btn-start {
+      background: var(--accent);
+      border: 1.5px solid var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(74,111,165,.30);
+    }
+    .btn-start:hover {
+      background: #3a5c8f;
+      border-color: #3a5c8f;
+      box-shadow: 0 4px 12px rgba(74,111,165,.40);
+    }
+
+    /* ── 로딩 ── */
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;background:var(--accent);animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+
+    .btn-top-back {
+      min-width: auto;
+      padding: 4.5px 18px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay active" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문을 준비하는 중...</span>
+  </div>
+
+  <div class="card" id="mainCard" style="display:none;">
+    <div class="top-bar">
+      <h1 class="card-title">3차 델파이 설문</h1>
+      <button class="btn btn-back btn-top-back" onclick="location.href='select_delphi.html'">이전으로 돌아가기</button>
+    </div>
+    <hr class="divider" />
+
+    <div class="body-text">
+      <p>&nbsp <strong id="scheduleText">※ 설문 기간 : 불러오는 중...</strong></p>
+      <p>&nbsp 3차 델파이 설문은 2차 델파이 설문 결과를 바탕으로 <strong>교육활동 평정 지표</strong>, <strong>하화활동 평정 지표</strong>, <strong>상구활동 평정 지표</strong>의 적절성을 재평정하는 설문입니다.</p>
+
+      <p>&nbsp 여기서는 2차 델파이 설문의 통계 결과(평균, 표준편차, CVR 등)와 매우 부적절(1점) 및 부적절(2점)로 평가된 지표들의 경우에 해당 판단의 근거가 제시되며, 1차와 2차 설문과 동일하게 <strong>교육활동 평정 지표</strong>, <strong>하화활동 평정 지표</strong>, <strong>상구활동 평정 지표</strong>가 상위 범주 및 요소 별로 묶여서 제시됩니다. 패널께서는 2차 설문 결과 등을 참고하시어 지표의 적절성 정도를<strong>매우 부적절(1점)부터 매우 적절(5점)까지</strong>의 다섯 단계 중 하나를 선택해주시면 됩니다. 지표의 적절성 정도에 대한 선택은 3차 델파이 설문 완료 전까지 수정이 가능합니다.</p>
+
+    </div>
+
+    <div class="notice-box">
+상세한 설문 방법을 확인하시려면 <strong>[3차 설문 방법 확인]</strong> 버튼을, 3차 설문을 시작하시려면 <strong>[설문 시작]</strong> 버튼을 클릭해주세요.
+    </div><br>
+
+    <div class="btn-row">
+      <button class="btn btn-guide" onclick="location.href='3rd_delphi_guide.html'">3차 설문 방법 확인</button>
+      <button class="btn btn-start" onclick="location.href='3rd_delphi_main.html'">설문 시작</button>
+    </div>
+  </div>
+
+<script>
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+  const ROUND = '3rd_delphi';
+
+  function showPage() {
+    document.getElementById('mainCard').style.display = '';
+    document.getElementById('loadingOverlay').classList.remove('active');
+  }
+
+  // 8초 안에 응답이 없으면 강제로 페이지 표시
+  const safetyTimer = setTimeout(() => {
+    console.warn('[타임아웃] 8초 초과 — 페이지 강제 표시');
+    const el = document.getElementById('scheduleText');
+    if (el.textContent.indexOf('불러오는 중') !== -1) {
+      el.textContent = '※ 설문 기간 : 설문 진행중...';
+    }
+    showPage();
+  }, 8000);
+
+  async function loadSchedule() {
+    try {
+      const res = await fetch(BASIC_GAS_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'getDelphiPeriods' })
+      });
+      const text = await res.text();
+      console.log('[getDelphiPeriods 응답 원문]', text);
+      let result;
+      try { result = JSON.parse(text); } catch { result = { status: 'error' }; }
+      console.log('[getDelphiPeriods 결과]', result);
+
+      const el = document.getElementById('scheduleText');
+      if (result.status === 'ok' && Array.isArray(result.periods)) {
+        const p = result.periods.find(item => String(item.no).trim() === ROUND);
+        if (p && p.start && p.end) {
+          el.textContent = '※ 설문 기간 : ' + p.start + ' ~ ' + p.end;
+        } else if (p && p.start) {
+          el.textContent = '※ 설문 기간 : ' + p.start + ' ~';
+        } else {
+          el.textContent = '※ 설문 기간 : 미정';
+        }
+      } else {
+        el.textContent = '※ 설문 기간 : 설문 진행중...';
+      }
+    } catch (e) {
+      console.error('[getDelphiPeriods 에러]', e);
+      document.getElementById('scheduleText').textContent = '※ 설문 기간 : 설문 진행중...';
+    } finally {
+      clearTimeout(safetyTimer);
+      showPage();
+    }
+  }
+  loadSchedule();
+</script>
+
+</body>
+</html>
