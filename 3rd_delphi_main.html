@@ -810,9 +810,9 @@
         // 평균 위치 (1~5 → 0~100%)
         const meanPos = ((m - 1) / 4 * 100);
 
-        // SD 바 계산: M ± SD/2 (1~5 스케일)
-        const sdL = Math.max(0, ((m - s/2) - 1) / 4 * 100);
-        const sdR = Math.min(100, ((m + s/2) - 1) / 4 * 100);
+        // SD 바 계산: M ± SD (1~5 스케일)
+        const sdL = Math.max(0, ((m - s) - 1) / 4 * 100);
+        const sdR = Math.min(100, ((m + s) - 1) / 4 * 100);
         const sdW = Math.max(0, sdR - sdL);
 
         // 패널의 2차 평정
