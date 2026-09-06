@@ -406,7 +406,7 @@
   /* CSV URL은 폴백용으로 보관 */
   const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS7UDAZqMDbD0louyQOl8pk5O-1BYqCfTcJGyQ1efJgk7_d8zuW0Q8yhTcmARrb5DbRZKjRgZeQ2JRQ/pub';
 
-  const RATING_LABELS = ['매우\n부적절','부적절','보통','적절','매우\n적절'];
+  const RATING_LABELS = ['매우\n부적절','부적절','적절','매우\n적절'];
 
   const panelEmail = sessionStorage.getItem('panelEmail') || '';
   if (!panelEmail) location.href = 'index.html';
@@ -803,21 +803,21 @@
       // ── 2차 결과 표시 ──
       if (res2 && res2.mean !== null) {
         const m = res2.mean, s = res2.sd || 0, c = res2.cvr;
-        const mDisp = m !== null ? m.toFixed(1) : '-';
-        const sDisp = s !== null ? s.toFixed(1) : '-';
-        const cDisp = c !== null ? (c < 1 && c > -1 ? c.toFixed(1).replace('0.', '.').replace('-0.','-.'): c.toFixed(1)) : '-';
+        const mDisp = m !== null ? m.toFixed(2) : '-';
+        const sDisp = s !== null ? (s < 1 && s > -1 ? s.toFixed(2).replace('0.', '.').replace('-0.','-.'): s.toFixed(2)) : '-';
+        const cDisp = c !== null ? (c < 1 && c > -1 ? c.toFixed(2).replace('0.', '.').replace('-0.','-.'): c.toFixed(2)) : '-';
 
-        // 평균 위치 (1~5 → 0~100%)
-        const meanPos = ((m - 1) / 4 * 100);
+        // 평균 위치 (1~4 → 0~100%)
+        const meanPos = ((m - 1) / 3 * 100);
 
-        // SD 바 계산: M ± SD (1~5 스케일)
-        const sdL = Math.max(0, ((m - s) - 1) / 4 * 100);
-        const sdR = Math.min(100, ((m + s) - 1) / 4 * 100);
+        // SD 바 계산: M ± SD (1~4 스케일)
+        const sdL = Math.max(0, ((m - s) - 1) / 3 * 100);
+        const sdR = Math.min(100, ((m + s) - 1) / 3 * 100);
         const sdW = Math.max(0, sdR - sdL);
 
         // 패널의 2차 평정
         const prevRating = (panelIdx > 0 && res2.ratings) ? (res2.ratings[panelIdx - 1] || 0) : 0;
-        const circlePos = prevRating > 0 ? ((prevRating - 1) / 4 * 100) : -1;
+        const circlePos = prevRating > 0 ? ((prevRating - 1) / 3 * 100) : -1;
 
         // 바 영역 HTML: M= 평균 위치에 배치
         const sdTooltip = `SD=${sDisp} (CVR=${cDisp})`;
@@ -851,7 +851,7 @@
         const totalOps = ops1.length + ops2.length;
         if (totalOps > 0) {
           const combinedOps = { ops1, ops2 };
-          opsHtml = ` <button class="ops-view-btn" onclick='showCombinedOpinionModal(this.dataset.ops)' data-ops='${esc(JSON.stringify(combinedOps))}'>(매우) 부적절 선택 의견(${totalOps}건) 조회</button>`;
+          opsHtml = ` <button class="ops-view-btn" onclick='showCombinedOpinionModal(this.dataset.ops)' data-ops='${esc(JSON.stringify(combinedOps))}'>(매우) 부적절 선택 의견(${totalOps}건) 조회 🔍</button>`;
         }
       } else {
         // 2차 결과 없음 → 점선만 표시
@@ -873,7 +873,7 @@
       // ── 평정 버튼 (오른쪽 칼럼) ──
       html += `  <div class="index-right">`;
       html += `    <div class="rating-group">`;
-      for (let r = 1; r <= 5; r++) {
+      for (let r = 1; r <= 4; r++) {
         const sel = saved.rating === r ? ' selected' : '';
         const tooltip = RATING_LABELS[r-1].replace('\n',' ');
         if (r > 1) html += `<span class="rating-dot-line"></span>`;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3차 설문 방법 안내</title>
+  <title>4차 설문 방법 안내</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -206,7 +206,7 @@
       color: var(--ink-soft);
     }
 
-    /* ── 2차 결과 미리보기 (실제 설문과 동일 구조) ── */
+    /* ── 3차 결과 미리보기 (실제 설문과 동일 구조) ── */
     .prev-demo {
       display: flex;
       align-items: center;
@@ -498,14 +498,14 @@
 
   <div class="card">
     <div class="top-bar">
-      <h1 class="card-title">3차 델파이 설문 방법 안내</h1>
+      <h1 class="card-title">4차 델파이 설문 방법 안내</h1>
       <button class="btn btn-back btn-top-back" onclick="history.back()">이전으로 돌아가기</button>
     </div>
     <p class="card-subtitle">설문을 시작하기 전에 아래 안내를 꼼꼼히 확인해주세요.</p>
 
     <div class="notice-box">
       <strong>💡 설문 요약</strong><br>
-      3차 설문은 2차 설문 결과를 참고하여 평정지표의 <strong>적절성</strong>을 다시 4점 척도(1 매우 부적절 ~ 4 매우 적절)로 평정하는 설문입니다. 각 지표마다 <strong>2차 델파이 결과</strong>(평균, 표준편차, CVR, 본인의 이전 선택, 부적절 의견)가 함께 제시되므로, 이를 참고하여 3차 평정을 진행합니다.
+      4차 설문은 3차 설문 결과를 참고하여 평정지표의 <strong>적절성</strong>을 다시 4점 척도(1 매우 부적절 ~ 4 매우 적절)로 평정하는 설문입니다. 각 지표마다 <strong>3차 델파이 결과</strong>(평균, 표준편차, CVR, 본인의 이전 선택, 부적절 의견)가 함께 제시되므로, 이를 참고하여 4차 평정을 진행합니다.
     </div>
 
     <hr class="divider" />
@@ -514,7 +514,7 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">1</span>화면 구성</h2>
       <div class="body-text">
-        <p>설문 화면은 크게 <strong>상단 헤더</strong>, <strong>평정지표 카드 3개</strong>, <strong>좌우 이동 버튼</strong>으로 구성됩니다. 각 카드 헤더에는 <strong>「2차 델파이 결과」</strong>와 <strong>「3차 델파이(진행중)」</strong> 칼럼 라벨이 표시되어 있습니다.</p>
+        <p>설문 화면은 크게 <strong>상단 헤더</strong>, <strong>평정지표 카드 3개</strong>, <strong>좌우 이동 버튼</strong>으로 구성됩니다. 각 카드 헤더에는 <strong>「3차 델파이 결과」</strong>와 <strong>「4차 델파이(진행중)」</strong> 칼럼 라벨이 표시되어 있습니다.</p>
       </div>
 
       <div class="ui-box">
@@ -524,15 +524,15 @@
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-blue">교육활동 카드</span>
-          <span class="ui-desc">교육활동 평정지표, 2차 결과, 3차 평정 척도가 파란색 카드에 표시됩니다.</span>
+          <span class="ui-desc">교육활동 평정지표, 3차 결과, 4차 평정 척도가 파란색 카드에 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-green">하화활동 카드</span>
-          <span class="ui-desc">하화활동 평정지표, 2차 결과, 3차 평정 척도가 초록색 카드에 표시됩니다.</span>
+          <span class="ui-desc">하화활동 평정지표, 3차 결과, 4차 평정 척도가 초록색 카드에 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-purple">상구활동 카드</span>
-          <span class="ui-desc">상구활동 평정지표, 2차 결과, 3차 평정 척도가 보라색 카드에 표시됩니다.</span>
+          <span class="ui-desc">상구활동 평정지표, 3차 결과, 4차 평정 척도가 보라색 카드에 표시됩니다.</span>
         </div>
       </div>
 
@@ -543,9 +543,9 @@
       <div class="layout-preview">
         <div class="layout-col layout-col-text">지표 텍스트</div>
         <span class="layout-arrow">→</span>
-        <div class="layout-col layout-col-prev">2차 델파이 결과</div>
+        <div class="layout-col layout-col-prev">3차 델파이 결과</div>
         <span class="layout-arrow">→</span>
-        <div class="layout-col layout-col-rate">3차 델파이(진행중)</div>
+        <div class="layout-col layout-col-rate">4차 델파이(진행중)</div>
       </div>
 
       <div class="color-chips">
@@ -557,14 +557,14 @@
 
     <hr class="divider" />
 
-    <!-- 섹션 2: 2차 델파이 결과 확인 -->
+    <!-- 섹션 2: 3차 델파이 결과 확인 -->
     <div class="section">
-      <h2 class="section-title"><span class="section-num">2</span>2차 델파이 결과 확인하기</h2>
+      <h2 class="section-title"><span class="section-num">2</span>3차 델파이 결과 확인하기</h2>
       <div class="body-text">
-        <p>각 지표의 중간 칼럼에 <strong>2차 델파이 결과</strong>가 시각적으로 표시됩니다. 이를 참고하여 3차 평정을 진행합니다.</p>
+        <p>각 지표의 중간 칼럼에 <strong>3차 델파이 결과</strong>가 시각적으로 표시됩니다. 이를 참고하여 4차 평정을 진행합니다.</p>
       </div>
 
-      <!-- 2차 결과 미리보기: M=3.0, SD=1.2, CVR=.64, 이전 선택=4 -->
+      <!-- 3차 결과 미리보기: M=3.0, SD=1.2, CVR=.64, 이전 선택=4 -->
       <div class="prev-demo">
         <div>
           <div class="prev-demo-wrap">
@@ -579,25 +579,25 @@
             </div>
           </div>
         </div>
-        <div class="prev-demo-label">← 2차 델파이 결과 (초록색 바와 원문자에 마우스를 올려보세요.)</div>
+        <div class="prev-demo-label">← 3차 델파이 결과 (초록색 바와 원문자에 마우스를 올려보세요.)</div>
       </div>
 
       <div class="ui-box">
         <div class="ui-row">
           <span class="ui-label ui-label-blue">M=값</span>
-          <span class="ui-desc">2차 설문의 <strong>평균(Mean)</strong>을 나타냅니다. 가로선 위에서 평균 위치에 M=값과 ▼ 화살표가 표시됩니다.</span>
+          <span class="ui-desc">3차 설문의 <strong>평균(Mean)</strong>을 나타냅니다. 가로선 위에서 평균 위치에 M=값과 ▼ 화살표가 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-green">초록 바</span>
-          <span class="ui-desc">2차 설문의 <strong>표준편차(SD) 범위</strong>를 나타냅니다. 평균을 중심으로 SD만큼 양쪽으로 표시됩니다. 마우스를 올리면 <strong>SD값과 CVR값</strong>이 말풍선으로 표시됩니다.</span>
+          <span class="ui-desc">3차 설문의 <strong>표준편차(SD) 범위</strong>를 나타냅니다. 평균을 중심으로 SD만큼 양쪽으로 표시됩니다. 마우스를 올리면 <strong>SD값과 CVR값</strong>이 말풍선으로 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-gray">회색 원</span>
-          <span class="ui-desc"><strong>본인의 2차 평정값</strong>을 나타냅니다. 마우스를 올리면 "이전 선택"이라는 말풍선이 표시됩니다.</span>
+          <span class="ui-desc"><strong>본인의 3차 평정값</strong>을 나타냅니다. 마우스를 올리면 "이전 선택"이라는 말풍선이 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-gold">의견 조회</span>
-          <span class="ui-desc">2차에서 (매우) 부적절 의견이 있는 경우, 지표 텍스트 끝에 <strong>(매우) 부적절 선택 의견(N건) 조회</strong> 버튼이 표시됩니다. 클릭하면 매우 부적절(1점)과 부적절(2점) 의견이 분리되어 모달로 표시됩니다.</span>
+          <span class="ui-desc">3차에서 (매우) 부적절 의견이 있는 경우, 지표 텍스트 끝에 <strong>(매우) 부적절 선택 의견(N건) 조회</strong> 버튼이 표시됩니다. 클릭하면 매우 부적절(1점)과 부적절(2점) 의견이 분리되어 모달로 표시됩니다.</span>
         </div>
       </div>
     </div>
@@ -608,7 +608,7 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">3</span>지표 확인하기</h2>
       <div class="body-text">
-        <p>각 카드에는 2차 델파이에서 평정된 <strong>평정지표</strong>가 왼쪽에 표시되고, 중간에 <strong>2차 결과</strong>, 오른쪽에 <strong>3차 적절성 평정 척도</strong>가 함께 제시됩니다. 카드 헤더에는 <strong>활동 유형명</strong>과 현재 <strong>요소명</strong>이 표시되어, 어떤 범주와 요소에 해당하는 지표를 보고 있는지 확인할 수 있습니다.</p>
+        <p>각 카드에는 3차 델파이에서 평정된 <strong>평정지표</strong>가 왼쪽에 표시되고, 중간에 <strong>3차 결과</strong>, 오른쪽에 <strong>4차 적절성 평정 척도</strong>가 함께 제시됩니다. 카드 헤더에는 <strong>활동 유형명</strong>과 현재 <strong>요소명</strong>이 표시되어, 어떤 범주와 요소에 해당하는 지표를 보고 있는지 확인할 수 있습니다.</p>
       </div>
     </div>
 
@@ -618,7 +618,7 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">4</span>적절성 평정하기</h2>
       <div class="body-text">
-        <p>각 지표의 오른쪽에 <strong>①~④ 원형 버튼</strong>이 점선으로 연결되어 표시됩니다. 2차 결과를 참고하여 해당 지표가 평정지표로서 얼마나 적절한지 판단하고 점수를 클릭합니다.</p>
+        <p>각 지표의 오른쪽에 <strong>①~④ 원형 버튼</strong>이 점선으로 연결되어 표시됩니다. 3차 결과를 참고하여 해당 지표가 평정지표로서 얼마나 적절한지 판단하고 점수를 클릭합니다.</p>
       </div>
 
       <!-- 척도 미리보기 -->
@@ -736,7 +736,7 @@
     <div class="section">
       <h2 class="section-title"><span class="section-num">10</span>설문 완료</h2>
       <div class="body-text">
-        <p>마지막 요소 페이지에서 <strong>다음(▷)</strong> 버튼을 클릭하면 <strong>설문 완료 화면</strong>이 나타납니다. <strong>[설문 완료]</strong> 버튼을 클릭하면 3차 델파이 설문이 완료 처리되며, 설문 선택 화면으로 돌아갑니다. 모든 지표에 대해 미평정 항목이 있으면 완료할 수 없으므로, 모든 지표를 평정한 후 완료해주세요.</p>
+        <p>마지막 요소 페이지에서 <strong>다음(▷)</strong> 버튼을 클릭하면 <strong>설문 완료 화면</strong>이 나타납니다. <strong>[설문 완료]</strong> 버튼을 클릭하면 4차 델파이 설문이 완료 처리되며, 설문 선택 화면으로 돌아갑니다. 모든 지표에 대해 미평정 항목이 있으면 완료할 수 없으므로, 모든 지표를 평정한 후 완료해주세요.</p>
       </div>
     </div>
 
@@ -748,7 +748,7 @@
     <div class="btn-row">
       <button class="btn btn-back" onclick="history.back()">이전으로 돌아가기</button>
       <button class="btn btn-print" onclick="window.print()">설문 방법 안내 인쇄하기</button>
-      <button class="btn btn-start" onclick="location.href='3rd_delphi_main.html'">설문 시작</button>
+      <button class="btn btn-start" onclick="location.href='4th_delphi_main.html'">설문 시작</button>
     </div>
   </div>
 
