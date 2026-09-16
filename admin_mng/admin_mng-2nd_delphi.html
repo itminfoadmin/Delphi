@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2차 델파이 설문지 관리</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a2e;--ink-mid:#3d3d5c;--ink-soft:#6b6b8a;--accent:#4a6fa5;--accent-lt:#e8edf5;--divider:#d0d5e0;--bg:#f4f5f8;--card-bg:#fff;--green:#5a9a6e;--purple:#8b6fb0;--red:#d9534f;--orange:#e67e22}
+    body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px 60px}
+
+    .header-bar{width:100%;max-width:1246px;display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+    .header-title{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ink);white-space:nowrap}
+    .header-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+    .btn-hdr{padding:10px 18px;font-size:13px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-back{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
+    .btn-back:hover{background:#d5d5d5}
+    .btn-sheet{background:#5a9a6e;color:#fff}
+    .btn-sheet:hover{background:#4a8a5e}
+    .btn-preview{background:#8b6fb0;color:#fff}
+    .btn-preview:hover{background:#7a5fa0}
+    .btn-import{background:var(--orange);color:#fff}
+    .btn-import:hover{background:#cf6d17}
+    .btn-save{padding:10px 18px;font-size:13px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-save:hover{background:#3a5c8f}
+    .btn-save:disabled{opacity:.5;cursor:default}
+
+    .main-area{width:100%;max-width:1246px;display:flex;align-items:flex-start;gap:0}
+    .nav-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px;padding-top:8px}
+    .nav-label{font-size:12px;color:var(--ink-soft);font-weight:500}
+    .nav-arrow{width:56px;min-width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ink-soft);cursor:pointer;user-select:none;transition:color .2s,background .2s;border-radius:6px;background:transparent;border:none}
+    .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+    .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
+    .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+
+    .meta-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;padding:20px 24px;border-top:3px solid #555}
+    .meta-row{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+    .meta-row:last-child{margin-bottom:0}
+    .meta-label{font-size:13px;font-weight:600;color:var(--ink-soft);min-width:80px;flex-shrink:0}
+    .meta-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:8px 12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:#fafbfc}
+    .meta-input:focus{border-color:var(--accent);background:#fff}
+
+    .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
+    .card-edu{border-top:3px solid #4a6fa5}
+    .card-edu .card-header{background:#e8edf5}
+    .card-hahwa{border-top:3px solid #5a9a6e}
+    .card-hahwa .card-header{background:#e9f5ec}
+    .card-sanggu{border-top:3px solid #8b6fb0}
+    .card-sanggu .card-header{background:#f0eaf7}
+    .card-header{display:flex;align-items:center;padding:9px 22px;border-bottom:1px solid var(--divider);gap:12px;flex-wrap:wrap}
+    .card-header-title{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
+    .element-row{display:flex;align-items:center;gap:10px;flex:1}
+    .element-label{font-size:12px;font-weight:600;color:var(--ink-soft);flex-shrink:0}
+    .element-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:border-color .2s}
+    .element-input:focus{border-color:var(--accent)}
+    .btn-card-action{font-size:12px;font-weight:600;border-radius:4px;padding:4px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;margin-left:auto;background:#fff;border:1.5px solid currentColor}
+    .card-edu .btn-card-action{color:#4a6fa5}
+    .card-hahwa .btn-card-action{color:#5a9a6e}
+    .card-sanggu .btn-card-action{color:#8b6fb0}
+    .card-body{padding:20px 22px}
+
+    .index-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+    .index-item:last-child{border-bottom:none}
+    .index-textarea{flex:1;border:1px solid var(--divider);border-radius:4px;padding:8px 10px;font-size:14px;font-family:inherit;line-height:1.7;outline:none;resize:vertical;min-height:38px;transition:border-color .2s;background:#fafbfc}
+    .index-textarea:focus{border-color:var(--accent);background:#fff}
+    .index-btns{display:flex;flex-direction:row;gap:4px;flex-shrink:0;padding-top:4px;align-items:center}
+    .btn-idx{width:28px;height:28px;font-size:16px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;border:1px solid var(--divider);background:#fff;color:var(--ink-soft);transition:all .15s}
+    .btn-idx:hover{background:#f5f5f5}
+    .btn-idx-del{color:var(--red);border-color:var(--red)}
+    .btn-idx-del:hover{background:var(--red);color:#fff}
+    .btn-idx-reason{color:var(--orange);border-color:var(--orange);font-size:14px}
+    .btn-idx-reason:hover{background:var(--orange);color:#fff}
+    .btn-idx-undo{color:var(--green);border-color:var(--green);font-size:14px}
+    .btn-idx-undo:hover{background:var(--green);color:#fff}
+    .index-item.pending-delete .index-textarea{border-color:var(--red);text-decoration:line-through;pointer-events:none}
+    .index-item.pending-delete .btn-idx-undo{opacity:1}
+    .btn-add-index{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;margin-top:8px;font-size:13px;font-weight:600;color:var(--green);background:#fff;border:1.5px dashed var(--green);border-radius:4px;cursor:pointer;transition:all .2s}
+    .btn-add-index:hover{background:#e9f5ec}
+
+    /* 설명 편집 모달 */
+    .desc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:1000}
+    .desc-overlay.active{display:block}
+    .desc-edit-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:902px;max-width:96vw;height:80vh;background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.22);z-index:1001;display:none;flex-direction:column;overflow:hidden}
+    .desc-edit-modal.active{display:flex}
+    .desc-edit-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none}
+    .desc-edit-header:active{cursor:grabbing}
+    .desc-edit-title{font-size:15px;font-weight:600;color:var(--ink);flex:1}
+    .desc-edit-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .desc-edit-close,.desc-edit-apply{padding:5px 16px;font-size:13px;font-weight:500;border-radius:4px;cursor:pointer;transition:background .15s}
+    .desc-edit-close{color:var(--ink-soft);background:#fff;border:1px solid var(--divider)}
+    .desc-edit-close:hover{background:#eee}
+    .desc-edit-apply{color:#fff;background:var(--accent);border:none;font-weight:600}
+    .desc-edit-apply:hover{background:#3a5c8f}
+    .desc-edit-body{padding:20px 24px;flex:1;display:flex;flex-direction:column;min-height:0}
+    .desc-edit-body textarea{width:100%;flex:1;border:1px solid var(--divider);border-radius:4px;padding:20px 24px;font-size:14.5px;font-family:inherit;line-height:2.0;color:var(--ink-mid);outline:none;resize:none;transition:border-color .2s;word-break:keep-all;text-align:justify;text-indent:1.5em;overflow-y:auto}
+    .desc-edit-body textarea:focus{border-color:var(--accent)}
+
+    /* 기타 */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}
+    .modal-overlay.active{display:flex}
+    .modal-box{background:#fff;border-radius:6px;padding:28px 32px 24px;width:520px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+    .modal-box h3{font-size:16px;color:var(--ink);margin-bottom:16px;font-weight:600}
+    .modal-actions{display:flex;gap:10px;margin-top:16px}
+    .modal-actions button{flex:1;padding:12px 0;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;transition:opacity .2s}
+    .modal-actions button:hover{opacity:.85}
+    .modal-cancel{background:#fff;border:1.5px solid #ccc;color:#333}
+    .modal-confirm{background:var(--accent);border:none;color:#fff}
+    .confirm-box{text-align:center;width:480px}
+    .confirm-box p{font-size:15px;color:#333;line-height:1.7;margin-bottom:24px}
+
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
+    .toast.show{opacity:1}
+
+    /* 진행 표시 바 */
+    .progress-float{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.15)}
+    .progress-float.active{display:flex}
+    .progress-inner{width:520px;max-width:94vw;background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:28px 32px 24px;display:flex;flex-direction:column;gap:10px}
+    .progress-title{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
+    .progress-title .spinner{width:16px;height:16px;border:2.5px solid var(--divider);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .progress-title .check{color:var(--green);font-size:18px;font-weight:700}
+    .progress-status{font-size:13px;color:var(--ink-mid);line-height:1.5}
+    .progress-bar-wrap{width:100%;height:6px;background:#e8e8e8;border-radius:3px;overflow:hidden}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:3px;transition:width .3s ease;width:0}
+    .progress-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+    .progress-btn{padding:7px 18px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;transition:all .15s;font-family:inherit}
+    .progress-btn-pause{background:#fff;border:1.5px solid var(--accent);color:var(--accent)}
+    .progress-btn-pause:hover{background:var(--accent-lt)}
+    .progress-btn-pause.paused{border-color:var(--green);color:var(--green)}
+    .progress-btn-pause.paused:hover{background:#e9f5ec}
+    .progress-btn-cancel{background:#fff;border:1.5px solid var(--orange);color:var(--orange)}
+    .progress-btn-cancel:hover{background:#fff8f0}
+    .progress-btn-close{background:#fff;border:1.5px solid var(--red);color:var(--red)}
+    .progress-btn-close:hover{background:#fff5f5}
+    .progress-btns.done{display:none}
+
+    @media(max-width:768px){.header-title{font-size:17px}.nav-arrow{width:36px;min-width:36px;font-size:22px}.header-bar{gap:10px}.meta-row{flex-direction:column;align-items:stretch}.meta-label{min-width:auto}}
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 데이터를 불러오는 중...</span>
+  </div>
+
+  <!-- 설명 편집 모달 -->
+  <div class="desc-overlay" id="descOverlay"></div>
+  <div class="desc-edit-modal" id="descEditModal">
+    <div class="desc-edit-header" id="descEditHeader">
+      <span class="desc-edit-title" id="descEditTitle">맥락 설명 편집</span>
+      <div class="desc-edit-right">
+        <button class="desc-edit-apply" id="descEditApply">적용</button>
+        <button class="desc-edit-close" id="descEditClose">닫기</button>
+      </div>
+    </div>
+    <div class="desc-edit-body"><textarea id="descEditText" placeholder="맥락 설명을 입력해주세요."></textarea></div>
+  </div>
+
+  <!-- 나가기 확인 모달 -->
+  <div class="modal-overlay" id="leaveModal">
+    <div class="modal-box confirm-box">
+      <p>변경사항이 저장되지 않았습니다.<br>저장하고 나가시겠습니까?</p>
+      <div class="modal-actions" style="gap:8px">
+        <button class="modal-cancel" id="leaveDiscard">저장하지 않고 나가기</button>
+        <button class="modal-confirm" id="leaveSave">저장하고 나가기</button>
+        <button class="modal-cancel" id="leaveCancel">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 추가 사유 모달 -->
+  <div class="modal-overlay" id="reasonModal">
+    <div class="modal-box" style="width:600px;max-height:80vh;display:flex;flex-direction:column">
+      <h3 id="reasonModalTitle" style="flex-shrink:0">추가 사유</h3>
+      <div id="reasonModalBody" style="overflow-y:auto;flex:1;font-size:14px;color:var(--ink-mid);line-height:1.9;word-break:keep-all"></div>
+      <div class="modal-actions" style="flex-shrink:0;justify-content:center">
+        <button class="modal-cancel" id="reasonModalClose" style="flex:none;width:140px">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1차 결과 불러오기 확인 모달 -->
+  <div class="modal-overlay" id="importConfirmModal">
+    <div class="modal-box confirm-box">
+      <p>1차 결과를 전체 페이지에 불러옵니다.<br>기존 입력 내용이 대체됩니다.<br><br>계속하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="importConfirmCancel">취소</button>
+        <button class="modal-confirm" id="importConfirmOk">불러오기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 진행 표시 바 -->
+  <div class="progress-float" id="progressFloat">
+    <div class="progress-inner">
+      <div class="progress-title" id="progressTitle"><span class="spinner"></span> <span>처리 중...</span></div>
+      <div class="progress-status" id="progressStatus">준비 중...</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="progress-btns" id="progressBtns">
+        <button class="progress-btn progress-btn-pause" id="progressPauseBtn">⏸ 일시 멈춤</button>
+        <button class="progress-btn progress-btn-cancel" id="progressCancelBtn">⏹ 취소</button>
+        <button class="progress-btn progress-btn-close" id="progressCloseBtn">✕ 닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 상단 헤더 -->
+  <div class="header-bar">
+    <div class="header-title">2차 델파이 설문지 관리</div>
+    <div class="header-right">
+      <span style="font-size:13px;color:var(--ink-soft);margin-right:4px" id="topEmail"></span>
+      <button class="btn-hdr btn-sheet" id="btnViewSheet">📊 시트 보기</button>
+      <button class="btn-hdr btn-import" id="btnImport1st">📥 1차 결과 불러오기</button>
+      <button class="btn-save" id="btnSave">변경사항 저장</button>
+      <button class="btn-hdr btn-preview" id="btnPreview">👁 설문 화면 보기</button>
+      <button class="btn-hdr btn-back" id="btnBack">관리자 메뉴</button>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main-area">
+    <div class="nav-col" id="navPrevCol">
+      <button class="nav-arrow" id="btnPrev" title="이전">&#10094;</button>
+      <span class="nav-label">이전</span>
+    </div>
+    <div class="cards-container">
+      <div class="meta-card" id="metaCard">
+        <div class="meta-row">
+          <input class="meta-input" id="metaId" readonly style="background:#f0f0f0;color:#666;max-width:100px;font-weight:600" />
+          <span style="min-width:1em"></span>
+          <span class="meta-label">범주명</span>
+          <input class="meta-input" id="metaCategory" placeholder="범주명" />
+        </div>
+      </div>
+
+      <div class="indicator-card card-edu">
+        <div class="card-header">
+          <span class="card-header-title">교육활동 평정 지표</span>
+          <div class="element-row">
+            <span class="element-label">요소명</span>
+            <input class="element-input" id="elemEdu" placeholder="교육활동 요소명" />
+          </div>
+          <button class="btn-card-action" data-type="edu" data-desc-key="descript_edu-act">맥락 설명 편집</button>
+        </div>
+        <div class="card-body" id="bodyEdu"></div>
+      </div>
+
+      <div class="indicator-card card-hahwa">
+        <div class="card-header">
+          <span class="card-header-title">하화활동 평정 지표</span>
+          <div class="element-row">
+            <span class="element-label">요소명</span>
+            <input class="element-input" id="elemHahwa" placeholder="하화활동 요소명" />
+          </div>
+          <button class="btn-card-action" data-type="hahwa" data-desc-key="descript_hahwa-act">맥락 설명 편집</button>
+        </div>
+        <div class="card-body" id="bodyHahwa"></div>
+      </div>
+
+      <div class="indicator-card card-sanggu">
+        <div class="card-header">
+          <span class="card-header-title">상구활동 평정 지표</span>
+          <div class="element-row">
+            <span class="element-label">요소명</span>
+            <input class="element-input" id="elemSanggu" placeholder="상구활동 요소명" />
+          </div>
+          <button class="btn-card-action" data-type="sanggu" data-desc-key="descript_sanggu-act">맥락 설명 편집</button>
+        </div>
+        <div class="card-body" id="bodySanggu"></div>
+      </div>
+    </div>
+    <div class="nav-col" id="navNextCol">
+      <button class="nav-arrow" id="btnNext" title="다음">&#10095;</button>
+      <span class="nav-label">다음</span>
+    </div>
+  </div>
+
+<script>
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGz8ajx0fQU6YGQAe2f4vPMtWgHyHg21XkCmZSj5NITyvkD8jgBrmurpiqRCDwFdo/exec';
+
+  const adminEmail = sessionStorage.getItem('adminEmail') || '';
+  document.getElementById('topEmail').textContent = adminEmail ? '👤 ' + adminEmail : '';
+
+  let idRows = [];      // e-id 탭
+  let eduRows = [];     // edu-act_index
+  let hahwaRows = [];   // hahwa-act_index
+  let sangguRows = [];  // sanggu-act_index
+  let currentIndex = 0;
+  let descData = {};    // 현재 페이지의 설명 데이터
+
+  // 원본 데이터 (변경 추적용)
+  let origIdRows = [];
+  let origEduRows = [];
+  let origHahwaRows = [];
+  let origSangguRows = [];
+
+  // 삭제된 행 추적
+  let deletedIndexRows = []; // { sheet, rowNum, iId, eId, indexText }
+
+  function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+  async function gasCall(payload) {
+    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+    const t = await res.text();
+    try { return JSON.parse(t); } catch { return { status:'error', message:'GAS 응답 파싱 실패' }; }
+  }
+  function showToast(m, d=2000) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d); }
+  function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('active',v); }
+  function deepClone(a) { return JSON.parse(JSON.stringify(a)); }
+
+  /* ═══════════ 시트에서 최신 데이터 다시 불러오기 ═══════════ */
+  async function reloadFromSheet() {
+    try {
+      console.log('[reload] 시트에서 최신 데이터 불러오기...');
+      // index 데이터 + 1차 추가 의견 동시 로드
+      const [res, addRes] = await Promise.all([
+        gasCall({ action:'adminGetData' }),
+        gasCall({ action:'get1stAddData' })
+      ]);
+      if (res.status !== 'ok') throw new Error(res.message);
+      idRows = res.idRows || [];
+      eduRows = res.eduRows || [];
+      hahwaRows = res.hahwaRows || [];
+      sangguRows = res.sangguRows || [];
+
+      // 1차 추가 의견에서 추가 사유 복원
+      const addRows = (addRes.status === 'ok' && addRes.rows) ? addRes.rows : [];
+      if (addRows.length > 0) {
+        applyAddReasons(eduRows, addRows, 'Index_edu_act', 'descrpt_index_edu_act');
+        applyAddReasons(hahwaRows, addRows, 'Index_hahwa_act', 'descrpt_index_hawha_act');
+        applyAddReasons(sangguRows, addRows, 'Index_sanggu_act', 'descrpt_index_sanggu_act');
+      }
+
+      origIdRows = deepClone(idRows);
+      origEduRows = deepClone(eduRows);
+      origHahwaRows = deepClone(hahwaRows);
+      origSangguRows = deepClone(sangguRows);
+      deletedIndexRows = [];
+      if (currentIndex >= idRows.length) currentIndex = Math.max(0, idRows.length - 1);
+      const cur = idRows[currentIndex] || {};
+      descData = {
+        edu: cur['descript_edu-act'] || '',
+        hahwa: cur['descript_hahwa-act'] || '',
+        sanggu: cur['descript_sanggu-act'] || ''
+      };
+      renderPage();
+      console.log('[reload] 완료 — id:', idRows.length, 'edu:', eduRows.length);
+    } catch(e) {
+      console.error('[reload] 실패:', e);
+      showToast('시트 데이터 새로고침 실패', 3000);
+    }
+  }
+
+  /* 1차 추가 의견 → 현재 index 행에 _addPanel/_addReason 복원 */
+  function applyAddReasons(indexRows, addRows, addIndexKey, addDescKey) {
+    for (const item of indexRows) {
+      const eid = item['E-ID'] || '';
+      const indexText = (item.index || '').trim();
+      if (!eid || !indexText) continue;
+
+      // 같은 E-ID의 추가 의견 중 지표 텍스트가 포함된 것을 찾기
+      const match = addRows.find(a => {
+        if (a.ID !== eid) return false;
+        const addText = (a[addIndexKey] || '').trim();
+        if (!addText) return false;
+        // 지표 텍스트에 추가 의견 내용이 포함되어 있으면 매칭
+        return indexText.includes(addText) || addText.includes(indexText);
+      });
+
+      if (match) {
+        item._addPanel = match.panel || '';
+        item._addReason = match[addDescKey] || '';
+      }
+    }
+  }
+
+  /* ═══════════ 진행 표시 + 일시멈춤/취소 ═══════════ */
+  let progressPaused = false;
+  let progressCancelled = false;
+  let progressClosedWhilePaused = false;
+  let progressResumeResolve = null;
+
+  function showProgress(title) {
+    progressPaused = false;
+    progressCancelled = false;
+    progressClosedWhilePaused = false;
+    const pauseBtn = document.getElementById('progressPauseBtn');
+    const cancelBtn = document.getElementById('progressCancelBtn');
+    pauseBtn.textContent = '⏸ 일시 멈춤';
+    pauseBtn.classList.remove('paused');
+    pauseBtn.style.display = '';
+    cancelBtn.style.display = '';
+    document.getElementById('progressBtns').classList.remove('done');
+    document.getElementById('progressTitle').innerHTML = '<span class="spinner"></span> <span>' + esc(title) + '</span>';
+    document.getElementById('progressStatus').textContent = '준비 중...';
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('progressFloat').classList.add('active');
+  }
+  function updateProgress(status, pct) {
+    document.getElementById('progressStatus').textContent = status;
+    document.getElementById('progressBar').style.width = Math.min(100, pct) + '%';
+  }
+  function completeProgress(msg) {
+    document.getElementById('progressTitle').innerHTML = '<span class="check">✓</span> <span>' + esc(msg) + '</span>';
+    document.getElementById('progressStatus').textContent = '완료';
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('progressPauseBtn').style.display = 'none';
+    document.getElementById('progressCancelBtn').style.display = 'none';
+  }
+  function failProgress(msg) {
+    document.getElementById('progressTitle').innerHTML = '<span style="color:var(--red);font-size:18px">✗</span> <span>' + esc(msg) + '</span>';
+    document.getElementById('progressStatus').textContent = '중단됨';
+    document.getElementById('progressPauseBtn').style.display = 'none';
+    document.getElementById('progressCancelBtn').style.display = 'none';
+  }
+
+  // 일시 멈춤 시 대기
+  async function waitIfPaused() {
+    if (progressCancelled) throw new Error('사용자에 의해 취소됨');
+    if (!progressPaused) return;
+    document.getElementById('progressStatus').textContent = '⏸ 일시 멈춤 상태 — 다시 시작을 눌러주세요';
+    return new Promise(resolve => { progressResumeResolve = resolve; });
+  }
+
+  // 일시 멈춤 버튼
+  document.getElementById('progressPauseBtn').addEventListener('click', () => {
+    const btn = document.getElementById('progressPauseBtn');
+    if (!progressPaused) {
+      progressPaused = true;
+      btn.textContent = '▶ 다시 시작';
+      btn.classList.add('paused');
+    } else {
+      progressPaused = false;
+      btn.textContent = '⏸ 일시 멈춤';
+      btn.classList.remove('paused');
+      if (progressResumeResolve) { progressResumeResolve(); progressResumeResolve = null; }
+    }
+  });
+
+  // 취소 버튼 — 작업 중단, 취소 상태 즉시 표시 (모달 유지)
+  document.getElementById('progressCancelBtn').addEventListener('click', () => {
+    progressCancelled = true;
+    progressPaused = false;
+    if (progressResumeResolve) { progressResumeResolve(); progressResumeResolve = null; }
+    document.getElementById('progressTitle').innerHTML = '<span style="color:var(--orange);font-size:18px">⏹</span> <span>작업이 취소되었습니다</span>';
+    document.getElementById('progressStatus').textContent = '이미 처리된 항목은 시트에 반영되어 있습니다.';
+    document.getElementById('progressPauseBtn').style.display = 'none';
+    document.getElementById('progressCancelBtn').style.display = 'none';
+  });
+
+  // 닫기 버튼
+  document.getElementById('progressCloseBtn').addEventListener('click', () => {
+    if (progressPaused) {
+      // 일시멈춤 상태: 롤백 없이 현재까지 처리된 결과 유지
+      progressCancelled = true;
+      progressPaused = false;
+      progressClosedWhilePaused = true;
+      if (progressResumeResolve) { progressResumeResolve(); progressResumeResolve = null; }
+    } else if (!progressCancelled) {
+      // 진행 중: 취소+닫기
+      progressCancelled = true;
+    }
+    // 완료/실패 상태에서는 그냥 닫기
+    document.getElementById('progressFloat').classList.remove('active');
+  });
+
+  /* ═══════════ 데이터 로드 ═══════════ */
+  async function loadData() {
+    showLoading(true);
+    try {
+      const res = await gasCall({ action:'adminGetData' });
+      if (res.status !== 'ok') throw new Error(res.message);
+      idRows = res.idRows || [];
+      eduRows = res.eduRows || [];
+      hahwaRows = res.hahwaRows || [];
+      sangguRows = res.sangguRows || [];
+      if (idRows.length === 0) { showToast('데이터가 없습니다.', 3000); }
+      else {
+        origIdRows = deepClone(idRows);
+        origEduRows = deepClone(eduRows);
+        origHahwaRows = deepClone(hahwaRows);
+        origSangguRows = deepClone(sangguRows);
+        deletedIndexRows = [];
+        renderPage();
+      }
+    } catch(e) {
+      showToast('데이터 로드 실패: ' + e.message, 4000);
+    } finally { showLoading(false); }
+  }
+
+  /* ═══════════ E-ID로 index 필터 ═══════════ */
+  function getIndexForEid(rows, eid) {
+    return rows.filter(r => (r['E-ID'] || r.ID) === eid);
+  }
+
+  /* ═══════════ 지표 렌더링 ═══════════ */
+  function renderIndicators(containerId, items, type) {
+    const body = document.getElementById(containerId);
+    body.innerHTML = '';
+    items.forEach((item, i) => {
+      const isPending = !!item._pendingDelete;
+      const div = document.createElement('div');
+      div.className = 'index-item' + (isPending ? ' pending-delete' : '');
+      div.innerHTML = `
+        <textarea class="index-textarea" data-type="${type}" data-idx="${i}" data-rownum="${item._rowNum || ''}" rows="1">${esc(item.index || '')}</textarea>
+        <div class="index-btns">
+          ${item._addReason ? '<button class="btn-idx btn-idx-reason" title="추가 사유" data-reason="'+esc(item._addReason).replace(/"/g,'&quot;')+'" data-panel="'+esc(item._addPanel||'').replace(/"/g,'&quot;')+'">💬</button>' : ''}
+          ${isPending
+            ? '<button class="btn-idx btn-idx-undo" title="삭제 취소" data-type="'+type+'" data-idx="'+i+'">↶</button>'
+            : '<button class="btn-idx btn-idx-del" title="삭제" data-type="'+type+'" data-idx="'+i+'" data-rownum="'+(item._rowNum||'')+'">×</button>'
+          }
+        </div>`;
+      body.appendChild(div);
+    });
+
+    // 지표 추가 버튼
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add-index';
+    addBtn.innerHTML = '＋ 지표 추가';
+    addBtn.dataset.type = type;
+    addBtn.addEventListener('click', () => addIndicator(type));
+    body.appendChild(addBtn);
+
+    // 삭제 이벤트
+    body.querySelectorAll('.btn-idx-del').forEach(btn => {
+      btn.addEventListener('click', () => removeIndicator(btn.dataset.type, parseInt(btn.dataset.idx)));
+    });
+
+    // 삭제 취소(되돌리기) 이벤트
+    body.querySelectorAll('.btn-idx-undo').forEach(btn => {
+      btn.addEventListener('click', () => undoRemoveIndicator(btn.dataset.type, parseInt(btn.dataset.idx)));
+    });
+
+    // 추가 사유 이벤트
+    body.querySelectorAll('.btn-idx-reason').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = btn.dataset.panel || '';
+        const reason = btn.dataset.reason || '';
+        document.getElementById('reasonModalTitle').textContent = (panel ? panel + ' — ' : '') + '추가 사유';
+        document.getElementById('reasonModalBody').innerHTML = reason ? '<p>' + esc(reason) + '</p>' : '<p style="color:#bbb;font-style:italic">사유가 기재되지 않았습니다.</p>';
+        document.getElementById('reasonModal').classList.add('active');
+      });
+    });
+
+    // 자동 높이
+    body.querySelectorAll('.index-textarea').forEach(ta => {
+      ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px';
+      ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
+    });
+  }
+
+  function addIndicator(type) {
+    const eid = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID || '';
+    const idBase = eid.replace(/^ID_/i, '').replace(/_/g, '-');
+    const rows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
+    const existing = getIndexForEid(rows, eid);
+    let maxNum = 0;
+    existing.forEach(r => {
+      const m = (r['I-ID'] || '').match(/\d+-\d+-(\d+)/);
+      if (m) { const n = parseInt(m[1], 10); if (n > maxNum) maxNum = n; }
+    });
+    const newIId = 'ID_' + idBase + '-' + (maxNum + 1);
+    const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+    const newItem = { 'I-ID': newIId, 'E-ID': eid, index: '', _rowNum: 0, _isNew: true, _sheet: sheetName };
+    rows.push(newItem);
+    renderPage();
+    // 새 textarea 포커스
+    const body = document.getElementById(type === 'edu' ? 'bodyEdu' : type === 'hahwa' ? 'bodyHahwa' : 'bodySanggu');
+    const areas = body.querySelectorAll('.index-textarea');
+    if (areas.length) areas[areas.length - 1].focus();
+  }
+
+  function removeIndicator(type, idx) {
+    const eid = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID || '';
+    const rows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
+    const items = getIndexForEid(rows, eid);
+    if (idx >= 0 && idx < items.length) {
+      const target = items[idx];
+      if (target._isNew && target._rowNum === 0) {
+        // 아직 시트에 저장 안 된 항목 → 바로 제거
+        const globalIdx = rows.indexOf(target);
+        if (globalIdx >= 0) rows.splice(globalIdx, 1);
+      } else {
+        // 시트에 있는 항목 → pending 마킹
+        target._pendingDelete = true;
+        console.log('[delete] 삭제 예정:', target['I-ID'], '_rowNum:', target._rowNum);
+      }
+    }
+    renderPage();
+  }
+
+  function undoRemoveIndicator(type, idx) {
+    const eid = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID || '';
+    const rows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
+    const items = getIndexForEid(rows, eid);
+    if (idx >= 0 && idx < items.length) {
+      delete items[idx]._pendingDelete;
+      console.log('[undo] 삭제 취소:', items[idx]['I-ID']);
+    }
+    renderPage();
+  }
+
+  /* ═══════════ 페이지 렌더링 ═══════════ */
+  function renderPage() {
+    if (!idRows.length) return;
+    const row = idRows[currentIndex];
+    const eid = row['E-ID'] || row.ID || '';
+
+    document.getElementById('metaId').value = eid;
+    document.getElementById('metaCategory').value = row.category || '';
+
+    document.getElementById('elemEdu').value = row['element_edu-act'] || '';
+    document.getElementById('elemHahwa').value = row['element_hahwa-act'] || '';
+    document.getElementById('elemSanggu').value = row['element_sanggu-act'] || '';
+
+    descData = {
+      edu: row['descript_edu-act'] || '',
+      hahwa: row['descript_hahwa-act'] || '',
+      sanggu: row['descript_sanggu-act'] || ''
+    };
+
+    renderIndicators('bodyEdu', getIndexForEid(eduRows, eid), 'edu');
+    renderIndicators('bodyHahwa', getIndexForEid(hahwaRows, eid), 'hahwa');
+    renderIndicators('bodySanggu', getIndexForEid(sangguRows, eid), 'sanggu');
+
+    document.getElementById('navPrevCol').style.visibility = (currentIndex === 0) ? 'hidden' : 'visible';
+    document.getElementById('btnPrev').disabled = (currentIndex === 0);
+    const isLast = currentIndex >= idRows.length - 1;
+    document.getElementById('navNextCol').style.visibility = isLast ? 'hidden' : 'visible';
+    document.getElementById('btnNext').disabled = isLast;
+  }
+
+  /* ═══════════ 현재 페이지 입력값 → 데이터 동기화 ═══════════ */
+  function syncCurrentPage() {
+    if (!idRows.length) return;
+    const row = idRows[currentIndex];
+    const eid = row['E-ID'] || row.ID || '';
+
+    row['category'] = document.getElementById('metaCategory').value.trim();
+    row['element_edu-act'] = document.getElementById('elemEdu').value.trim();
+    row['element_hahwa-act'] = document.getElementById('elemHahwa').value.trim();
+    row['element_sanggu-act'] = document.getElementById('elemSanggu').value.trim();
+    row['descript_edu-act'] = descData.edu || '';
+    row['descript_hahwa-act'] = descData.hahwa || '';
+    row['descript_sanggu-act'] = descData.sanggu || '';
+
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const containerId = type === 'edu' ? 'bodyEdu' : type === 'hahwa' ? 'bodyHahwa' : 'bodySanggu';
+      const rows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
+      const items = getIndexForEid(rows, eid);
+      const textareas = document.getElementById(containerId).querySelectorAll('.index-textarea');
+      for (let i = 0; i < textareas.length && i < items.length; i++) {
+        items[i].index = textareas[i].value.trim();
+      }
+    });
+  }
+
+  /* ═══════════ 전체 변경사항 저장 (롤백 지원) ═══════════ */
+  document.getElementById('btnSave').addEventListener('click', async () => {
+    syncCurrentPage();
+
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true;
+    showProgress('변경사항 저장 중');
+    updateProgress('변경사항 분석 중...', 5);
+
+    const rollbackActions = []; // 취소 시 되돌리기용
+
+    try {
+      let totalOps = 0, doneOps = 0;
+      const tasks = [];
+
+      // 1) e-id 탭 변경사항 수집
+      for (let p = 0; p < idRows.length; p++) {
+        const cur = idRows[p];
+        const orig = origIdRows.find(o => (o['E-ID'] || o.ID) === (cur['E-ID'] || cur.ID));
+        if (!orig) continue;
+        const fields = ['category','element_edu-act','element_hahwa-act','element_sanggu-act','descript_edu-act','descript_hahwa-act','descript_sanggu-act'];
+        const changed = fields.some(f => (cur[f] || '') !== (orig[f] || ''));
+        if (changed) {
+          const origCopy = deepClone(orig);
+          tasks.push({
+            label: 'e-id: ' + (cur['E-ID']||cur.ID),
+            fn: () => gasCall({ action:'adminUpdateEid', rowData: cur }),
+            rollback: () => gasCall({ action:'adminUpdateEid', rowData: origCopy })
+          });
+        }
+      }
+
+      // 2) index 탭 변경사항 수집
+      for (const type of ['edu','hahwa','sanggu']) {
+        const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+        const curRows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
+        const origRows = type === 'edu' ? origEduRows : type === 'hahwa' ? origHahwaRows : origSangguRows;
+
+        for (const item of curRows) {
+          if (item._isNew) {
+            tasks.push({
+              label: sheetName + ': ' + (item['I-ID'] || '신규'),
+              fn: async () => {
+                const res = await gasCall({ action:'adminAddIndexRow', sheet:sheetName, iId:item['I-ID'], eId:item['E-ID'], indexText:item.index });
+                if (res.status === 'ok') { item._rowNum = res.rowNum; delete item._isNew; }
+                return res;
+              },
+              rollback: async () => {
+                if (item._rowNum) return gasCall({ action:'adminDeleteIndexRow', sheet:sheetName, rowNum:item._rowNum });
+              }
+            });
+          } else if (item._rowNum) {
+            const orig = origRows.find(o => o._rowNum === item._rowNum);
+            if (!orig || orig.index !== item.index) {
+              const origText = orig ? orig.index : '';
+              tasks.push({
+                label: sheetName + ': ' + (item['I-ID'] || 'row'+item._rowNum),
+                fn: () => gasCall({ action:'adminUpdateIndex', sheet:sheetName, rowNum:item._rowNum, indexText:item.index }),
+                rollback: () => gasCall({ action:'adminUpdateIndex', sheet:sheetName, rowNum:item._rowNum, indexText:origText })
+              });
+            }
+          }
+        }
+      }
+
+      // 3) 삭제 예정 항목 수집 (_pendingDelete)
+      for (const type of ['edu','hahwa','sanggu']) {
+        const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+        const curRows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
+        for (const item of curRows) {
+          if (item._pendingDelete && item._rowNum > 0 && !item._isNew) {
+            deletedIndexRows.push({
+              sheet: sheetName,
+              rowNum: Number(item._rowNum),
+              iId: item['I-ID'] || '',
+              eId: item['E-ID'] || '',
+              indexText: item.index || ''
+            });
+          }
+        }
+      }
+
+      // 4) 삭제된 행 처리 (rowNum 큰 것부터 삭제해야 행번호 밀리지 않음)
+      console.log('[save] 삭제 대기:', deletedIndexRows.length, '건', deletedIndexRows);
+      const sortedDeleted = [...deletedIndexRows].sort((a, b) => b.rowNum - a.rowNum);
+      for (const del of sortedDeleted) {
+        const delCopy = {...del}; // 클로저 안전
+        tasks.push({
+          label: delCopy.sheet + ': ' + delCopy.iId + ' 삭제 (row ' + delCopy.rowNum + ')',
+          fn: () => {
+            console.log('[save] 삭제 요청:', delCopy);
+            return gasCall({ action:'adminDeleteIndexRow', sheet:delCopy.sheet, rowNum:delCopy.rowNum });
+          },
+          rollback: () => gasCall({ action:'adminAddIndexRow', sheet:delCopy.sheet, iId:delCopy.iId, eId:delCopy.eId, indexText:delCopy.indexText })
+        });
+      }
+
+      totalOps = tasks.length;
+      if (totalOps === 0) {
+        completeProgress('변경사항이 없습니다.');
+        btn.disabled = false;
+        return;
+      }
+
+      updateProgress(`총 ${totalOps}건의 변경사항 저장 시작...`, 10);
+
+      for (let i = 0; i < tasks.length; i++) {
+        await waitIfPaused();
+        const task = tasks[i];
+        const pct = 10 + Math.round((i / totalOps) * 85);
+        updateProgress(`(${i+1}/${totalOps}) ${task.label} 저장 중...`, pct);
+        const res = await task.fn();
+        if (res.status !== 'ok') console.warn('[save] 실패:', task.label, res.message);
+        rollbackActions.push(task.rollback);
+        doneOps++;
+      }
+
+      origIdRows = deepClone(idRows);
+      origEduRows = deepClone(eduRows);
+      origHahwaRows = deepClone(hahwaRows);
+      origSangguRows = deepClone(sangguRows);
+      deletedIndexRows = [];
+
+      updateProgress(`${doneOps}건 저장 완료 — 시트 정렬 중...`, 95);
+      try {
+        await gasCall({ action:'adminSortIndex' });
+      } catch(se) { console.warn('[sort] 정렬 실패:', se); }
+      updateProgress(`${doneOps}건 저장 완료 — 새로고침 중...`, 98);
+      await reloadFromSheet();
+      completeProgress(`${doneOps}건 저장 완료`);
+    } catch(e) {
+      console.error('[save] 오류:', e);
+      if (progressCancelled && !progressClosedWhilePaused && rollbackActions.length > 0) {
+        // 취소 버튼 → 롤백 수행
+        document.getElementById('progressTitle').innerHTML = '<span class="spinner"></span> <span>저장 취소 — 되돌리는 중...</span>';
+        for (let ri = rollbackActions.length - 1; ri >= 0; ri--) {
+          updateProgress(`(${rollbackActions.length - ri}/${rollbackActions.length}) 되돌리는 중...`, Math.round(((rollbackActions.length - ri) / rollbackActions.length) * 100));
+          try { await rollbackActions[ri](); } catch(re) { console.warn('[rollback] 실패:', re); }
+        }
+        // 롤백 후 정렬 + 시트에서 다시 불러오기
+        try { await gasCall({ action:'adminSortIndex' }); } catch(se) { console.warn('[sort]', se); }
+        await reloadFromSheet();
+        failProgress('저장이 취소되고 원래 상태로 되돌렸습니다.');
+      } else if (progressClosedWhilePaused) {
+        // 일시멈춤 중 닫기 → 정렬 후 시트에서 다시 불러오기
+        try { await gasCall({ action:'adminSortIndex' }); } catch(se) { console.warn('[sort]', se); }
+        await reloadFromSheet();
+        showToast('처리 완료된 항목은 저장되었습니다.', 3000);
+      } else if (progressCancelled) {
+        failProgress('저장이 취소되었습니다.');
+      } else {
+        failProgress('저장 오류: ' + e.message);
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  /* ═══════════ 시트 보기 (새 탭) ═══════════ */
+  const SHEET_ID = '1YhffsxsOaEflHiKI9QNLeUcCBPxZos_KJCOdpbx9kEk';
+  document.getElementById('btnViewSheet').addEventListener('click', () => {
+    window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit', '_blank');
+  });
+
+  /* ═══════════ 설문 화면 보기 (새 탭) ═══════════ */
+  document.getElementById('btnPreview').addEventListener('click', () => {
+    window.open('2nd_delphi_main.html?preview=1&panel=panel_01&panelIndex=1', '_blank');
+  });
+
+  /* ═══════════ 설명 편집 모달 ═══════════ */
+  const descOverlay = document.getElementById('descOverlay');
+  const descEditModal = document.getElementById('descEditModal');
+  let currentDescType = '';
+
+  document.querySelectorAll('.btn-card-action').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentDescType = btn.dataset.type;
+      document.getElementById('descEditTitle').textContent = (currentDescType === 'edu' ? '교육활동' : currentDescType === 'hahwa' ? '하화활동' : '상구활동') + ' 맥락 설명 편집';
+      document.getElementById('descEditText').value = descData[currentDescType] || '';
+      descOverlay.classList.add('active');
+      descEditModal.classList.add('active');
+    });
+  });
+
+  function closeDescEdit() { descOverlay.classList.remove('active'); descEditModal.classList.remove('active'); }
+  document.getElementById('descEditClose').addEventListener('click', closeDescEdit);
+  descOverlay.addEventListener('click', closeDescEdit);
+  document.getElementById('descEditApply').addEventListener('click', () => {
+    descData[currentDescType] = document.getElementById('descEditText').value;
+    closeDescEdit();
+    showToast('설명이 적용되었습니다. 저장 버튼을 눌러 확정하세요.');
+  });
+
+  // 모달 드래그
+  let isDrag=false, dOX=0, dOY=0;
+  document.getElementById('descEditHeader').addEventListener('mousedown', e => {
+    isDrag=true; const r=descEditModal.getBoundingClientRect();
+    dOX=e.clientX-r.left; dOY=e.clientY-r.top;
+    descEditModal.style.transform='none'; descEditModal.style.left=r.left+'px'; descEditModal.style.top=r.top+'px';
+  });
+  document.addEventListener('mousemove', e => { if(!isDrag)return; descEditModal.style.left=(e.clientX-dOX)+'px'; descEditModal.style.top=(e.clientY-dOY)+'px'; });
+  document.addEventListener('mouseup', ()=>{ isDrag=false; });
+
+  /* ═══════════ 1차 결과 불러오기 → 전체 페이지 입력란 채우기 ═══════════ */
+  const importConfirmModal = document.getElementById('importConfirmModal');
+
+  document.getElementById('btnImport1st').addEventListener('click', () => {
+    importConfirmModal.classList.add('active');
+  });
+  document.getElementById('importConfirmCancel').addEventListener('click', () => {
+    importConfirmModal.classList.remove('active');
+  });
+  importConfirmModal.addEventListener('click', e => { if (e.target === importConfirmModal) importConfirmModal.classList.remove('active'); });
+
+  document.getElementById('importConfirmOk').addEventListener('click', async () => {
+    importConfirmModal.classList.remove('active');
+
+    const btn = document.getElementById('btnImport1st');
+    btn.disabled = true;
+    showProgress('1차 델파이 결과 불러오기');
+    updateProgress('서버에서 데이터 요청 중...', 5);
+
+    try {
+      const res = await gasCall({ action:'get1stAll' });
+      if (res.status !== 'ok') throw new Error(res.message || '데이터 없음');
+
+      const data1st = res.dataRows || [];
+      const add1st = res.addRows || [];
+      updateProgress(`1차 데이터 ${data1st.length}건, 추가 의견 ${add1st.length}건 수신 완료`, 25);
+
+      eduRows = [];
+      hahwaRows = [];
+      sangguRows = [];
+
+      let importCount = 0;
+      const total = idRows.length;
+
+      for (let pi = 0; pi < idRows.length; pi++) {
+        await waitIfPaused();
+        const idRow = idRows[pi];
+        const eid = idRow['E-ID'] || idRow.ID || '';
+        const row1st = data1st.find(r => r.ID === eid);
+
+        const pct = 25 + Math.round((pi / total) * 65);
+        updateProgress(`(${pi+1}/${total}) ${eid} 지표 구성 중...`, pct);
+
+        if (!row1st) continue;
+
+        idRow['category'] = row1st.category || '';
+        idRow['element_edu-act'] = row1st.element_edu_act || '';
+        idRow['element_hahwa-act'] = row1st.element_hahwa_act || '';
+        idRow['element_sanggu-act'] = row1st.element_sanggu_act || '';
+        idRow['descript_edu-act'] = row1st.descrpt_index_edu_act || '';
+        idRow['descript_hahwa-act'] = row1st.descrpt_index_hawha_act || '';
+        idRow['descript_sanggu-act'] = row1st.descrpt_index_sanggu_act || '';
+
+        const additions = add1st.filter(a => a.ID === eid);
+        const idBase = eid.replace(/^ID_/i, '').replace(/_/g, '-');
+
+        populateIndicators('edu', 'edu-act_index', row1st.Index_edu_act, additions, 'Index_edu_act', 'descrpt_index_edu_act', idBase, eid);
+        populateIndicators('hahwa', 'hahwa-act_index', row1st.Index_hahwa_act, additions, 'Index_hahwa_act', 'descrpt_index_hawha_act', idBase, eid);
+        populateIndicators('sanggu', 'sanggu-act_index', row1st.Index_sanggu_act, additions, 'Index_sanggu_act', 'descrpt_index_sanggu_act', idBase, eid);
+
+        importCount++;
+      }
+
+      updateProgress('화면 렌더링 중...', 95);
+
+      const cur = idRows[currentIndex];
+      descData = {
+        edu: cur['descript_edu-act'] || '',
+        hahwa: cur['descript_hahwa-act'] || '',
+        sanggu: cur['descript_sanggu-act'] || ''
+      };
+
+      renderPage();
+      showToast(`${importCount}개 페이지 불러오기 완료 — 저장 버튼으로 확정하세요`, 3000);
+      document.getElementById('progressFloat').classList.remove('active');
+    } catch(e) {
+      console.error('[1st import] 오류:', e);
+      if (progressCancelled) {
+        failProgress('불러오기 중단됨');
+      } else {
+        failProgress('불러오기 실패: ' + e.message);
+      }
+    } finally {
+      btn.disabled = false; btn.textContent = '📥 1차 결과 불러오기';
+    }
+  });
+
+  function parseIndicatorItems(text) {
+    if (!text || !text.trim()) return [];
+    // [지표 x-x-x] 패턴으로 분리
+    const parts = text.split(/(?=\[지표\s)/);
+    const result = parts.filter(s => s.trim()).map(s => s.trim());
+    console.log('[parseIndicators] input:', text.substring(0, 80), '→', result.length, '개');
+    return result;
+  }
+
+  function populateIndicators(type, sheetName, indexText, additions, addIndexKey, addDescKey, idBase, eid) {
+    const rows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
+    const origRows = type === 'edu' ? origEduRows : type === 'hahwa' ? origHahwaRows : origSangguRows;
+
+    // 현재 E-ID의 기존 시트 행들을 I-ID로 매핑
+    const existingMap = {};
+    origRows.filter(r => (r['E-ID'] || r.ID) === eid).forEach(r => {
+      if (r['I-ID']) existingMap[r['I-ID']] = r;
+    });
+
+    // 기존 지표 파싱
+    const items = parseIndicatorItems(indexText);
+
+    // 기존 지표에서 최대 번호 추출
+    let maxNum = 0;
+    items.forEach(text => {
+      const m = text.match(/\[지표\s*\d+-\d+-(\d+)/);
+      if (m) { const n = parseInt(m[1], 10); if (n > maxNum) maxNum = n; }
+    });
+    if (maxNum === 0) maxNum = items.length;
+
+    const usedExistingIds = new Set();
+
+    // 기존 지표 → I-ID 추출 후 시트 행과 매칭
+    items.forEach((text, i) => {
+      // 텍스트에서 지표 번호 추출하여 I-ID 생성
+      let iId = 'ID_' + idBase + '-' + (i + 1);
+      const numMatch = text.match(/\[지표\s*\d+-\d+-(\d+)/);
+      if (numMatch) iId = 'ID_' + idBase + '-' + numMatch[1];
+
+      const existing = existingMap[iId];
+      if (existing && existing._rowNum > 0) {
+        // I-ID 매칭 → 기존 행 수정
+        usedExistingIds.add(iId);
+        rows.push({
+          'I-ID': iId,
+          'E-ID': eid,
+          index: text,
+          _rowNum: existing._rowNum,
+          _sheet: sheetName
+        });
+      } else {
+        // 매칭 안됨 → 새 행
+        rows.push({
+          'I-ID': iId,
+          'E-ID': eid,
+          index: text,
+          _rowNum: 0,
+          _isNew: true,
+          _sheet: sheetName
+        });
+      }
+    });
+
+    // 추가 지표 (패널 추가분)
+    const relevantAdds = additions.filter(a => (a[addIndexKey] || '').trim());
+    relevantAdds.forEach(a => {
+      maxNum++;
+      const iId = 'ID_' + idBase + '-' + maxNum;
+      const originalText = (a[addIndexKey] || '').trim();
+      const indexFinal = originalText.match(/^\[지표/) ? originalText : '[지표 ' + idBase + '-' + maxNum + '] ' + originalText;
+
+      const existing = existingMap[iId];
+      if (existing && existing._rowNum > 0) {
+        usedExistingIds.add(iId);
+        rows.push({
+          'I-ID': iId, 'E-ID': eid, index: indexFinal,
+          _rowNum: existing._rowNum, _sheet: sheetName,
+          _addPanel: a.panel || '', _addReason: a[addDescKey] || ''
+        });
+      } else {
+        rows.push({
+          'I-ID': iId, 'E-ID': eid, index: indexFinal,
+          _rowNum: 0, _isNew: true, _sheet: sheetName,
+          _addPanel: a.panel || '', _addReason: a[addDescKey] || ''
+        });
+      }
+    });
+
+    // 사용되지 않은 기존 행 → 삭제 대상
+    Object.keys(existingMap).forEach(id => {
+      if (!usedExistingIds.has(id) && existingMap[id]._rowNum > 0) {
+        deletedIndexRows.push({
+          sheet: sheetName,
+          rowNum: existingMap[id]._rowNum,
+          iId: id,
+          eId: eid,
+          indexText: existingMap[id].index || ''
+        });
+      }
+    });
+  }
+
+  /* ═══════════ 추가 사유 모달 ═══════════ */
+  const reasonModal = document.getElementById('reasonModal');
+  document.getElementById('reasonModalClose').addEventListener('click', () => reasonModal.classList.remove('active'));
+  reasonModal.addEventListener('click', e => { if (e.target === reasonModal) reasonModal.classList.remove('active'); });
+
+  /* ═══════════ 나가기 ═══════════ */
+  const leaveModal = document.getElementById('leaveModal');
+  document.getElementById('btnBack').addEventListener('click', () => { location.href='admin_mng-intro.html'; });
+  document.getElementById('leaveCancel').addEventListener('click', () => leaveModal.classList.remove('active'));
+  document.getElementById('leaveDiscard').addEventListener('click', () => { location.href='admin_mng-intro.html'; });
+  document.getElementById('leaveSave').addEventListener('click', async () => {
+    document.getElementById('btnSave').click();
+    setTimeout(() => { location.href='admin_mng-intro.html'; }, 1500);
+  });
+
+  /* ═══════════ 네비게이션 ═══════════ */
+  function navigate(dir) {
+    syncCurrentPage(); // 이동 전 현재 입력값 동기화
+    const ni = currentIndex + dir;
+    if (ni < 0 || ni >= idRows.length) return;
+    currentIndex = ni;
+    // 이동한 페이지의 descData 업데이트
+    const cur = idRows[currentIndex];
+    descData = {
+      edu: cur['descript_edu-act'] || '',
+      hahwa: cur['descript_hahwa-act'] || '',
+      sanggu: cur['descript_sanggu-act'] || ''
+    };
+    renderPage();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  document.getElementById('btnPrev').addEventListener('click', () => navigate(-1));
+  document.getElementById('btnNext').addEventListener('click', () => navigate(1));
+  document.addEventListener('keydown', e => {
+    if (descEditModal.classList.contains('active') || leaveModal.classList.contains('active')) {
+      if (e.key === 'Escape') { closeDescEdit(); leaveModal.classList.remove('active'); }
+      return;
+    }
+    if (e.key === 'ArrowLeft') navigate(-1);
+    if (e.key === 'ArrowRight') navigate(1);
+  });
+
+  /* ═══════════ 시작 ═══════════ */
+  loadData();
+</script>
+</body>
+</html>

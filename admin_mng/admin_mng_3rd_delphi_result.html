@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3차 델파이 설문 결과</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a2e;--ink-mid:#3d3d5c;--ink-soft:#6b6b8a;--accent:#4a6fa5;--accent-lt:#e8edf5;--divider:#d0d5e0;--bg:#f4f5f8;--card-bg:#fff;--green:#5a9a6e;--purple:#8b6fb0}
+    body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px 60px}
+
+    .header-bar{width:100%;max-width:1340px;display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+    .header-title{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ink);white-space:nowrap}
+    .header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+    .btn-hdr{padding:10px 18px;font-size:13px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-back{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}.btn-back:hover{background:#d5d5d5}
+    .btn-sheet{background:var(--green);color:#fff}.btn-sheet:hover{background:#4a8a5e}
+
+    .main-area{width:100%;max-width:1340px;display:flex;align-items:flex-start}
+    .nav-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px;padding-top:8px}
+    .nav-label{font-size:12px;color:var(--ink-soft);font-weight:500}
+    .nav-arrow{width:56px;min-width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ink-soft);cursor:pointer;user-select:none;transition:color .2s,background .2s;border-radius:6px;background:transparent;border:none}
+    .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+    .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
+    .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+
+    .meta-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;padding:16px 24px;border-top:3px solid #555}
+    .meta-row{display:flex;align-items:center;gap:12px}
+    .meta-badge{font-size:14px;font-weight:700;color:var(--ink);background:#f0f0f0;padding:6px 16px;border-radius:4px}
+    .meta-category{font-size:15px;font-weight:600;color:var(--ink-mid)}
+
+    .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
+    .card-edu{border-top:3px solid #4a6fa5}.card-edu .card-header{background:#e8edf5}
+    .card-hahwa{border-top:3px solid #5a9a6e}.card-hahwa .card-header{background:#e9f5ec}
+    .card-sanggu{border-top:3px solid #8b6fb0}.card-sanggu .card-header{background:#f0eaf7}
+    .card-header{display:flex;align-items:center;padding:9px 22px;border-bottom:1px solid var(--divider);gap:12px;flex-wrap:wrap}
+    .card-header-title{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
+    .card-header-element{font-size:14px;font-weight:600;flex:1}
+    .card-edu .card-header-element{color:#4a6fa5}.card-hahwa .card-header-element{color:#5a9a6e}.card-sanggu .card-header-element{color:#8b6fb0}
+    .col-labels{display:flex;gap:8px;flex-shrink:0}
+    .col-label-header{font-size:12px;font-weight:700;color:#666;text-align:center;white-space:nowrap;width:220px}
+    .card-body{padding:16px 22px}
+
+    /* 지표 행 */
+    .index-item{display:flex;align-items:stretch;gap:0;padding:12px 0;border-bottom:1px solid #f0f0f0}
+    .index-item:last-child{border-bottom:none}
+    .index-left{flex:1;min-width:0;padding-right:16px;display:flex;flex-direction:column;justify-content:center}
+    .index-text{font-size:14px;color:var(--ink-mid);line-height:1.8;word-break:keep-all}
+
+    /* 결과 차트 영역 */
+    .result-chart-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:center}
+    .trend-chart{position:relative;width:220px;height:90px;flex-shrink:0}
+    .trend-chart svg{width:100%;height:100%}
+
+    /* 버튼 */
+    .btn-panel-view,.btn-opinion{display:inline-block;margin-left:6px;padding:2px 8px;font-size:11px;font-weight:600;font-family:inherit;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;vertical-align:middle}
+    .btn-panel-view{border:1px solid var(--accent);background:#fff;color:var(--accent)}.btn-panel-view:hover{background:var(--accent-lt)}.btn-panel-view.active{background:var(--accent);color:#fff}
+    .btn-opinion{border:1px solid var(--purple);background:#fff;color:var(--purple)}.btn-opinion:hover{background:#f0eaf7}.btn-opinion.active{background:var(--purple);color:#fff}
+    .btn-panel-view.r2{border-color:#999;color:#999}.btn-panel-view.r2:hover{background:#f5f5f5}.btn-panel-view.r2.active{background:#999;color:#fff}
+
+    .toggle-section{display:none;margin-top:8px;padding:10px 14px;background:#fafbfd;border:1px solid var(--divider);border-radius:6px}.toggle-section.show{display:block}
+    .panel-ratings{display:flex;flex-wrap:wrap;gap:6px}
+    .panel-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--divider);background:#fff;color:var(--ink-mid)}
+    .panel-badge .p-label{font-weight:600;color:#999;font-size:10px}.panel-badge .p-val{font-weight:700;color:var(--ink)}
+    .panel-badge.rating-1{background:#fff3e0;border-color:#e67e22}.panel-badge.rating-1 .p-val{color:#e67e22}
+    .panel-badge.rating-2{background:#fffde7;border-color:#f0c040}.panel-badge.rating-2 .p-val{color:#b8960c}
+    .opinion-item{padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px;line-height:1.7}.opinion-item:last-child{border-bottom:none}
+    .opinion-panel{font-weight:700;color:#999;font-size:11px;margin-bottom:2px}.opinion-text{color:var(--ink-mid);word-break:keep-all}
+
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}.modal-overlay.active{display:flex}
+    .modal-box{background:#fff;border-radius:8px;width:640px;max-width:94vw;max-height:80vh;box-shadow:0 8px 32px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden}
+    .modal-header{padding:18px 24px;border-bottom:1px solid var(--divider);font-size:16px;font-weight:700;color:var(--ink);flex-shrink:0}
+    .modal-body{overflow-y:auto;flex:1;padding:16px 24px}
+    .modal-footer{padding:14px 24px;border-top:1px solid var(--divider);display:flex;justify-content:center;flex-shrink:0}
+    .modal-close{padding:8px 32px;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;background:#fff;border:1.5px solid var(--divider);color:var(--ink-mid);font-family:inherit}.modal-close:hover{background:#f5f5f5}
+
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}.loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}.loading-dots span{width:14px;height:14px;border-radius:50%;animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}.loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}.loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}.loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}.loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}.toast.show{opacity:1}
+  </style>
+</head>
+<body>
+  <div class="loading-overlay active" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 결과를 불러오는 중...</span>
+  </div>
+
+  <div class="modal-overlay" id="opinionModal">
+    <div class="modal-box">
+      <div class="modal-header" id="opinionModalTitle">패널 의견 조회</div>
+      <div class="modal-body" id="opinionModalBody"></div>
+      <div class="modal-footer"><button class="modal-close" id="opinionModalClose">닫기</button></div>
+    </div>
+  </div>
+  <!-- 차트 확대 모달 -->
+  <div class="modal-overlay" id="chartModal">
+    <div class="modal-box" style="width:560px;max-width:96vw">
+      <div class="modal-header" id="chartModalTitle">2차→3차 변동 차트</div>
+      <div class="modal-body" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 24px">
+        <div id="chartModalBody" style="width:480px;height:220px;max-width:100%"></div>
+        <div id="chartModalStats" style="font-size:13px;color:var(--ink-mid);line-height:1.8;text-align:center"></div>
+      </div>
+      <div class="modal-footer"><button class="modal-close" id="chartModalClose">닫기</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="header-bar">
+    <div class="header-title">3차 델파이 설문 결과</div>
+    <div class="header-right">
+      <button class="btn-hdr btn-sheet" onclick="window.open('https://docs.google.com/spreadsheets/d/1paf79LNNgX5Y328o51DSvkcRROblV7v-FyU__YIkC8Q/edit','_blank')">📊 시트 보기</button>
+      <button class="btn-hdr btn-back" onclick="location.href='admin_mng-intro.html'">관리자 메뉴</button>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="nav-col" id="navPrevCol"><button class="nav-arrow" id="btnPrev">&#10094;</button><span class="nav-label">이전</span></div>
+    <div class="cards-container">
+      <div class="meta-card"><div class="meta-row"><span class="meta-badge" id="metaId"></span><span class="meta-category" id="metaCategory"></span></div></div>
+      <div class="indicator-card card-edu"><div class="card-header"><span class="card-header-title">교육활동 평정 지표</span><span class="card-header-element" id="labelEduElement"></span><div class="col-labels"><span class="col-label-header">2차→3차 변동</span></div></div><div class="card-body" id="bodyEdu"></div></div>
+      <div class="indicator-card card-hahwa"><div class="card-header"><span class="card-header-title">하화활동 평정 지표</span><span class="card-header-element" id="labelHahwaElement"></span><div class="col-labels"><span class="col-label-header">2차→3차 변동</span></div></div><div class="card-body" id="bodyHahwa"></div></div>
+      <div class="indicator-card card-sanggu"><div class="card-header"><span class="card-header-title">상구활동 평정 지표</span><span class="card-header-element" id="labelSangguElement"></span><div class="col-labels"><span class="col-label-header">2차→3차 변동</span></div></div><div class="card-body" id="bodySanggu"></div></div>
+    </div>
+    <div class="nav-col" id="navNextCol"><button class="nav-arrow" id="btnNext">&#10095;</button><span class="nav-label">다음</span></div>
+  </div>
+
+<script>
+  const GAS_URL='https://script.google.com/macros/s/AKfycbz8m8GNpAxzac3-eekZkHjRehsgtMyDI01Y0ttJKklZ4HjwOrD1pv-RnBxHNvyr2o7Q/exec';
+  let idRows=[],eduRows=[],hahwaRows=[],sangguRows=[],eduResult=[],hahwaResult=[],sangguResult=[];
+  let currentIndex=0;
+
+  function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+  async function gasCall(p){const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)});const t=await r.text();try{return JSON.parse(t)}catch{return{status:'error'}}}
+  function showToast(m,d=2000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
+  function fmtStat(v){if(v===''||v===null||v===undefined||v==='Ready')return'-';const n=Number(v);if(isNaN(n))return String(v);if(Math.abs(n)<1&&n!==0)return n.toFixed(2).replace('0.','.').replace('-0.','-.');return n.toFixed(2);}
+  function getForEid(rows,eid){return rows.filter(r=>r['E-ID']===eid)}
+
+  async function loadData(){
+    try{
+      const res=await gasCall({action:'adminGetResultData'});
+      if(res.status!=='ok')throw new Error(res.message);
+      idRows=res.idRows||[];
+      // 3차 (index 탭 — 현재 라운드)
+      eduRows=res.eduRows||[];hahwaRows=res.hahwaRows||[];sangguRows=res.sangguRows||[];
+      // 2차 (result 탭 — 이전 라운드)
+      eduResult=res.eduResult||[];hahwaResult=res.hahwaResult||[];sangguResult=res.sangguResult||[];
+      if(idRows.length)renderPage();else showToast('데이터가 없습니다.',3000);
+    }catch(e){showToast('로드 실패: '+e.message,4000)}
+    finally{document.getElementById('loadingOverlay').classList.remove('active')}
+  }
+
+  function renderPage(){
+    const row=idRows[currentIndex],eid=row['E-ID']||row.ID||'';
+    document.getElementById('metaId').textContent=eid;
+    document.getElementById('metaCategory').textContent=row.category||'';
+    document.getElementById('labelEduElement').textContent=row['element_edu-act']||'';
+    document.getElementById('labelHahwaElement').textContent=row['element_hahwa-act']||'';
+    document.getElementById('labelSangguElement').textContent=row['element_sanggu-act']||'';
+    renderCard('bodyEdu',getForEid(eduRows,eid),getForEid(eduResult,eid));
+    renderCard('bodyHahwa',getForEid(hahwaRows,eid),getForEid(hahwaResult,eid));
+    renderCard('bodySanggu',getForEid(sangguRows,eid),getForEid(sangguResult,eid));
+    document.getElementById('navPrevCol').style.visibility=currentIndex===0?'hidden':'visible';
+    document.getElementById('navNextCol').style.visibility=currentIndex>=idRows.length-1?'hidden':'visible';
+  }
+
+  function fmtDiff(cur,prev){
+    const cn=Number(cur),pn=Number(prev);
+    if(isNaN(cn)||isNaN(pn))return'-';
+    const d=cn-pn;const abs=Math.abs(d);
+    const fmt=abs<1&&abs!==0?abs.toFixed(2).replace('0.','.'):(abs).toFixed(2);
+    return(d>=0?'+':'-')+fmt;
+  }
+
+  function makeTrendChart(m,s,c,rm2,rs2,rc2,mDisp2,sDisp2,cDisp2,mDisp3,sDisp3,cDisp3){
+    const W=220,H=90,PL=32,PR=32,PT=12,PB=18;
+    const cw=W-PL-PR, ch=H-PT-PB;
+    const x2=PL, x3=PL+cw, xMid=(x2+x3)/2;
+
+    function mY(v){const n=Number(v);if(isNaN(n))return null;return PT+ch-(n+1)/5*ch;}
+    function cY(v){const n=Number(v);if(isNaN(n))return null;return PT+ch-(n+1)/5*ch;}
+
+    const m2N=mY(rm2),m3N=mY(m),c2N=cY(rc2),c3N=cY(c);
+
+    let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Noto Sans KR',sans-serif">`;
+    svg+=`<rect x="${PL}" y="${PT}" width="${cw}" height="${ch}" fill="#fafbfd" stroke="#e8e8e8" rx="3"/>`;
+    for(let i=0;i<=5;i++){const y=PT+ch/5*i;svg+=`<line x1="${PL}" y1="${y}" x2="${PL+cw}" y2="${y}" stroke="#f0f0f0" stroke-width="0.5"/>`;}
+
+    svg+=`<text x="${x2}" y="${H-3}" font-size="8" fill="#999" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp2}, SD=${sDisp2}, CVR=${cDisp2}</title>2차 <tspan font-size="10">🔍</tspan></text>`;
+    svg+=`<text x="${x3}" y="${H-3}" font-size="8" fill="#4a6fa5" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp3}, SD=${sDisp3}, CVR=${cDisp3}</title>3차 <tspan font-size="10">🔍</tspan></text>`;
+
+    // M 라인 + 차이 라벨
+    if(m2N!==null&&m3N!==null){
+      svg+=`<line x1="${x2}" y1="${m2N}" x2="${x3}" y2="${m3N}" stroke="#4a6fa5" stroke-width="1.5" stroke-dasharray="${m3N<m2N?'':'3,2'}"/>`;
+      const mD=fmtDiff(m,rm2);const sD=fmtDiff(s,rs2);const mMidY=Math.min(m2N,m3N)-5;
+      svg+=`<text x="${xMid}" y="${mMidY}" font-size="8.5" fill="#4a6fa5" text-anchor="middle" font-weight="700">M: ${mD} (SD: ${sD})</text>`;
+    }
+    if(m2N!==null)svg+=`<circle cx="${x2}" cy="${m2N}" r="4" fill="#999" stroke="#fff" stroke-width="1"/><text x="${x2}" y="${m2N-6}" font-size="7.5" fill="#999" text-anchor="middle" font-weight="700">${mDisp2}</text>`;
+    if(m3N!==null)svg+=`<circle cx="${x3}" cy="${m3N}" r="4" fill="#4a6fa5" stroke="#fff" stroke-width="1"/><text x="${x3}" y="${m3N-6}" font-size="7.5" fill="#4a6fa5" text-anchor="middle" font-weight="700">${mDisp3}</text>`;
+
+    // CVR 라인 + 차이 라벨
+    if(c2N!==null&&c3N!==null){
+      svg+=`<line x1="${x2}" y1="${c2N}" x2="${x3}" y2="${c3N}" stroke="#8b6fb0" stroke-width="1.5" stroke-dasharray="${c3N<c2N?'':'3,2'}"/>`;
+      const cD=fmtDiff(c,rc2);const cMidY=Math.min(c2N,c3N)-5;
+      svg+=`<text x="${xMid}" y="${cMidY}" font-size="8.5" fill="#8b6fb0" text-anchor="middle" font-weight="700">CVR: ${cD}</text>`;
+    }
+    if(c2N!==null)svg+=`<rect x="${x2-3.5}" y="${c2N-3.5}" width="7" height="7" rx="1" fill="#bbb" stroke="#fff" stroke-width="1"/><text x="${x2}" y="${c2N+13}" font-size="7" fill="#999" text-anchor="middle">${cDisp2}</text>`;
+    if(c3N!==null)svg+=`<rect x="${x3-3.5}" y="${c3N-3.5}" width="7" height="7" rx="1" fill="#8b6fb0" stroke="#fff" stroke-width="1"/><text x="${x3}" y="${c3N+13}" font-size="7" fill="#8b6fb0" text-anchor="middle">${cDisp3}</text>`;
+
+    svg+=`</svg>`;
+    return svg;
+  }
+
+  function renderCard(bodyId,items3rd,items2nd){
+    const body=document.getElementById(bodyId);
+    if(!items3rd.length&&!items2nd.length){body.innerHTML='<div style="color:#bbb;font-style:italic;padding:8px 0">등록된 지표가 없습니다.</div>';return;}
+
+    const displayItems=items3rd.length?items3rd:items2nd;
+    let html='';
+
+    displayItems.forEach((item,idx)=>{
+      const uid=bodyId+'_'+idx;
+      const iId=item['I-ID']||'';
+
+      const r2=items2nd.find(r=>r['I-ID']===iId)||{};
+      const m2=fmtStat(r2.mean),s2=fmtStat(r2.sd),c2=fmtStat(r2.cvr);
+      const m3=fmtStat(item.mean),s3=fmtStat(item.sd),c3=fmtStat(item.cvr);
+
+      // 트렌드 차트
+      const chart=makeTrendChart(item.mean,item.sd,item.cvr,r2.mean,r2.sd,r2.cvr,m2,s2,c2,m3,s3,c3);
+
+      const hasOps3=item.reasons&&Object.keys(item.reasons).length>0;
+      const hasOps2=r2.reasons&&Object.keys(r2.reasons).length>0;
+
+      let btnsHtml='';
+      btnsHtml+=` <button class="btn-panel-view r2" onclick="toggleSection('${uid}_r2ratings',this)">2차 패널별 평정</button>`;
+      if(hasOps2){const oj=esc(JSON.stringify(r2.reasons)).replace(/"/g,'&quot;');btnsHtml+=` <button class="btn-opinion" onclick="showOpinionModal('2차',this.dataset.ops)" data-ops="${oj}">2차 의견 🔍</button>`;}
+      btnsHtml+=` <button class="btn-panel-view" onclick="toggleSection('${uid}_r3ratings',this)">3차 패널별 평정</button>`;
+      if(hasOps3){const oj=esc(JSON.stringify(item.reasons)).replace(/"/g,'&quot;');btnsHtml+=` <button class="btn-opinion" onclick="showOpinionModal('3차',this.dataset.ops)" data-ops="${oj}">3차 의견 🔍</button>`;}
+
+      html+=`<div class="index-item">`;
+      html+=`<div class="index-left">`;
+      html+=`  <div class="index-text">${esc(item.index||'')}${btnsHtml}</div>`;
+
+      // 2차 패널 평정 토글
+      html+=`  <div class="toggle-section" id="${uid}_r2ratings"><div style="font-size:11px;font-weight:700;color:#999;margin-bottom:6px">2차 패널별 평정 결과</div><div class="panel-ratings">`;
+      if(r2.ratings){for(let p=0;p<15;p++){const v=r2.ratings[p];if(v===''||v===null||v===undefined)continue;const nv=Number(v);const cc=nv===1?' rating-1':nv===2?' rating-2':'';html+=`<span class="panel-badge${cc}"><span class="p-label">P${String(p+1).padStart(2,'0')}</span><span class="p-val">${v}</span></span>`;}}
+      html+=`</div></div>`;
+
+      // 3차 패널 평정 토글
+      html+=`  <div class="toggle-section" id="${uid}_r3ratings"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px">3차 패널별 평정 결과</div><div class="panel-ratings">`;
+      if(item.ratings){for(let p=0;p<15;p++){const v=item.ratings[p];if(v===''||v===null||v===undefined)continue;const nv=Number(v);const cc=nv===1?' rating-1':nv===2?' rating-2':'';html+=`<span class="panel-badge${cc}"><span class="p-label">P${String(p+1).padStart(2,'0')}</span><span class="p-val">${v}</span></span>`;}}
+      html+=`</div></div>`;
+
+      html+=`</div>`; // index-left
+
+      // 차트 영역 (클릭시 모달)
+      const chartData=esc(JSON.stringify({m2,s2,c2,m3,s3,c3,rm2:r2.mean,rs2:r2.sd,rc2:r2.cvr,rm3:item.mean,rs3:item.sd,rc3:item.cvr,idx:item.index||''})).replace(/"/g,'&quot;');
+      html+=`<div class="result-chart-col">`;
+      html+=`  <div class="trend-chart" style="cursor:pointer" onclick="openChartModal(this.dataset.chart)" data-chart="${chartData}">${chart}</div>`;
+      html+=`</div>`;
+
+      html+=`</div>`; // index-item
+    });
+
+    body.innerHTML=html;
+  }
+
+  function toggleSection(id,btn){const el=document.getElementById(id);if(!el)return;btn.classList.toggle('active',el.classList.toggle('show'));}
+
+  function showOpinionModal(round,opsJson){
+    let reasons;try{reasons=JSON.parse(opsJson)}catch{reasons={}}
+    const keys=Object.keys(reasons).sort();
+    let html=keys.length?'':'<div style="color:#bbb;font-style:italic">등록된 의견이 없습니다.</div>';
+    keys.forEach(k=>{html+=`<div class="opinion-item"><div class="opinion-panel">${esc(k.replace('panel_','Panel '))}</div><div class="opinion-text">${esc(reasons[k])}</div></div>`;});
+    document.getElementById('opinionModalTitle').textContent=round+' 패널 의견 조회 ('+keys.length+'건)';
+    document.getElementById('opinionModalBody').innerHTML=html;
+    document.getElementById('opinionModal').classList.add('active');
+  }
+  document.getElementById('opinionModalClose').addEventListener('click',()=>document.getElementById('opinionModal').classList.remove('active'));
+  document.getElementById('opinionModal').addEventListener('click',e=>{if(e.target.id==='opinionModal')e.target.classList.remove('active');});
+
+  /* ═══════════ 차트 확대 모달 ═══════════ */
+  function makeLargeChart(rm2,rs2,rc2,rm3,rs3,rc3,mD2,sD2,cD2,mD3,sD3,cD3){
+    const W=480,H=220,PL=48,PR=48,PT=24,PB=30;
+    const cw=W-PL-PR,ch=H-PT-PB;
+    const x2=PL,x3=PL+cw,xMid=(x2+x3)/2;
+    function mY(v){const n=Number(v);if(isNaN(n))return null;return PT+ch-(n+1)/5*ch;}
+    function cY(v){const n=Number(v);if(isNaN(n))return null;return PT+ch-(n+1)/5*ch;}
+    const m2N=mY(rm2),m3N=mY(rm3),c2N=cY(rc2),c3N=cY(rc3);
+    let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Noto Sans KR',sans-serif">`;
+    svg+=`<rect x="${PL}" y="${PT}" width="${cw}" height="${ch}" fill="#fafbfd" stroke="#e0e0e0" rx="4"/>`;
+    for(let i=0;i<=5;i++){const y=PT+ch/5*i;svg+=`<line x1="${PL}" y1="${y}" x2="${PL+cw}" y2="${y}" stroke="#eee" stroke-width="0.5"/>`;}
+    svg+=`<text x="${x2}" y="${H-6}" font-size="12" fill="#999" text-anchor="middle" font-weight="700">2차</text>`;
+    svg+=`<text x="${x3}" y="${H-6}" font-size="12" fill="#4a6fa5" text-anchor="middle" font-weight="700">3차</text>`;
+    // M 라인 + 차이 라벨
+    if(m2N!==null&&m3N!==null){
+      svg+=`<line x1="${x2}" y1="${m2N}" x2="${x3}" y2="${m3N}" stroke="#4a6fa5" stroke-width="2"/>`;
+      const mDiffVal=fmtDiff(rm3,rm2);const sDiffVal=fmtDiff(rs3,rs2);const mMidY=Math.min(m2N,m3N)-14;
+      svg+=`<text x="${xMid}" y="${mMidY}" font-size="11" fill="#4a6fa5" text-anchor="middle" font-weight="700">M: ${mDiffVal} (SD: ${sDiffVal})</text>`;
+    }
+    if(m2N!==null)svg+=`<circle cx="${x2}" cy="${m2N}" r="6" fill="#999" stroke="#fff" stroke-width="1.5"/><text x="${x2}" y="${m2N-10}" font-size="11" fill="#999" text-anchor="middle" font-weight="700">${mD2}</text>`;
+    if(m3N!==null)svg+=`<circle cx="${x3}" cy="${m3N}" r="6" fill="#4a6fa5" stroke="#fff" stroke-width="1.5"/><text x="${x3}" y="${m3N-10}" font-size="11" fill="#4a6fa5" text-anchor="middle" font-weight="700">${mD3}</text>`;
+    // CVR 라인 + 차이 라벨
+    if(c2N!==null&&c3N!==null){
+      svg+=`<line x1="${x2}" y1="${c2N}" x2="${x3}" y2="${c3N}" stroke="#8b6fb0" stroke-width="2"/>`;
+      const cDiffVal=fmtDiff(rc3,rc2);const cMidY=Math.min(c2N,c3N)-14;
+      svg+=`<text x="${xMid}" y="${cMidY}" font-size="11" fill="#8b6fb0" text-anchor="middle" font-weight="700">CVR: ${cDiffVal}</text>`;
+    }
+    if(c2N!==null)svg+=`<rect x="${x2-5}" y="${c2N-5}" width="10" height="10" rx="2" fill="#bbb" stroke="#fff" stroke-width="1.5"/><text x="${x2}" y="${c2N+18}" font-size="10" fill="#999" text-anchor="middle">${cD2}</text>`;
+    if(c3N!==null)svg+=`<rect x="${x3-5}" y="${c3N-5}" width="10" height="10" rx="2" fill="#8b6fb0" stroke="#fff" stroke-width="1.5"/><text x="${x3}" y="${c3N+18}" font-size="10" fill="#8b6fb0" text-anchor="middle">${cD3}</text>`;
+    svg+=`</svg>`;
+    return svg;
+  }
+
+  function openChartModal(chartJson){
+    let d;try{d=JSON.parse(chartJson)}catch{return;}
+    const largeChart=makeLargeChart(d.rm2,d.rs2,d.rc2,d.rm3,d.rs3,d.rc3,d.m2,d.s2,d.c2,d.m3,d.s3,d.c3);
+    document.getElementById('chartModalBody').innerHTML=largeChart;
+    document.getElementById('chartModalStats').innerHTML=
+      `<span style="color:#999">2차: M=${d.m2} (SD=${d.s2}), CVR=${d.c2}</span>&nbsp;&nbsp;│&nbsp;&nbsp;<span style="color:var(--accent)">3차: M=${d.m3} (SD=${d.s3}), CVR=${d.c3}</span>`;
+    document.getElementById('chartModal').classList.add('active');
+  }
+  document.getElementById('chartModalClose').addEventListener('click',()=>document.getElementById('chartModal').classList.remove('active'));
+  document.getElementById('chartModal').addEventListener('click',e=>{if(e.target.id==='chartModal')e.target.classList.remove('active');});
+
+  function navigate(dir){const ni=currentIndex+dir;if(ni<0||ni>=idRows.length)return;currentIndex=ni;renderPage();window.scrollTo({top:0,behavior:'smooth'});}
+  document.getElementById('btnPrev').addEventListener('click',()=>navigate(-1));
+  document.getElementById('btnNext').addEventListener('click',()=>navigate(1));
+  document.addEventListener('keydown',e=>{if(document.getElementById('opinionModal').classList.contains('active')){if(e.key==='Escape')document.getElementById('opinionModal').classList.remove('active');return;}if(e.key==='ArrowLeft')navigate(-1);if(e.key==='ArrowRight')navigate(1);});
+
+  loadData();
+</script>
+</body>
+</html>

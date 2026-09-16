@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1차 델파이 설문 결과</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a2e;--ink-mid:#3d3d5c;--ink-soft:#6b6b8a;--accent:#4a6fa5;--accent-lt:#e8edf5;--divider:#d0d5e0;--bg:#f4f5f8;--card-bg:#fff;--green:#5a9a6e;--purple:#8b6fb0;--orange:#e67e22}
+    body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px 60px}
+
+    .header-bar{width:100%;max-width:1246px;display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+    .header-title{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ink);line-height:1.4;white-space:nowrap}
+    .header-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+    .btn-hdr{padding:10px 22px;font-size:14px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-back{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
+    .btn-back:hover{background:#d5d5d5}
+
+    .main-area{width:100%;max-width:1246px;display:flex;align-items:flex-start;gap:0}
+    .nav-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px;padding-top:8px}
+    .nav-label{font-size:12px;color:var(--ink-soft);font-weight:500}
+    .nav-arrow{width:56px;min-width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ink-soft);cursor:pointer;user-select:none;transition:color .2s,background .2s;border-radius:6px;background:transparent;border:none}
+    .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+    .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
+    .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+
+    .meta-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;padding:16px 24px;border-top:3px solid #555}
+    .meta-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .meta-badge{font-size:14px;font-weight:700;color:var(--ink);background:#f0f0f0;padding:6px 16px;border-radius:4px}
+    .meta-category{font-size:15px;font-weight:600;color:var(--ink-mid)}
+
+    /* 카드 */
+    .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
+    .card-edu{border-top:3px solid #4a6fa5}
+    .card-edu .card-header{background:#e8edf5}
+    .card-hahwa{border-top:3px solid #5a9a6e}
+    .card-hahwa .card-header{background:#e9f5ec}
+    .card-sanggu{border-top:3px solid #8b6fb0}
+    .card-sanggu .card-header{background:#f0eaf7}
+    .card-header{display:flex;align-items:center;padding:9px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);gap:12px;flex-wrap:wrap}
+    .card-header-title{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
+    .card-header-element{font-size:14px;font-weight:600;color:var(--accent);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .card-body{padding:20px 22px}
+
+    /* 지표 텍스트 (읽기전용) */
+    .index-item{padding:8px 0;border-bottom:1px solid #f0f0f0}
+    .index-item:last-child{border-bottom:none}
+    .index-text{font-size:14px;color:var(--ink-mid);line-height:1.8;word-break:keep-all}
+
+    /* 패널 추가 의견 */
+    .additions-section{margin-top:16px;border-top:2px dashed var(--divider);padding-top:14px}
+    .additions-title{font-size:13px;font-weight:700;color:var(--orange);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .additions-title .badge{background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+    .add-item{padding:10px 14px;margin-bottom:8px;background:#fffdf5;border:1px solid #f0e6cc;border-radius:6px}
+    .add-item:last-child{margin-bottom:0}
+    .add-panel{font-size:11.5px;font-weight:600;color:#999;margin-bottom:4px}
+    .add-index{font-size:13.5px;color:var(--ink-mid);line-height:1.7;word-break:keep-all;display:inline}
+    .btn-reason{display:inline-block;margin-left:8px;padding:2px 10px;font-size:11px;font-weight:600;font-family:inherit;background:#fff;border:1px solid #c0a060;border-radius:4px;color:#8a6d30;cursor:pointer;transition:background .15s;vertical-align:middle}
+    .btn-reason:hover{background:#fff3d8}
+    .add-desc{display:none;font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin-top:6px;padding:8px 12px;background:#fff9ee;border-left:3px solid #e8dfc0;border-radius:0 4px 4px 0;word-break:keep-all}
+    .add-desc.show{display:block}
+
+    .no-additions{font-size:13px;color:#bbb;font-style:italic;padding:8px 0}
+
+    /* 설명 모달 */
+    .desc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:1000}
+    .desc-overlay.active{display:block}
+    .desc-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:902px;max-width:96vw;height:80vh;background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.22);z-index:1001;display:none;flex-direction:column;overflow:hidden}
+    .desc-modal.active{display:flex}
+    .desc-modal-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none;flex-shrink:0}
+    .desc-modal-header:active{cursor:grabbing}
+    .desc-modal-title{font-size:15px;font-weight:600;color:var(--ink);flex:1}
+    .desc-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .desc-modal-close:hover{background:#eee}
+    .desc-modal-body{flex:1;padding:28px 32px;overflow-y:auto;font-size:14.5px;color:var(--ink-mid);line-height:2.0;word-break:keep-all;text-align:justify}
+    .desc-modal-body p{text-indent:1.5em;margin-bottom:12px}
+
+    .btn-desc{padding:4px 14px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;transition:all .2s;white-space:nowrap;background:#fff;border:1.5px solid currentColor}
+    .card-edu .btn-desc{color:#4a6fa5}
+    .card-hahwa .btn-desc{color:#5a9a6e}
+    .card-sanggu .btn-desc{color:#8b6fb0}
+    .btn-desc:hover{opacity:.8}
+
+    /* 로딩 */
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;background:var(--accent);animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
+    .toast.show{opacity:1}
+
+    @media(max-width:768px){.header-title{font-size:17px}.nav-arrow{width:36px;min-width:36px;font-size:22px}.header-bar{gap:10px}}
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 결과를 불러오는 중...</span>
+  </div>
+
+  <!-- 설명 모달 -->
+  <div class="desc-overlay" id="descOverlay"></div>
+  <div class="desc-modal" id="descModal">
+    <div class="desc-modal-header" id="descModalHeader">
+      <span class="desc-modal-title" id="descModalTitle">맥락 설명</span>
+      <button class="desc-modal-close" id="descModalClose">닫기</button>
+    </div>
+    <div class="desc-modal-body" id="descModalBody"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 상단 헤더 -->
+  <div class="header-bar">
+    <div class="header-title">1차 델파이 설문 결과</div>
+    <div class="header-right">
+      <span style="font-size:13px;color:var(--ink-soft);margin-right:6px" id="topEmail"></span>
+      <button class="btn-hdr btn-back" id="btnBack" onclick="location.href='admin_mng-intro.html'">관리자 메뉴로 가기</button>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main-area">
+    <div class="nav-col" id="navPrevCol">
+      <button class="nav-arrow" id="btnPrev" title="이전">&#10094;</button>
+      <span class="nav-label">이전</span>
+    </div>
+    <div class="cards-container">
+      <div class="meta-card" id="metaCard">
+        <div class="meta-row">
+          <span class="meta-badge" id="metaId"></span>
+          <span class="meta-category" id="metaCategory"></span>
+        </div>
+      </div>
+
+      <div class="indicator-card card-edu">
+        <div class="card-header">
+          <span class="card-header-title">교육활동 평정 지표</span>
+          <span class="card-header-element" id="labelEduElement"></span>
+          <button class="btn-desc" id="btnDescEdu">☞ 요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodyEdu"></div>
+      </div>
+
+      <div class="indicator-card card-hahwa">
+        <div class="card-header">
+          <span class="card-header-title">하화활동 평정 지표</span>
+          <span class="card-header-element" id="labelHahwaElement"></span>
+          <button class="btn-desc" id="btnDescHahwa">☞ 요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodyHahwa"></div>
+      </div>
+
+      <div class="indicator-card card-sanggu">
+        <div class="card-header">
+          <span class="card-header-title">상구활동 평정 지표</span>
+          <span class="card-header-element" id="labelSangguElement"></span>
+          <button class="btn-desc" id="btnDescSanggu">☞ 요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodySanggu"></div>
+      </div>
+    </div>
+    <div class="nav-col" id="navNextCol">
+      <button class="nav-arrow" id="btnNext" title="다음">&#10095;</button>
+      <span class="nav-label">다음</span>
+    </div>
+  </div>
+
+<script>
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbz0YI3MF9lvKRwG7yDIlQmx3I--3zFImt0qK1VOUgTibVW-EH3DzTa4U3CZ-RkFF9D6YQ/exec';
+
+  const adminEmail = sessionStorage.getItem('adminEmail') || '';
+  document.getElementById('topEmail').textContent = adminEmail ? '👤 ' + adminEmail : '';
+
+  let allRows = [];      // 1st_delphi_data
+  let addRows = [];       // 1st_delphi_add
+  let currentIndex = 0;
+
+  function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+  async function gasCall(payload) {
+    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+    const t = await res.text();
+    try { return JSON.parse(t); } catch { return { status:'error', message:'GAS 응답 파싱 실패' }; }
+  }
+  function showToast(m, d=2000) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d); }
+  function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('active',v); }
+
+  /* ════════════════════ 데이터 로드 ════════════════════ */
+  async function loadData() {
+    showLoading(true);
+    try {
+      // 두 탭 동시 로드
+      const [dataRes, addRes] = await Promise.all([
+        gasCall({ action:'getData' }),
+        gasCall({ action:'getAddData' })
+      ]);
+      if (dataRes.status !== 'ok') throw new Error(dataRes.message || '데이터 로드 실패');
+      allRows = dataRes.rows || [];
+      addRows = (addRes.status === 'ok' && addRes.rows) ? addRes.rows : [];
+      console.log('[load] data:', allRows.length, 'add:', addRows.length);
+      if (allRows.length === 0) { showToast('데이터가 없습니다.', 3000); }
+      else { renderPage(); }
+    } catch(e) {
+      showToast('데이터 로드 실패: ' + e.message, 4000);
+    } finally { showLoading(false); }
+  }
+
+  /* ════════════════════ 지표 파싱 ════════════════════ */
+  function parseIndicators(text) {
+    if (!text) return [];
+    return text.split(/(?=\[)/).filter(s => s.trim()).map(s => s.trim());
+  }
+
+  /* ════════════════════ 추가 의견 그룹핑 ════════════════════ */
+  function getAdditionsForId(id) {
+    return addRows.filter(r => r.ID === id);
+  }
+
+  /* ════════════════════ 렌더링 ════════════════════ */
+  function renderPage() {
+    if (!allRows.length) return;
+    const row = allRows[currentIndex];
+    const id = row.ID || '';
+
+    document.getElementById('metaId').textContent = id;
+    document.getElementById('metaCategory').textContent = row.category || '';
+
+    // 요소명
+    document.getElementById('labelEduElement').textContent = row.element_edu_act || '';
+    document.getElementById('labelHahwaElement').textContent = row.element_hahwa_act || '';
+    document.getElementById('labelSangguElement').textContent = row.element_sanggu_act || '';
+
+    // 각 카드 렌더링
+    const additions = getAdditionsForId(id);
+    renderCard('bodyEdu', row.Index_edu_act, additions, 'Index_edu_act', 'descrpt_index_edu_act', id);
+    renderCard('bodyHahwa', row.Index_hahwa_act, additions, 'Index_hahwa_act', 'descrpt_index_hawha_act', id);
+    renderCard('bodySanggu', row.Index_sanggu_act, additions, 'Index_sanggu_act', 'descrpt_index_sanggu_act', id);
+
+    // 네비게이션
+    document.getElementById('navPrevCol').style.visibility = (currentIndex === 0) ? 'hidden' : 'visible';
+    document.getElementById('btnPrev').disabled = (currentIndex === 0);
+    const isLast = currentIndex >= allRows.length - 1;
+    document.getElementById('navNextCol').style.visibility = isLast ? 'hidden' : 'visible';
+    document.getElementById('btnNext').disabled = isLast;
+  }
+
+  function renderCard(bodyId, indexText, additions, addIndexKey, addDescKey, rowId) {
+    const body = document.getElementById(bodyId);
+    let html = '';
+
+    // 기존 지표 (읽기전용)
+    const items = parseIndicators(indexText);
+    if (items.length) {
+      items.forEach(text => {
+        html += `<div class="index-item"><div class="index-text">${esc(text)}</div></div>`;
+      });
+    } else {
+      html += `<div class="index-item"><div class="index-text" style="color:#bbb;font-style:italic">등록된 지표가 없습니다.</div></div>`;
+    }
+
+    // 기존 지표에서 마지막 번호 추출 (예: [지표 1-1-3] → 3)
+    const idBase = (rowId || '').replace(/^ID_/i, '').replace(/_/g, '-'); // "1-1"
+    let maxNum = 0;
+    items.forEach(text => {
+      const m = text.match(/\[지표\s*\d+-\d+-(\d+)/);
+      if (m) { const n = parseInt(m[1], 10); if (n > maxNum) maxNum = n; }
+    });
+
+    // 패널 추가 의견
+    const relevantAdds = additions.filter(a => (a[addIndexKey] || '').trim());
+    html += `<div class="additions-section">`;
+    html += `<div class="additions-title">패널 추가 의견 <span class="badge">${relevantAdds.length}건</span></div>`;
+    if (relevantAdds.length > 0) {
+      relevantAdds.forEach((a, i) => {
+        const panel = a.panel || '(미상)';
+        const idx = a[addIndexKey] || '';
+        const desc = a[addDescKey] || '';
+        const addNum = maxNum + i + 1;
+        const addLabel = `[지표 ${idBase}-${addNum}]`;
+        html += `<div class="add-item">`;
+        html += `  <div class="add-panel">${esc(panel)}</div>`;
+        html += `  <div><span class="add-index"><strong style="color:var(--orange)">${esc(addLabel)}</strong> ${esc(idx)}</span>`;
+        if (desc) {
+          html += ` <button class="btn-reason" onclick="this.nextElementSibling.classList.toggle('show');this.textContent=this.nextElementSibling.classList.contains('show')?'추가 사유 닫기':'추가 사유 보기'">추가 사유 보기</button>`;
+          html += `<div class="add-desc">${esc(desc)}</div>`;
+        }
+        html += `</div>`;
+        html += `</div>`;
+      });
+    } else {
+      html += `<div class="no-additions">추가된 의견이 없습니다.</div>`;
+    }
+    html += `</div>`;
+
+    body.innerHTML = html;
+  }
+
+  /* ════════════════════ 설명 모달 ════════════════════ */
+  const descOverlay = document.getElementById('descOverlay');
+  const descModal = document.getElementById('descModal');
+
+  function openDescModal(title, text) {
+    document.getElementById('descModalTitle').textContent = title;
+    const body = document.getElementById('descModalBody');
+    if (!text || !text.trim()) {
+      body.innerHTML = '<p style="color:#bbb;font-style:italic;text-indent:0">등록된 설명이 없습니다.</p>';
+    } else {
+      body.innerHTML = text.split(/\n\n|\n/).filter(p => p.trim()).map(p => '<p>' + esc(p) + '</p>').join('');
+    }
+    descOverlay.classList.add('active');
+    descModal.classList.add('active');
+  }
+
+  function closeDescModal() {
+    descOverlay.classList.remove('active');
+    descModal.classList.remove('active');
+  }
+
+  document.getElementById('descModalClose').addEventListener('click', closeDescModal);
+  descOverlay.addEventListener('click', closeDescModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDescModal(); });
+
+  document.getElementById('btnDescEdu').addEventListener('click', () => {
+    const row = allRows[currentIndex];
+    openDescModal('교육활동 요소 설명', row.descrpt_index_edu_act || '');
+  });
+  document.getElementById('btnDescHahwa').addEventListener('click', () => {
+    const row = allRows[currentIndex];
+    openDescModal('하화활동 요소 설명', row.descrpt_index_hawha_act || '');
+  });
+  document.getElementById('btnDescSanggu').addEventListener('click', () => {
+    const row = allRows[currentIndex];
+    openDescModal('상구활동 요소 설명', row.descrpt_index_sanggu_act || '');
+  });
+
+  // 모달 드래그
+  let isDrag=false, dOX=0, dOY=0;
+  document.getElementById('descModalHeader').addEventListener('mousedown', e => {
+    isDrag=true; const r=descModal.getBoundingClientRect();
+    dOX=e.clientX-r.left; dOY=e.clientY-r.top;
+    descModal.style.transform='none'; descModal.style.left=r.left+'px'; descModal.style.top=r.top+'px';
+  });
+  document.addEventListener('mousemove', e => { if(!isDrag)return; descModal.style.left=(e.clientX-dOX)+'px'; descModal.style.top=(e.clientY-dOY)+'px'; });
+  document.addEventListener('mouseup', ()=>{ isDrag=false; });
+
+  /* ════════════════════ 네비게이션 ════════════════════ */
+  function navigate(dir) {
+    const ni = currentIndex + dir;
+    if (ni < 0 || ni >= allRows.length) return;
+    currentIndex = ni;
+    renderPage();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  document.getElementById('btnPrev').addEventListener('click', () => navigate(-1));
+  document.getElementById('btnNext').addEventListener('click', () => navigate(1));
+  document.addEventListener('keydown', e => {
+    if (descModal.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft') navigate(-1);
+    if (e.key === 'ArrowRight') navigate(1);
+  });
+
+  /* ════════════════════ 시작 ════════════════════ */
+  loadData();
+</script>
+</body>
+</html>

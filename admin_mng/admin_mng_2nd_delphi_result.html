@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2차 델파이 설문 결과</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a2e;--ink-mid:#3d3d5c;--ink-soft:#6b6b8a;--accent:#4a6fa5;--accent-lt:#e8edf5;--divider:#d0d5e0;--bg:#f4f5f8;--card-bg:#fff;--green:#5a9a6e;--purple:#8b6fb0}
+    body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px 60px}
+
+    /* 헤더 */
+    .header-bar{width:100%;max-width:1246px;display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+    .header-title{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ink);white-space:nowrap}
+    .header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+    .btn-hdr{padding:10px 18px;font-size:13px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-back{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
+    .btn-back:hover{background:#d5d5d5}
+    .btn-sheet{background:var(--green);color:#fff}
+    .btn-sheet:hover{background:#4a8a5e}
+
+    /* 메인 레이아웃 */
+    .main-area{width:100%;max-width:1246px;display:flex;align-items:flex-start}
+    .nav-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px;padding-top:8px}
+    .nav-label{font-size:12px;color:var(--ink-soft);font-weight:500}
+    .nav-arrow{width:56px;min-width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ink-soft);cursor:pointer;user-select:none;transition:color .2s,background .2s;border-radius:6px;background:transparent;border:none}
+    .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+    .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
+    .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+
+    .meta-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;padding:16px 24px;border-top:3px solid #555}
+    .meta-row{display:flex;align-items:center;gap:12px}
+    .meta-badge{font-size:14px;font-weight:700;color:var(--ink);background:#f0f0f0;padding:6px 16px;border-radius:4px}
+    .meta-category{font-size:15px;font-weight:600;color:var(--ink-mid)}
+
+    /* 카드 */
+    .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
+    .card-edu{border-top:3px solid #4a6fa5}
+    .card-edu .card-header{background:#e8edf5}
+    .card-hahwa{border-top:3px solid #5a9a6e}
+    .card-hahwa .card-header{background:#e9f5ec}
+    .card-sanggu{border-top:3px solid #8b6fb0}
+    .card-sanggu .card-header{background:#f0eaf7}
+    .card-header{display:flex;align-items:center;padding:9px 22px;border-bottom:1px solid var(--divider);gap:12px;flex-wrap:wrap}
+    .card-header-title{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
+    .card-header-element{font-size:14px;font-weight:600;flex:1}
+    .card-edu .card-header-element{color:#4a6fa5}
+    .card-hahwa .card-header-element{color:#5a9a6e}
+    .card-sanggu .card-header-element{color:#8b6fb0}
+    .col-label-header{font-size:13px;font-weight:700;color:#666;text-align:center;white-space:nowrap;width:186px}
+    .card-body{padding:16px 22px}
+
+    /* 지표 행: 텍스트 | 결과바+버튼 */
+    .index-item{display:flex;align-items:stretch;gap:0;padding:10px 0;border-bottom:1px solid #f0f0f0}
+    .index-item:last-child{border-bottom:none}
+    .index-left{flex:1;min-width:0;padding-right:16px;display:flex;flex-direction:column;justify-content:center}
+    .index-text{font-size:14px;color:var(--ink-mid);line-height:1.8;word-break:keep-all}
+
+    /* 결과 바 + CVR 영역 */
+    .result-bar-col{flex-shrink:0;display:flex;align-items:center;gap:10px}
+    .prev-bar-area{position:relative;flex-shrink:0;width:186px;padding:22px 2px 22px;display:flex;flex-direction:column;justify-content:center}
+    .cvr-display{flex-shrink:0;min-width:70px;text-align:center;font-size:12px;font-weight:700;color:var(--purple);background:#f0eaf7;padding:4px 10px;border-radius:4px;align-self:center;white-space:nowrap}
+    .prev-mean-group{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;white-space:nowrap;z-index:3}
+    .prev-mean-label{font-size:10.5px;font-weight:700;color:#4a6fa5;line-height:1.2}
+    .prev-mean-arrow{color:#4a6fa5;font-size:9px;line-height:1}
+    .prev-bar-track{position:relative;height:8px}
+    .prev-bar-dotline{position:absolute;top:50%;left:0;right:0;border-top:2px dotted #c0c5d0;transform:translateY(-50%)}
+    .prev-bar-sd{position:absolute;top:0;height:100%;background:#5a9a6e;border-radius:4px;z-index:1}
+
+    /* 패널 평정/의견 버튼 (지표 텍스트 끝에 인라인) */
+    .btn-panel-view{display:inline-block;margin-left:6px;padding:2px 8px;font-size:11px;font-weight:600;font-family:inherit;border:1px solid var(--accent);background:#fff;color:var(--accent);border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;vertical-align:middle}
+    .btn-panel-view:hover{background:var(--accent-lt)}
+    .btn-panel-view.active{background:var(--accent);color:#fff}
+    .btn-opinion{display:inline-block;margin-left:4px;padding:2px 8px;font-size:11px;font-weight:600;font-family:inherit;border:1px solid var(--purple);background:#fff;color:var(--purple);border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;vertical-align:middle}
+    .btn-opinion:hover{background:#f0eaf7}
+    .btn-opinion.active{background:var(--purple);color:#fff}
+
+    /* 토글 영역 */
+    .toggle-section{display:none;margin-top:8px;padding:10px 14px;background:#fafbfd;border:1px solid var(--divider);border-radius:6px}
+    .toggle-section.show{display:block}
+    .panel-ratings{display:flex;flex-wrap:wrap;gap:6px}
+    .panel-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--divider);background:#fff;color:var(--ink-mid)}
+    .panel-badge .p-label{font-weight:600;color:#999;font-size:10px}
+    .panel-badge .p-val{font-weight:700;color:var(--ink)}
+    .panel-badge.empty{opacity:.35}
+    .panel-badge.rating-1{background:#fff3e0;border-color:#e67e22}
+    .panel-badge.rating-1 .p-val{color:#e67e22}
+    .panel-badge.rating-2{background:#fffde7;border-color:#f0c040}
+    .panel-badge.rating-2 .p-val{color:#b8960c}
+
+    /* 의견 모달 */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}
+    .modal-overlay.active{display:flex}
+    .modal-box{background:#fff;border-radius:8px;width:640px;max-width:94vw;max-height:80vh;box-shadow:0 8px 32px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden}
+    .modal-header{padding:18px 24px;border-bottom:1px solid var(--divider);font-size:16px;font-weight:700;color:var(--ink);flex-shrink:0}
+    .modal-body{overflow-y:auto;flex:1;padding:16px 24px}
+    .modal-footer{padding:14px 24px;border-top:1px solid var(--divider);display:flex;justify-content:center;flex-shrink:0}
+    .modal-close{padding:8px 32px;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;background:#fff;border:1.5px solid var(--divider);color:var(--ink-mid);font-family:inherit}
+    .modal-close:hover{background:#f5f5f5}
+    .opinion-item{padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px;line-height:1.7}
+    .opinion-item:last-child{border-bottom:none}
+    .opinion-panel{font-weight:700;color:#999;font-size:11px;margin-bottom:2px}
+    .opinion-text{color:var(--ink-mid);word-break:keep-all}
+    .no-data-text{color:#bbb;font-style:italic;font-size:13px;padding:8px 0}
+
+    /* 로딩 */
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
+    .toast.show{opacity:1}
+
+    @media(max-width:768px){.header-title{font-size:17px}.nav-arrow{width:36px;min-width:36px;font-size:22px}.result-bar-col{flex-direction:column;width:100%}.prev-bar-area{width:100%}}
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay active" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 결과를 불러오는 중...</span>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <!-- 의견 조회 모달 -->
+  <div class="modal-overlay" id="opinionModal">
+    <div class="modal-box">
+      <div class="modal-header" id="opinionModalTitle">패널 의견 조회</div>
+      <div class="modal-body" id="opinionModalBody"></div>
+      <div class="modal-footer">
+        <button class="modal-close" id="opinionModalClose">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-bar">
+    <div class="header-title">2차 델파이 설문 결과</div>
+    <div class="header-right">
+      <button class="btn-hdr btn-sheet" onclick="window.open('https://docs.google.com/spreadsheets/d/1YhffsxsOaEflHiKI9QNLeUcCBPxZos_KJCOdpbx9kEk/edit','_blank')">📊 시트 보기</button>
+      <button class="btn-hdr btn-back" onclick="location.href='admin_mng-intro.html'">관리자 메뉴</button>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="nav-col" id="navPrevCol">
+      <button class="nav-arrow" id="btnPrev">&#10094;</button>
+      <span class="nav-label">이전</span>
+    </div>
+    <div class="cards-container">
+      <div class="meta-card"><div class="meta-row">
+        <span class="meta-badge" id="metaId"></span>
+        <span class="meta-category" id="metaCategory"></span>
+      </div></div>
+
+      <div class="indicator-card card-edu">
+        <div class="card-header">
+          <span class="card-header-title">교육활동 평정 지표</span>
+          <span class="card-header-element" id="labelEduElement"></span>
+          <span class="col-label-header">2차 평정 결과</span>
+        </div>
+        <div class="card-body" id="bodyEdu"></div>
+      </div>
+      <div class="indicator-card card-hahwa">
+        <div class="card-header">
+          <span class="card-header-title">하화활동 평정 지표</span>
+          <span class="card-header-element" id="labelHahwaElement"></span>
+          <span class="col-label-header">2차 평정 결과</span>
+        </div>
+        <div class="card-body" id="bodyHahwa"></div>
+      </div>
+      <div class="indicator-card card-sanggu">
+        <div class="card-header">
+          <span class="card-header-title">상구활동 평정 지표</span>
+          <span class="card-header-element" id="labelSangguElement"></span>
+          <span class="col-label-header">2차 평정 결과</span>
+        </div>
+        <div class="card-body" id="bodySanggu"></div>
+      </div>
+    </div>
+    <div class="nav-col" id="navNextCol">
+      <button class="nav-arrow" id="btnNext">&#10095;</button>
+      <span class="nav-label">다음</span>
+    </div>
+  </div>
+
+<script>
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGz8ajx0fQU6YGQAe2f4vPMtWgHyHg21XkCmZSj5NITyvkD8jgBrmurpiqRCDwFdo/exec';
+  let idRows=[], eduRows=[], hahwaRows=[], sangguRows=[], currentIndex=0;
+
+  function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+  async function gasCall(p){const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)});const t=await r.text();try{return JSON.parse(t)}catch{return{status:'error'}}}
+  function showToast(m,d=2000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
+
+  async function loadData(){
+    try{
+      const res=await gasCall({action:'adminGetResultData'});
+      if(res.status!=='ok')throw new Error(res.message);
+      idRows=res.idRows||[];eduRows=res.eduRows||[];hahwaRows=res.hahwaRows||[];sangguRows=res.sangguRows||[];
+      if(idRows.length)renderPage();else showToast('데이터가 없습니다.',3000);
+    }catch(e){showToast('로드 실패: '+e.message,4000)}
+    finally{document.getElementById('loadingOverlay').classList.remove('active')}
+  }
+
+  function getForEid(rows,eid){return rows.filter(r=>r['E-ID']===eid)}
+
+  function fmtStat(val){
+    if(val===''||val===null||val===undefined||val==='Ready')return'-';
+    const n=Number(val);if(isNaN(n))return String(val);
+    if(Math.abs(n)<1&&n!==0)return n.toFixed(2).replace('0.','.').replace('-0.','-.');
+    return n.toFixed(2);
+  }
+
+  function renderPage(){
+    const row=idRows[currentIndex],eid=row['E-ID']||row.ID||'';
+    document.getElementById('metaId').textContent=eid;
+    document.getElementById('metaCategory').textContent=row.category||'';
+    document.getElementById('labelEduElement').textContent=row['element_edu-act']||'';
+    document.getElementById('labelHahwaElement').textContent=row['element_hahwa-act']||'';
+    document.getElementById('labelSangguElement').textContent=row['element_sanggu-act']||'';
+    renderResultCard('bodyEdu',getForEid(eduRows,eid));
+    renderResultCard('bodyHahwa',getForEid(hahwaRows,eid));
+    renderResultCard('bodySanggu',getForEid(sangguRows,eid));
+    document.getElementById('navPrevCol').style.visibility=currentIndex===0?'hidden':'visible';
+    document.getElementById('navNextCol').style.visibility=currentIndex>=idRows.length-1?'hidden':'visible';
+  }
+
+  function renderResultCard(bodyId,items){
+    const body=document.getElementById(bodyId);
+    if(!items.length){body.innerHTML='<div class="no-data-text">등록된 지표가 없습니다.</div>';return;}
+    let html='';
+    items.forEach((item,idx)=>{
+      const uid=bodyId+'_'+idx;
+      const m=item.mean,s=item.sd,c=item.cvr;
+      const mN=(m!==''&&m!==null&&m!=='Ready')?Number(m):null;
+      const sN=(s!==''&&s!==null&&s!=='Ready')?Number(s):null;
+      const mDisp=fmtStat(m),sDisp=fmtStat(s),cDisp=fmtStat(c);
+
+      // 바 위치 계산 (1~4 스케일)
+      let barHtml='';
+      if(mN!==null&&!isNaN(mN)){
+        const meanPos=((mN-1)/3*100);
+        const sVal=sN!==null&&!isNaN(sN)?sN:0;
+        const sdL=Math.max(0,((mN-sVal)-1)/3*100);
+        const sdR=Math.min(100,((mN+sVal)-1)/3*100);
+        const sdW=Math.max(0,sdR-sdL);
+
+        barHtml+=`<div class="prev-bar-area">`;
+        barHtml+=`  <div class="prev-mean-group" style="left:${meanPos}%">`;
+        barHtml+=`    <div class="prev-mean-label">M=${mDisp} (SD=${sDisp})</div>`;
+        barHtml+=`    <div class="prev-mean-arrow">▼</div>`;
+        barHtml+=`  </div>`;
+        barHtml+=`  <div class="prev-bar-track">`;
+        barHtml+=`    <div class="prev-bar-dotline"></div>`;
+        barHtml+=`    <div class="prev-bar-sd" style="left:${sdL}%;width:${sdW}%"></div>`;
+        barHtml+=`  </div>`;
+        barHtml+=`</div>`;
+      } else {
+        barHtml+='<div class="prev-bar-area" style="display:flex;align-items:center;justify-content:center"><span style="font-size:12px;color:#bbb">Ready</span></div>';
+      }
+
+      const hasOpinions=item.reasons&&Object.keys(item.reasons).length>0;
+
+      // 버튼 HTML (지표 텍스트 끝에 인라인)
+      let btnsHtml = ` <button class="btn-panel-view" onclick="toggleSection('${uid}_ratings',this)">패널별 평정 결과</button>`;
+      if(hasOpinions) {
+        const opsJson = esc(JSON.stringify(item.reasons)).replace(/"/g,'&quot;');
+        btnsHtml += ` <button class="btn-opinion" onclick="showOpinionModal(this.dataset.ops)" data-ops="${opsJson}">의견 조회 🔍</button>`;
+      }
+
+      html+=`<div class="index-item">`;
+      html+=`  <div class="index-left">`;
+      html+=`    <div class="index-text">${esc(item.index||'')}${btnsHtml}</div>`;
+      // 패널 평정 토글 (값 있는 패널만, 왼쪽부터)
+      html+=`    <div class="toggle-section" id="${uid}_ratings"><div class="panel-ratings">`;
+      for(let p=0;p<15;p++){
+        const val=item.ratings?item.ratings[p]:'';
+        const isEmpty=val===''||val===null||val===undefined;
+        if(isEmpty) continue;
+        const pLabel='P'+String(p+1).padStart(2,'0');
+        const numVal=Number(val);
+        const colorCls=numVal===1?' rating-1':numVal===2?' rating-2':'';
+        html+=`<span class="panel-badge${colorCls}"><span class="p-label">${pLabel}</span><span class="p-val">${val}</span></span>`;
+      }
+      html+=`</div></div>`;
+      html+=`  </div>`;
+      html+=`  <div class="result-bar-col">`;
+      html+=barHtml;
+      html+=`    <div class="cvr-display">CVR=${cDisp}</div>`;
+      html+=`  </div>`;
+      html+=`</div>`;
+    });
+    body.innerHTML=html;
+  }
+
+  function toggleSection(id,btn){
+    const el=document.getElementById(id);if(!el)return;
+    const show=el.classList.toggle('show');
+    btn.classList.toggle('active',show);
+  }
+
+  /* ═══════════ 의견 조회 모달 ═══════════ */
+  function showOpinionModal(opsJson) {
+    let reasons;
+    try { reasons = JSON.parse(opsJson); } catch { reasons = {}; }
+    const keys = Object.keys(reasons).sort();
+    let html = '';
+    if (keys.length === 0) {
+      html = '<div class="no-data-text">등록된 의견이 없습니다.</div>';
+    } else {
+      keys.forEach(key => {
+        const panelName = key.replace('panel_', 'Panel ');
+        html += '<div class="opinion-item">';
+        html += '  <div class="opinion-panel">' + esc(panelName) + '</div>';
+        html += '  <div class="opinion-text">' + esc(reasons[key]) + '</div>';
+        html += '</div>';
+      });
+    }
+    document.getElementById('opinionModalTitle').textContent = '패널 의견 조회 (' + keys.length + '건)';
+    document.getElementById('opinionModalBody').innerHTML = html;
+    document.getElementById('opinionModal').classList.add('active');
+  }
+  document.getElementById('opinionModalClose').addEventListener('click', () => document.getElementById('opinionModal').classList.remove('active'));
+  document.getElementById('opinionModal').addEventListener('click', e => { if (e.target.id === 'opinionModal') e.target.classList.remove('active'); });
+
+  function navigate(dir){
+    const ni=currentIndex+dir;if(ni<0||ni>=idRows.length)return;
+    currentIndex=ni;renderPage();window.scrollTo({top:0,behavior:'smooth'});
+  }
+  document.getElementById('btnPrev').addEventListener('click',()=>navigate(-1));
+  document.getElementById('btnNext').addEventListener('click',()=>navigate(1));
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')navigate(-1);if(e.key==='ArrowRight')navigate(1);});
+
+  loadData();
+</script>
+</body>
+</html>
