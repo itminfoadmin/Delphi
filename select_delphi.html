@@ -170,7 +170,7 @@
   const loOverlay = document.getElementById('loOverlay');
   document.getElementById('btnLogout').addEventListener('click', ()=>loOverlay.classList.add('active'));
   document.getElementById('loCancel').addEventListener('click',  ()=>loOverlay.classList.remove('active'));
-  document.getElementById('loConfirm').addEventListener('click', ()=>{ sessionStorage.clear(); location.href='index.html'; });
+  document.getElementById('loConfirm').addEventListener('click', ()=>{ sessionStorage.clear(); location.href='end.html'; });
   loOverlay.addEventListener('click', e=>{ if(e.target===loOverlay) loOverlay.classList.remove('active'); });
 
   /* CSV 파싱 */

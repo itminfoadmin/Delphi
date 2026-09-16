@@ -157,17 +157,18 @@
     /* ── Admin Modal ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.38); z-index: 1000;
+      background: rgba(26,26,46,.45); z-index: 1000;
       align-items: center; justify-content: center;
+      backdrop-filter: blur(2px);
     }
     .modal-overlay.active { display: flex; }
 
     .modal {
-      background: #f4f5f8;
+      background: var(--card-bg);
       border-top: 4px solid var(--accent);
       border-radius: 4px;
-      padding: 40px 44px 36px;
-      width: 690px; max-width: 94vw;
+      padding: 36px 44px 32px;
+      width: 480px; max-width: 94vw;
       position: relative;
       box-shadow: 0 8px 32px rgba(26,26,46,.18);
     }
@@ -179,42 +180,53 @@
     }
     .modal-close:hover { color: var(--ink); }
 
-    .modal-desc {
-      font-family: 'Courier New', monospace;
-      font-size: 14px; line-height: 1.8;
-      color: var(--ink-mid); margin-bottom: 28px;
+    .modal-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--ink); margin-bottom: 20px;
     }
 
-    .modal-field { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .modal-field { margin-bottom: 16px; }
     .modal-field label {
-      font-family: 'Courier New', monospace;
-      font-size: 14px; color: var(--ink-soft);
-      width: 80px; text-align: right; flex-shrink: 0;
+      display: block;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 12px; font-weight: 600;
+      color: var(--ink-soft); letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
     }
     .modal-field input {
-      flex: 1; border: 1px solid var(--divider); border-radius: 4px;
-      background: #fff; font-size: 14px; padding: 10px 14px;
+      width: 100%; border: none;
+      border-bottom: 1.5px solid var(--divider);
+      background: transparent;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 15px; padding: 8px 2px;
       outline: none; color: var(--ink); transition: border-color .2s;
     }
     .modal-field input::placeholder { color: #bbb; }
-    .modal-field input:focus { border-color: var(--accent); }
+    .modal-field input:focus { border-bottom-color: var(--accent); }
 
     .modal-error {
       color: #c0392b; font-size: 13px;
-      margin-top: -6px; margin-bottom: 6px;
-      min-height: 18px; padding-left: 96px;
+      min-height: 18px; margin-bottom: 4px;
     }
 
-    .modal-actions { display: flex; gap: 10px; margin-top: 28px; }
+    .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
     .modal-actions button {
-      flex: 1; padding: 13px 0;
+      flex: 1; padding: 12px 0;
       font-family: 'Noto Sans KR', sans-serif;
       font-size: 14px; font-weight: 600;
-      border-radius: 4px; cursor: pointer; transition: opacity .2s;
+      border-radius: 4px; cursor: pointer; transition: all .2s;
     }
-    .modal-actions button:hover { opacity: .85; }
-    .btn-cancel  { background: #fff; border: 1.5px solid var(--divider); color: var(--ink-mid); }
-    .btn-confirm { background: var(--ink); border: none; color: #fff; }
+    .btn-cancel {
+      background: #fff; border: 1.5px solid var(--divider); color: var(--ink-mid);
+    }
+    .btn-cancel:hover { background: var(--bg); }
+    .btn-confirm {
+      background: var(--accent); border: 1.5px solid var(--accent); color: #fff;
+      box-shadow: 0 2px 8px rgba(74,111,165,.25);
+    }
+    .btn-confirm:hover { background: #3a5c8f; border-color: #3a5c8f; }
     .btn-confirm:disabled { opacity: .5; cursor: default; }
   </style>
 </head>
@@ -258,22 +270,19 @@
   <div class="modal-overlay" id="adminModal">
     <div class="modal">
       <button class="modal-close" id="modalClose">×</button>
-      <p class="modal-desc">
-        To log in as an administrator,<br>
-        enter your administrator account below.
-      </p>
+      <div class="modal-title">관리자 로그인</div>
       <div class="modal-field">
-        <label>e-mail</label>
-        <input type="email" id="adminEmail" placeholder="이메일 주소를 입력해주세요." autocomplete="username" />
+        <label>E-MAIL</label>
+        <input type="email" id="adminEmail" placeholder="이메일 주소" autocomplete="username" />
       </div>
       <div class="modal-field">
-        <label>Password</label>
-        <input type="password" id="adminPw" placeholder="패스워드를 입력해주세요." autocomplete="current-password" />
+        <label>PASSWORD</label>
+        <input type="password" id="adminPw" placeholder="패스워드" autocomplete="current-password" />
       </div>
       <p class="modal-error" id="adminError"></p>
       <div class="modal-actions">
-        <button class="btn-cancel"  id="modalCancel">Cancel</button>
-        <button class="btn-confirm" id="modalConfirm">Confirm</button>
+        <button class="btn-cancel" id="modalCancel">취소</button>
+        <button class="btn-confirm" id="modalConfirm">로그인</button>
       </div>
     </div>
   </div>
@@ -361,7 +370,7 @@
         if (!user)               { errorEl.textContent='등록되지 않은 이메일입니다.'; return; }
         if (user['password']!==pw){ errorEl.textContent='패스워드가 올바르지 않습니다.'; return; }
         sessionStorage.setItem('adminEmail', email);
-        location.href = (user['e-mail']===user['password']) ? 'admin_pass_change.html' : 'admin_mng-01.html';
+        location.href = (user['e-mail']===user['password']) ? '/admin_mng/admin_pass_change.html' : 'admin_mng-01.html';
       } catch(err) {
         errorEl.textContent='인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
         console.error(err);

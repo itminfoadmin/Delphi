@@ -74,6 +74,8 @@
     .index-left{flex:1;min-width:0}
     .index-text{font-size:15px;color:var(--ink-mid);line-height:1.9;padding-left:var(--hang,2em);text-indent:calc(-1 * var(--hang,2em))}
     .index-right{flex-shrink:0;display:flex;align-items:center;padding-top:4px}
+    .btn-add-reason{display:inline-block;margin-left:6px;padding:2px 8px;font-size:11px;font-family:inherit;background:#fffbf0;border:1px solid #c0a060;border-radius:4px;color:#8a6d30;cursor:pointer;font-weight:600;vertical-align:middle;line-height:1.4;transition:background .15s}
+    .btn-add-reason:hover{background:#fff3d8}
     .rating-row{display:flex;align-items:center}
     .rating-group{display:flex;align-items:center;gap:0}
 
@@ -277,6 +279,17 @@
     </div>
   </div>
 
+  <!-- 추가 사유 확인 모달 -->
+  <div class="modal-overlay" id="addReasonModal">
+    <div class="modal-box" style="width:600px;max-height:80vh;display:flex;flex-direction:column">
+      <h3 id="addReasonModalTitle" style="flex-shrink:0">추가 사유</h3>
+      <div id="addReasonModalBody" style="overflow-y:auto;flex:1;font-size:14px;color:var(--ink-mid);line-height:1.9;word-break:keep-all"></div>
+      <div class="modal-actions" style="flex-shrink:0;justify-content:center">
+        <button class="modal-cancel" id="addReasonModalClose" style="flex:none;width:140px">닫기</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- 상단 헤더 -->
@@ -357,9 +370,14 @@
 
   const RATING_LABELS = ['매우\n부적절','부적절','적절','매우\n적절'];
 
-  const panelEmail = sessionStorage.getItem('panelEmail') || '';
+  const urlParams = new URLSearchParams(window.location.search);
+  const isPreview = urlParams.get('preview') === '1';
+  const previewPanel = urlParams.get('panel') || 'panel_01';
+  const previewIndex = parseInt(urlParams.get('panelIndex') || '1', 10);
+
+  const panelEmail = sessionStorage.getItem('panelEmail') || (isPreview ? 'admin_preview' : '');
   if (!panelEmail) location.href = 'index.html';
-  document.getElementById('panelLabel').textContent = '패널 : ' + panelEmail;
+  document.getElementById('panelLabel').textContent = isPreview ? '패널 : 관리자 미리보기' : '패널 : ' + panelEmail;
 
   /* 패널 번호: GAS에서 Basic_Data 조회하여 설정 */
   let panelColValue = '';  // 'panel_01' ~ 'panel_15'
@@ -373,6 +391,7 @@
   let eduIndices   = {};   // { ID: [ {index, row#, ...} ] }
   let hahwaIndices = {};
   let sangguIndices= {};
+  let addReasonData = []; // 1차 추가 의견 데이터
   let currentIndex  = 0;
 
   // 평정 상태를 메모리에 보관 (pageId-type-indexRow → {rating, reason})
@@ -535,13 +554,18 @@
 
       if (!surveyData) {
         /* ── 서버에서 로드 (캐시 미스 또는 기존 포맷 무효화) ── */
-        // 1) 패널 조회 (BASIC_GAS)
-        const panelP = fetch(BASIC_GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
-        }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
-          .catch(() => ({ status:'error' }));
+        // 1) 패널 조회 — 미리보기 모드에서는 URL 파라미터 사용
+        let panelP;
+        if (isPreview) {
+          panelP = Promise.resolve({ status:'ok', panelCol: previewPanel, panelIndex: previewIndex });
+        } else {
+          panelP = fetch(BASIC_GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+          }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
+            .catch(() => ({ status:'error' }));
+        }
 
         // 2) 설문 데이터 (GAS - 가벼운 getAllData)
         const dataP = fetch(GAS_URL + '?action=getAllData')
@@ -584,6 +608,16 @@
       eduIndices    = groupByIdFromGAS(surveyData.eduRows || []);
       hahwaIndices  = groupByIdFromGAS(surveyData.hahwaRows || []);
       sangguIndices = groupByIdFromGAS(surveyData.sangguRows || []);
+
+      // 1차 추가 의견 데이터 로드 (추가 사유 확인용)
+      try {
+        const addRes = await gasCall({ action:'get1stAddData' });
+        if (addRes.status === 'ok' && addRes.rows) {
+          addReasonData = addRes.rows;
+          console.log('[init] 1차 추가 의견:', addReasonData.length, '건');
+        }
+      } catch(ae) { console.warn('[init] 추가 의견 로드 실패:', ae); }
+
       console.log('[init] id:', idRows.length, 'edu:', (surveyData.eduRows||[]).length, 'hahwa:', (surveyData.hahwaRows||[]).length, 'sanggu:', (surveyData.sangguRows||[]).length);
       console.log('[init] eduIndices keys:', Object.keys(eduIndices));
       console.log('[init] hahwaIndices keys:', Object.keys(hahwaIndices));
@@ -754,9 +788,28 @@
       // 내어쓰기 +3ch 추가
       const hangVal = hang + 4;
 
+      // 추가 사유 확인 버튼 (1차 추가 의견과 매칭)
+      let addReasonBtn = '';
+      if (addReasonData.length > 0) {
+        const eid = idRow['E-ID'] || idRow.ID || '';
+        const addIndexKey = type === 'edu' ? 'Index_edu_act' : type === 'hahwa' ? 'Index_hahwa_act' : 'Index_sanggu_act';
+        const addDescKey = type === 'edu' ? 'descrpt_index_edu_act' : type === 'hahwa' ? 'descrpt_index_hawha_act' : 'descrpt_index_sanggu_act';
+        const match = addReasonData.find(a => {
+          if (a.ID !== eid) return false;
+          const addText = (a[addIndexKey] || '').trim();
+          if (!addText) return false;
+          return indexText.includes(addText) || addText.includes(indexText);
+        });
+        if (match && (match[addDescKey] || match.panel)) {
+          const panel = esc(match.panel || '');
+          const reason = esc(match[addDescKey] || '(사유 미기재)');
+          addReasonBtn = ` <button class="btn-add-reason" onclick="showAddReasonModal('${panel}', '${reason.replace(/'/g,"\\'")}')">추가 사유 확인</button>`;
+        }
+      }
+
       html += `<div class="index-item" data-key="${key}">`;
       html += `  <div class="index-left">`;
-      html += `    <div class="index-text" style="--hang:${hangVal}ch">${esc(indexText)}</div>`;
+      html += `    <div class="index-text" style="--hang:${hangVal}ch">${esc(indexText)}${addReasonBtn}</div>`;
       html += `  </div>`;
       html += `  <div class="index-right">`;
       html += `    <div class="rating-row">`;
@@ -839,6 +892,17 @@
   }
 
   /* ════════════════════ 저장 (GAS) ════════════════════ */
+  /* ════════════════════ 추가 사유 확인 모달 ════════════════════ */
+  function showAddReasonModal(panel, reason) {
+    document.getElementById('addReasonModalTitle').textContent = '추가 사유';
+    document.getElementById('addReasonModalBody').innerHTML = reason
+      ? '<p>' + reason + '</p>'
+      : '<p style="color:#bbb;font-style:italic">사유가 기재되지 않았습니다.</p>';
+    document.getElementById('addReasonModal').classList.add('active');
+  }
+  document.getElementById('addReasonModalClose').addEventListener('click', () => document.getElementById('addReasonModal').classList.remove('active'));
+  document.getElementById('addReasonModal').addEventListener('click', e => { if (e.target.id === 'addReasonModal') e.target.classList.remove('active'); });
+
   async function gasCall(payload) {
     const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
     const t = await res.text();
