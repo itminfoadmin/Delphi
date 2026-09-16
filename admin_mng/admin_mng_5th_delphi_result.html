@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>4차 델파이 설문 결과</title>
+  <title>5차 델파이 설문 결과</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -103,7 +103,7 @@
   <!-- 차트 확대 모달 -->
   <div class="modal-overlay" id="chartModal">
     <div class="modal-box" style="width:560px;max-width:96vw">
-      <div class="modal-header" id="chartModalTitle">3차→4차 변동 차트</div>
+      <div class="modal-header" id="chartModalTitle">4차→5차 변동 차트</div>
       <div class="modal-body" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 24px">
         <div id="chartModalBody" style="width:480px;height:220px;max-width:100%"></div>
         <div id="chartModalStats" style="font-size:13px;color:var(--ink-mid);line-height:1.8;text-align:center"></div>
@@ -115,9 +115,9 @@
   <div class="toast" id="toast"></div>
 
   <div class="header-bar">
-    <div class="header-title">4차 델파이 설문 결과</div>
+    <div class="header-title">5차 델파이 설문 결과</div>
     <div class="header-right">
-      <button class="btn-hdr btn-sheet" onclick="window.open('https://docs.google.com/spreadsheets/d/1GRNAmGNeJDNadQWfpmhoRV799JiUKZSzut3ilEd6JUk/edit','_blank')">📊 시트 보기</button>
+      <button class="btn-hdr btn-sheet" onclick="window.open('https://docs.google.com/spreadsheets/d/1s6yJcII_ANynOPwN222QHRGD-eppHnIVEhgeeGAPos0/edit','_blank')">📊 시트 보기</button>
       <button class="btn-hdr btn-back" onclick="location.href='admin_mng-intro.html'">관리자 메뉴</button>
     </div>
   </div>
@@ -126,15 +126,15 @@
     <div class="nav-col" id="navPrevCol"><button class="nav-arrow" id="btnPrev">&#10094;</button><span class="nav-label">이전</span></div>
     <div class="cards-container">
       <div class="meta-card"><div class="meta-row"><span class="meta-badge" id="metaId"></span><span class="meta-category" id="metaCategory"></span></div></div>
-      <div class="indicator-card card-edu"><div class="card-header"><span class="card-header-title">교육활동 평정 지표</span><span class="card-header-element" id="labelEduElement"></span><div class="col-labels"><span class="col-label-header">3차→4차 변동</span></div></div><div class="card-body" id="bodyEdu"></div></div>
-      <div class="indicator-card card-hahwa"><div class="card-header"><span class="card-header-title">하화활동 평정 지표</span><span class="card-header-element" id="labelHahwaElement"></span><div class="col-labels"><span class="col-label-header">3차→4차 변동</span></div></div><div class="card-body" id="bodyHahwa"></div></div>
-      <div class="indicator-card card-sanggu"><div class="card-header"><span class="card-header-title">상구활동 평정 지표</span><span class="card-header-element" id="labelSangguElement"></span><div class="col-labels"><span class="col-label-header">3차→4차 변동</span></div></div><div class="card-body" id="bodySanggu"></div></div>
+      <div class="indicator-card card-edu"><div class="card-header"><span class="card-header-title">교육활동 평정 지표</span><span class="card-header-element" id="labelEduElement"></span><div class="col-labels"><span class="col-label-header">4차→5차 변동</span></div></div><div class="card-body" id="bodyEdu"></div></div>
+      <div class="indicator-card card-hahwa"><div class="card-header"><span class="card-header-title">하화활동 평정 지표</span><span class="card-header-element" id="labelHahwaElement"></span><div class="col-labels"><span class="col-label-header">4차→5차 변동</span></div></div><div class="card-body" id="bodyHahwa"></div></div>
+      <div class="indicator-card card-sanggu"><div class="card-header"><span class="card-header-title">상구활동 평정 지표</span><span class="card-header-element" id="labelSangguElement"></span><div class="col-labels"><span class="col-label-header">4차→5차 변동</span></div></div><div class="card-body" id="bodySanggu"></div></div>
     </div>
     <div class="nav-col" id="navNextCol"><button class="nav-arrow" id="btnNext">&#10095;</button><span class="nav-label">다음</span></div>
   </div>
 
 <script>
-  const GAS_URL='https://script.google.com/macros/s/AKfycbyWx7Sy9rKthKH8CtDdkQubKkIGGa7IQVjJxlwae69GdwJv5JVhDYeROlvqMHVMTS4I/exec';
+  const GAS_URL='https://script.google.com/macros/s/AKfycbxVX_7atj29tetASrhrMg6Tmy1FU0Cn0b9Pq8j_LS9Qkb5ccjn5D6ZnVd6QzuLCLBqU2g/exec';
   let idRows=[],eduRows=[],hahwaRows=[],sangguRows=[],eduResult=[],hahwaResult=[],sangguResult=[];
   let currentIndex=0;
 
@@ -194,8 +194,8 @@
     svg+=`<rect x="${PL}" y="${PT}" width="${cw}" height="${ch}" fill="#fafbfd" stroke="#e8e8e8" rx="3"/>`;
     for(let i=0;i<=5;i++){const y=PT+ch/5*i;svg+=`<line x1="${PL}" y1="${y}" x2="${PL+cw}" y2="${y}" stroke="#f0f0f0" stroke-width="0.5"/>`;}
 
-    svg+=`<text x="${x2}" y="${H-3}" font-size="8" fill="#999" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp2}, SD=${sDisp2}, CVR=${cDisp2}</title>3차 <tspan font-size="10">🔍</tspan></text>`;
-    svg+=`<text x="${x3}" y="${H-3}" font-size="8" fill="#4a6fa5" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp3}, SD=${sDisp3}, CVR=${cDisp3}</title>4차 <tspan font-size="10">🔍</tspan></text>`;
+    svg+=`<text x="${x2}" y="${H-3}" font-size="8" fill="#999" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp2}, SD=${sDisp2}, CVR=${cDisp2}</title>4차 <tspan font-size="10">🔍</tspan></text>`;
+    svg+=`<text x="${x3}" y="${H-3}" font-size="8" fill="#4a6fa5" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp3}, SD=${sDisp3}, CVR=${cDisp3}</title>5차 <tspan font-size="10">🔍</tspan></text>`;
 
     // M 라인 + 차이 라벨
     if(m2N!==null&&m3N!==null){
@@ -241,22 +241,22 @@
       const hasOps2=r2.reasons&&Object.keys(r2.reasons).length>0;
 
       let btnsHtml='';
-      btnsHtml+=` <button class="btn-panel-view r2" onclick="toggleSection('${uid}_r2ratings',this)">3차 패널별 평정</button>`;
-      if(hasOps2){const oj=esc(JSON.stringify(r2.reasons)).replace(/"/g,'&quot;');btnsHtml+=` <button class="btn-opinion" onclick="showOpinionModal('3차',this.dataset.ops)" data-ops="${oj}">3차 의견 🔍</button>`;}
-      btnsHtml+=` <button class="btn-panel-view" onclick="toggleSection('${uid}_r3ratings',this)">4차 패널별 평정</button>`;
-      if(hasOps3){const oj=esc(JSON.stringify(item.reasons)).replace(/"/g,'&quot;');btnsHtml+=` <button class="btn-opinion" onclick="showOpinionModal('4차',this.dataset.ops)" data-ops="${oj}">4차 의견 🔍</button>`;}
+      btnsHtml+=` <button class="btn-panel-view r2" onclick="toggleSection('${uid}_r2ratings',this)">4차 패널별 평정</button>`;
+      if(hasOps2){const oj=esc(JSON.stringify(r2.reasons)).replace(/"/g,'&quot;');btnsHtml+=` <button class="btn-opinion" onclick="showOpinionModal('4차',this.dataset.ops)" data-ops="${oj}">4차 의견 🔍</button>`;}
+      btnsHtml+=` <button class="btn-panel-view" onclick="toggleSection('${uid}_r3ratings',this)">5차 패널별 평정</button>`;
+      if(hasOps3){const oj=esc(JSON.stringify(item.reasons)).replace(/"/g,'&quot;');btnsHtml+=` <button class="btn-opinion" onclick="showOpinionModal('5차',this.dataset.ops)" data-ops="${oj}">5차 의견 🔍</button>`;}
 
       html+=`<div class="index-item">`;
       html+=`<div class="index-left">`;
       html+=`  <div class="index-text">${esc(item.index||'')}${btnsHtml}</div>`;
 
       // 2차 패널 평정 토글
-      html+=`  <div class="toggle-section" id="${uid}_r2ratings"><div style="font-size:11px;font-weight:700;color:#999;margin-bottom:6px">3차 패널별 평정 결과</div><div class="panel-ratings">`;
+      html+=`  <div class="toggle-section" id="${uid}_r2ratings"><div style="font-size:11px;font-weight:700;color:#999;margin-bottom:6px">4차 패널별 평정 결과</div><div class="panel-ratings">`;
       if(r2.ratings){for(let p=0;p<15;p++){const v=r2.ratings[p];if(v===''||v===null||v===undefined)continue;const nv=Number(v);const cc=nv===1?' rating-1':nv===2?' rating-2':'';html+=`<span class="panel-badge${cc}"><span class="p-label">P${String(p+1).padStart(2,'0')}</span><span class="p-val">${v}</span></span>`;}}
       html+=`</div></div>`;
 
       // 3차 패널 평정 토글
-      html+=`  <div class="toggle-section" id="${uid}_r3ratings"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px">4차 패널별 평정 결과</div><div class="panel-ratings">`;
+      html+=`  <div class="toggle-section" id="${uid}_r3ratings"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px">5차 패널별 평정 결과</div><div class="panel-ratings">`;
       if(item.ratings){for(let p=0;p<15;p++){const v=item.ratings[p];if(v===''||v===null||v===undefined)continue;const nv=Number(v);const cc=nv===1?' rating-1':nv===2?' rating-2':'';html+=`<span class="panel-badge${cc}"><span class="p-label">P${String(p+1).padStart(2,'0')}</span><span class="p-val">${v}</span></span>`;}}
       html+=`</div></div>`;
 
@@ -299,8 +299,8 @@
     let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Noto Sans KR',sans-serif">`;
     svg+=`<rect x="${PL}" y="${PT}" width="${cw}" height="${ch}" fill="#fafbfd" stroke="#e0e0e0" rx="4"/>`;
     for(let i=0;i<=5;i++){const y=PT+ch/5*i;svg+=`<line x1="${PL}" y1="${y}" x2="${PL+cw}" y2="${y}" stroke="#eee" stroke-width="0.5"/>`;}
-    svg+=`<text x="${x2}" y="${H-6}" font-size="12" fill="#999" text-anchor="middle" font-weight="700">3차</text>`;
-    svg+=`<text x="${x3}" y="${H-6}" font-size="12" fill="#4a6fa5" text-anchor="middle" font-weight="700">4차</text>`;
+    svg+=`<text x="${x2}" y="${H-6}" font-size="12" fill="#999" text-anchor="middle" font-weight="700">4차</text>`;
+    svg+=`<text x="${x3}" y="${H-6}" font-size="12" fill="#4a6fa5" text-anchor="middle" font-weight="700">5차</text>`;
     // M 라인 + 차이 라벨
     if(m2N!==null&&m3N!==null){
       svg+=`<line x1="${x2}" y1="${m2N}" x2="${x3}" y2="${m3N}" stroke="#4a6fa5" stroke-width="2"/>`;
@@ -326,7 +326,7 @@
     const largeChart=makeLargeChart(d.rm2,d.rs2,d.rc2,d.rm3,d.rs3,d.rc3,d.m2,d.s2,d.c2,d.m3,d.s3,d.c3);
     document.getElementById('chartModalBody').innerHTML=largeChart;
     document.getElementById('chartModalStats').innerHTML=
-      `<span style="color:#999">3차: M=${d.m2} (SD=${d.s2}), CVR=${d.c2}</span>&nbsp;&nbsp;│&nbsp;&nbsp;<span style="color:var(--accent)">4차: M=${d.m3} (SD=${d.s3}), CVR=${d.c3}</span>`;
+      `<span style="color:#999">4차: M=${d.m2} (SD=${d.s2}), CVR=${d.c2}</span>&nbsp;&nbsp;│&nbsp;&nbsp;<span style="color:var(--accent)">5차: M=${d.m3} (SD=${d.s3}), CVR=${d.c3}</span>`;
     document.getElementById('chartModal').classList.add('active');
   }
   document.getElementById('chartModalClose').addEventListener('click',()=>document.getElementById('chartModal').classList.remove('active'));
