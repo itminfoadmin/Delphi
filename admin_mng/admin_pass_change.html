@@ -98,12 +98,16 @@
 
     .btn-cancel  { background: #fff; border: 1.5px solid #ccc; color: #333; }
     .btn-confirm { background: #1e1e1e; border: none; color: #fff; }
+
+    /* embed 모드: iframe 내에서 배경 투명, 카드 그림자 제거 */
+    body.embed { background: transparent; padding: 20px; min-height: auto; }
+    body.embed .card { box-shadow: none; padding: 32px 36px 28px; }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <p class="card-title">
+  <p class="card-title" id="cardTitle">
     최초 로그인 하셨습니다.<br>
     보안을 위해 로그인 비밀번호를 변경해주세요.
   </p>
@@ -140,12 +144,14 @@
 
 <script>
   /* ── 설정 ── */
-  // ★ 아래 GAS_URL 을 배포 후 발급된 웹앱 URL로 교체하세요
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbz2efw4LV9gavToM5x9mIj7xi2dzW4BlfPOsilHtR1TU9PfYAjBnS6zPIgtT1FsNpys/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzDES_x1oHeiC_NbN97iCpwS4bKwY7zGTRFlp_IqmEC4wPbgpzmyDimoPSx5TQPPnfVPQ/exec';
 
-  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkDVzf4EpV7PqZSd-IkSKDbJznhnuABEjcOddp0HCsRqPIVjsbpiAqjdPPn03A1Amp8XzUTbhUwXx-/pub?gid=0&single=true&output=csv';
-
-
+  /* ── embed 모드 감지 ── */
+  const isEmbed = new URLSearchParams(location.search).has('embed');
+  if (isEmbed) {
+    document.body.classList.add('embed');
+    document.getElementById('cardTitle').innerHTML = '비밀번호 변경을 위해 아래 내용을 입력하고<br>[확인(Confirm)] 버튼을 클릭해주세요.';
+  }
 
   /* ── 세션에서 이메일 자동 채우기 ── */
   const savedEmail = sessionStorage.getItem('adminEmail') || '';
@@ -159,27 +165,13 @@
   const confirmBtn = document.getElementById('confirmBtn');
   const cancelBtn  = document.getElementById('cancelBtn');
 
-  cancelBtn.addEventListener('click', () => { location.href = 'admin_mng-intro.html'; });
-
-  /* ── CSV 파싱 ── */
-  function parseCSV(text) {
-    const lines = text.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    return lines.slice(1).map(line => {
-      const cols = [];
-      let cur = '', inQ = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') { inQ = !inQ; }
-        else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-        else { cur += ch; }
-      }
-      cols.push(cur.trim());
-      const row = {};
-      headers.forEach((h, i) => row[h] = (cols[i] || '').replace(/^"|"$/g, ''));
-      return row;
-    });
-  }
+  cancelBtn.addEventListener('click', () => {
+    if (isEmbed && window.parent !== window) {
+      window.parent.postMessage({ type: 'pwModalClose' }, '*');
+    } else {
+      location.href = 'admin_mng-intro.html';
+    }
+  });
 
   /* ── 확인 버튼 ── */
   confirmBtn.addEventListener('click', async () => {
@@ -195,7 +187,7 @@
     if (!email || !currentPw || !newPw || !newPwConf) {
       errorEl.textContent = '모든 항목을 입력해주세요.'; return;
     }
-if (newPw !== newPwConf) {
+    if (newPw !== newPwConf) {
       errorEl.textContent = '새 패스워드와 확인 패스워드가 일치하지 않습니다.'; return;
     }
     if (newPw === currentPw) {
@@ -206,26 +198,41 @@ if (newPw !== newPwConf) {
     confirmBtn.textContent = '처리 중…';
 
     try {
-      // 1) 현재 CSV에서 계정 검증
-      const res  = await fetch(CSV_URL);
-      const text = await res.text();
-      const rows = parseCSV(text);
-      const user = rows.find(r => r['e-mail'] === email);
+      // 1) GAS로 현재 패스워드 검증 (CSV 캐시 문제 방지 — 항상 최신 데이터 조회)
+      const verifyRes = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'verifyAdmin', email, password: currentPw }),
+        redirect: 'follow'
+      });
+      const verifyData = await verifyRes.json();
 
-      if (!user) { errorEl.textContent = '등록되지 않은 이메일입니다.'; return; }
-      if (user['password'] !== currentPw) { errorEl.textContent = '현재 패스워드가 올바르지 않습니다.'; return; }
+      if (verifyData.status !== 'ok') {
+        errorEl.textContent = verifyData.message || '현재 패스워드가 올바르지 않습니다.';
+        return;
+      }
 
       // 2) GAS 웹앱으로 패스워드 업데이트 요청
       const gasRes = await fetch(GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'changeAdminPassword', email, newPassword: newPw }),
-        mode: 'no-cors'   // GAS 웹앱은 no-cors 로 요청
+        redirect: 'follow'
       });
+      const gasData = await gasRes.json();
 
-      // no-cors 는 응답 body를 읽을 수 없으므로 성공으로 간주
-      successEl.textContent = '비밀번호가 성공적으로 변경되었습니다. 잠시 후 관리 페이지로 이동합니다.';
-      setTimeout(() => { location.href = 'admin_mng-intro.html'; }, 2000);
+      if (gasData.status !== 'ok') {
+        errorEl.textContent = gasData.message || '비밀번호 변경 중 오류가 발생했습니다.';
+        return;
+      }
+
+      successEl.textContent = '비밀번호가 성공적으로 변경되었습니다.';
+      if (isEmbed && window.parent !== window) {
+        setTimeout(() => { window.parent.postMessage({ type: 'pwModalClose' }, '*'); }, 1500);
+      } else {
+        successEl.textContent += ' 잠시 후 관리 페이지로 이동합니다.';
+        setTimeout(() => { location.href = 'admin_mng-intro.html'; }, 2000);
+      }
 
     } catch (err) {
       errorEl.textContent = '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';

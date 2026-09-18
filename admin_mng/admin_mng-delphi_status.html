@@ -349,9 +349,8 @@
   /* ════════════════════════════════
      설정
   ════════════════════════════════ */
-  const GAS_URL       = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
-  const PANEL_CSV     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
-  const DELPHI_NO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1701744269&single=true&output=csv';
+  const GAS_URL       = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
+  /* CSV 제거 — GAS 직접 조회로 교체 (캐시 문제 해결) */
 
   const ROUND_LABELS = ['1차 설문', '2차 설문', '3차 설문', '4차 설문', '5차 설문'];
   const DELPHI_KEYS  = ['1st_delphi','2nd_delphi','3rd_delphi','4th_delphi','5th_delphi'];
@@ -372,26 +371,7 @@
     catch(e) { return { status: 'error', message: 'GAS 응답 파싱 실패: ' + text }; }
   }
 
-  /* ── CSV 파싱 ── */
-  async function fetchCSV(url) {
-    const res  = await fetch(url);
-    const text = await res.text();
-    const lines = text.trim().split(/\r\n|\r|\n/);
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
-    return lines.slice(1).filter(l => l.trim() !== '').map(line => {
-      const cols = []; let cur = '', inQ = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
-        else if (ch===',' && !inQ) { cols.push(cur.trim()); cur=''; }
-        else cur+=ch;
-      }
-      cols.push(cur.trim());
-      const row = {};
-      headers.forEach((h,i) => { row[h]=(cols[i]||'').replace(/^"|"$/g,'').trim(); });
-      return row;
-    }).filter(r => r[headers[0]] && r[headers[0]].trim()!=='');
-  }
+  /* CSV 파싱 제거 — GAS 직접 조회 사용 */
 
   /* ── 색상 헬퍼 ── */
   function statusCls(val) {
@@ -553,7 +533,14 @@
     tbody.innerHTML = '';
     loadingOverlay.classList.add('active');
     try {
-      const [panelRows, delphiNoRows] = await Promise.all([fetchCSV(PANEL_CSV), fetchCSV(DELPHI_NO_CSV)]);
+      const [panelResult, delphiResult] = await Promise.all([
+        gasCall({ action: 'listPanels' }),
+        gasCall({ action: 'listDelphiNo' })
+      ]);
+      if (panelResult.status !== 'ok') throw new Error(panelResult.message || '패널 데이터 로드 실패');
+      if (delphiResult.status !== 'ok') throw new Error(delphiResult.message || '델파이 데이터 로드 실패');
+      const panelRows = panelResult.data;
+      const delphiNoRows = delphiResult.data;
       updateHeaders(delphiNoRows);
       // 세그먼트 초기값 저장 (변경 감지용)
       [1,2,3,4,5].forEach(r => {

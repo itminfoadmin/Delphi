@@ -15,6 +15,8 @@
     .header-title{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ink);line-height:1.4;white-space:nowrap}
     .header-right{display:flex;align-items:center;gap:10px;margin-left:auto}
     .btn-hdr{padding:10px 22px;font-size:14px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-preview{background:#8b6fb0;color:#fff}
+    .btn-preview:hover{background:#7a5fa0}
     .btn-back{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
     .btn-back:hover{background:#d5d5d5}
     .btn-add-row{background:var(--green);color:#fff}
@@ -186,6 +188,28 @@
     </div>
   </div>
 
+  <!-- 저장 확인 모달 -->
+  <div class="modal-overlay" id="saveConfirmModal">
+    <div class="modal-box confirm-box">
+      <p>변경사항을 저장하시겠습니까?</p>
+      <div class="modal-actions" style="gap:8px">
+        <button class="modal-cancel" id="saveConfirmCancel">취소</button>
+        <button class="modal-confirm" id="saveConfirmOk">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 삭제 확인 모달 -->
+  <div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal-box confirm-box">
+      <p>해당 지표를 정말 삭제하시겠습니까?</p>
+      <div class="modal-actions" style="gap:8px">
+        <button class="modal-cancel" id="deleteConfirmCancel">취소</button>
+        <button class="modal-confirm" id="deleteConfirmOk" style="background:var(--red)">삭제</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 행 추가 모달 -->
   <div class="modal-overlay" id="addRowModal">
     <div class="modal-box">
@@ -214,6 +238,7 @@
       <span style="font-size:13px;color:var(--ink-soft);margin-right:6px" id="topEmail"></span>
       <button class="btn-hdr btn-add-row" id="btnAddRow">＋ 새 항목 추가</button>
       <button class="btn-save" id="btnSave">변경사항 저장</button>
+      <button class="btn-hdr btn-preview" id="btnPreview">👁 설문 화면 보기</button>
       <button class="btn-hdr btn-back" id="btnBack">관리자 메뉴로 가기</button>
     </div>
   </div>
@@ -382,10 +407,19 @@
     if (areas.length) areas[areas.length - 1].focus();
   }
 
+  let pendingDeleteType = '', pendingDeleteIdx = -1;
+
   function removeIndicator(type, idx) {
-    const items = getCurrentIndicators(type);
-    items.splice(idx, 1);
-    renderIndicators({ edu:'bodyEdu', hahwa:'bodyHahwa', sanggu:'bodySanggu' }[type], items, type);
+    pendingDeleteType = type;
+    pendingDeleteIdx = idx;
+    document.getElementById('deleteConfirmModal').classList.add('active');
+  }
+
+  function doRemoveIndicator() {
+    const items = getCurrentIndicators(pendingDeleteType);
+    items.splice(pendingDeleteIdx, 1);
+    renderIndicators({ edu:'bodyEdu', hahwa:'bodyHahwa', sanggu:'bodySanggu' }[pendingDeleteType], items, pendingDeleteType);
+    document.getElementById('deleteConfirmModal').classList.remove('active');
   }
 
   /* ════════════════════ 페이지 렌더링 ════════════════════ */
@@ -441,7 +475,12 @@
   }
 
   /* ════════════════════ 저장 ════════════════════ */
-  document.getElementById('btnSave').addEventListener('click', async () => {
+  document.getElementById('btnSave').addEventListener('click', () => {
+    document.getElementById('saveConfirmModal').classList.add('active');
+  });
+
+  async function doSave() {
+    document.getElementById('saveConfirmModal').classList.remove('active');
     const btn = document.getElementById('btnSave');
     btn.disabled = true; btn.textContent = '저장 중…';
     try {
@@ -457,7 +496,7 @@
     } finally {
       btn.disabled = false; btn.textContent = '변경사항 저장';
     }
-  });
+  }
 
   /* ════════════════════ 맥락 설명 편집 모달 ════════════════════ */
   const descOverlay = document.getElementById('descOverlay');
@@ -641,6 +680,23 @@
     }
   });
 
+  /* ════════════════════ 저장/삭제 확인 모달 이벤트 ════════════════════ */
+  document.getElementById('saveConfirmOk').addEventListener('click', doSave);
+  document.getElementById('saveConfirmCancel').addEventListener('click', () => {
+    document.getElementById('saveConfirmModal').classList.remove('active');
+  });
+  document.getElementById('saveConfirmModal').addEventListener('click', e => {
+    if (e.target.id === 'saveConfirmModal') document.getElementById('saveConfirmModal').classList.remove('active');
+  });
+
+  document.getElementById('deleteConfirmOk').addEventListener('click', doRemoveIndicator);
+  document.getElementById('deleteConfirmCancel').addEventListener('click', () => {
+    document.getElementById('deleteConfirmModal').classList.remove('active');
+  });
+  document.getElementById('deleteConfirmModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteConfirmModal') document.getElementById('deleteConfirmModal').classList.remove('active');
+  });
+
   /* ════════════════════ 네비게이션 ════════════════════ */
   function navigate(dir) {
     const ni = currentIndex + dir;
@@ -653,12 +709,19 @@
   document.getElementById('btnNext').addEventListener('click', () => navigate(1));
 
   document.addEventListener('keydown', e => {
-    if (descEditModal.classList.contains('active') || addRowModal.classList.contains('active') || leaveModal.classList.contains('active')) {
-      if (e.key === 'Escape') { closeDescEdit(); addRowModal.classList.remove('active'); leaveModal.classList.remove('active'); }
+    const saveModal = document.getElementById('saveConfirmModal');
+    const delModal = document.getElementById('deleteConfirmModal');
+    if (descEditModal.classList.contains('active') || addRowModal.classList.contains('active') || leaveModal.classList.contains('active') || saveModal.classList.contains('active') || delModal.classList.contains('active')) {
+      if (e.key === 'Escape') { closeDescEdit(); addRowModal.classList.remove('active'); leaveModal.classList.remove('active'); saveModal.classList.remove('active'); delModal.classList.remove('active'); }
       return;
     }
     if (e.key === 'ArrowLeft')  navigate(-1);
     if (e.key === 'ArrowRight') navigate(1);
+  });
+
+  /* ═══════════ 설문 화면 보기 (새 탭) ═══════════ */
+  document.getElementById('btnPreview').addEventListener('click', () => {
+    window.open('../1st_delphi_main.html?preview=1&panel=panel_01&panelIndex=1', '_blank');
   });
 
   /* ════════════════════ 돌아가기 ════════════════════ */

@@ -207,6 +207,28 @@
     </div>
   </div>
 
+  <!-- 저장 확인 모달 -->
+  <div class="modal-overlay" id="saveConfirmModal">
+    <div class="modal-box confirm-box">
+      <p>변경사항을 저장하시겠습니까?</p>
+      <div class="modal-actions" style="gap:8px">
+        <button class="modal-cancel" id="saveConfirmCancel">취소</button>
+        <button class="modal-confirm" id="saveConfirmOk">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 삭제 확인 모달 -->
+  <div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal-box confirm-box">
+      <p>해당 지표를 정말 삭제하시겠습니까?</p>
+      <div class="modal-actions" style="gap:8px">
+        <button class="modal-cancel" id="deleteConfirmCancel">취소</button>
+        <button class="modal-confirm" id="deleteConfirmOk" style="background:var(--red)">삭제</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- 진행 표시 바 -->
@@ -588,18 +610,26 @@
     if (areas.length) areas[areas.length - 1].focus();
   }
 
+  let pendingDeleteType = '', pendingDeleteIdx = -1;
+
   function removeIndicator(type, idx) {
+    pendingDeleteType = type;
+    pendingDeleteIdx = idx;
+    document.getElementById('deleteConfirmModal').classList.add('active');
+  }
+
+  function doRemoveIndicator() {
+    document.getElementById('deleteConfirmModal').classList.remove('active');
+    const type = pendingDeleteType, idx = pendingDeleteIdx;
     const eid = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID || '';
     const rows = type === 'edu' ? eduRows : type === 'hahwa' ? hahwaRows : sangguRows;
     const items = getIndexForEid(rows, eid);
     if (idx >= 0 && idx < items.length) {
       const target = items[idx];
       if (target._isNew && target._rowNum === 0) {
-        // 아직 시트에 저장 안 된 항목 → 바로 제거
         const globalIdx = rows.indexOf(target);
         if (globalIdx >= 0) rows.splice(globalIdx, 1);
       } else {
-        // 시트에 있는 항목 → pending 마킹
         target._pendingDelete = true;
         console.log('[delete] 삭제 예정:', target['I-ID'], '_rowNum:', target._rowNum);
       }
@@ -674,8 +704,13 @@
   }
 
   /* ═══════════ 전체 변경사항 저장 (롤백 지원) ═══════════ */
-  document.getElementById('btnSave').addEventListener('click', async () => {
+  document.getElementById('btnSave').addEventListener('click', () => {
     syncCurrentPage();
+    document.getElementById('saveConfirmModal').classList.add('active');
+  });
+
+  async function doSave() {
+    document.getElementById('saveConfirmModal').classList.remove('active');
 
     const btn = document.getElementById('btnSave');
     btn.disabled = true;
@@ -829,17 +864,17 @@
     } finally {
       btn.disabled = false;
     }
-  });
+  }
 
   /* ═══════════ 시트 보기 (새 탭) ═══════════ */
-  const SHEET_ID = '1YhffsxsOaEflHiKI9QNLeUcCBPxZos_KJCOdpbx9kEk';
+  const SHEET_ID = '1NNGVW2uSdsMVZhuWJM4HhUWv4-PDIGR0S6EWoGund74';
   document.getElementById('btnViewSheet').addEventListener('click', () => {
     window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit', '_blank');
   });
 
   /* ═══════════ 설문 화면 보기 (새 탭) ═══════════ */
   document.getElementById('btnPreview').addEventListener('click', () => {
-    window.open('2nd_delphi_main.html?preview=1&panel=panel_01&panelIndex=1', '_blank');
+    window.open('../2nd_delphi_main.html?preview=1&panel=panel_01&panelIndex=1', '_blank');
   });
 
   /* ═══════════ 설명 편집 모달 ═══════════ */
@@ -1070,6 +1105,23 @@
   document.getElementById('reasonModalClose').addEventListener('click', () => reasonModal.classList.remove('active'));
   reasonModal.addEventListener('click', e => { if (e.target === reasonModal) reasonModal.classList.remove('active'); });
 
+  /* ═══════════ 저장/삭제 확인 모달 이벤트 ═══════════ */
+  document.getElementById('saveConfirmOk').addEventListener('click', doSave);
+  document.getElementById('saveConfirmCancel').addEventListener('click', () => {
+    document.getElementById('saveConfirmModal').classList.remove('active');
+  });
+  document.getElementById('saveConfirmModal').addEventListener('click', e => {
+    if (e.target.id === 'saveConfirmModal') document.getElementById('saveConfirmModal').classList.remove('active');
+  });
+
+  document.getElementById('deleteConfirmOk').addEventListener('click', doRemoveIndicator);
+  document.getElementById('deleteConfirmCancel').addEventListener('click', () => {
+    document.getElementById('deleteConfirmModal').classList.remove('active');
+  });
+  document.getElementById('deleteConfirmModal').addEventListener('click', e => {
+    if (e.target.id === 'deleteConfirmModal') document.getElementById('deleteConfirmModal').classList.remove('active');
+  });
+
   /* ═══════════ 나가기 ═══════════ */
   const leaveModal = document.getElementById('leaveModal');
   document.getElementById('btnBack').addEventListener('click', () => { location.href='admin_mng-intro.html'; });
@@ -1099,8 +1151,10 @@
   document.getElementById('btnPrev').addEventListener('click', () => navigate(-1));
   document.getElementById('btnNext').addEventListener('click', () => navigate(1));
   document.addEventListener('keydown', e => {
-    if (descEditModal.classList.contains('active') || leaveModal.classList.contains('active')) {
-      if (e.key === 'Escape') { closeDescEdit(); leaveModal.classList.remove('active'); }
+    const saveModal = document.getElementById('saveConfirmModal');
+    const delModal = document.getElementById('deleteConfirmModal');
+    if (descEditModal.classList.contains('active') || leaveModal.classList.contains('active') || saveModal.classList.contains('active') || delModal.classList.contains('active')) {
+      if (e.key === 'Escape') { closeDescEdit(); leaveModal.classList.remove('active'); saveModal.classList.remove('active'); delModal.classList.remove('active'); }
       return;
     }
     if (e.key === 'ArrowLeft') navigate(-1);
