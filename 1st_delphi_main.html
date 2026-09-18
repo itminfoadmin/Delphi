@@ -66,13 +66,23 @@
     .card-hahwa .btn-desc:not(.btn-add):hover{background:#5a9a6e;color:#fff}
     .card-sanggu .btn-desc:not(.btn-add){background:#fff;color:#8b6fb0;border:1.5px solid #8b6fb0}
     .card-sanggu .btn-desc:not(.btn-add):hover{background:#8b6fb0;color:#fff}
-    .card-edu .btn-add{background:#7a9dc8;color:#fff;border:1px solid #7a9dc8}
-    .card-edu .btn-add:hover{background:#4a6fa5;border-color:#4a6fa5}
-    .card-hahwa .btn-add{background:#82bb92;color:#fff;border:1px solid #82bb92}
-    .card-hahwa .btn-add:hover{background:#5a9a6e;border-color:#5a9a6e}
-    .card-sanggu .btn-add{background:#ab96cb;color:#fff;border:1px solid #ab96cb}
-    .card-sanggu .btn-add:hover{background:#8b6fb0;border-color:#8b6fb0}
-    .btn-add{margin-left:auto;font-weight:700;font-size:13px;padding:5px 18px;border-radius:4px}
+
+    /* ── #1: [+ 평정 지표 추가하기] 버튼 강조 ── */
+    .btn-add{
+      margin-left:auto;font-weight:700;font-size:14px;padding:7px 22px;border-radius:6px;
+      position:relative;overflow:hidden;
+      box-shadow:0 2px 8px rgba(0,0,0,.15);
+      transition:all .25s ease;
+    }
+    .card-edu .btn-add{background:#4a6fa5;color:#fff;border:2px solid #3a5c8f}
+    .card-edu .btn-add:hover{background:#3a5c8f;border-color:#2d4a73;box-shadow:0 4px 16px rgba(74,111,165,.4);transform:translateY(-1px)}
+    .card-hahwa .btn-add{background:#5a9a6e;color:#fff;border:2px solid #478a5a}
+    .card-hahwa .btn-add:hover{background:#478a5a;border-color:#367048;box-shadow:0 4px 16px rgba(90,154,110,.4);transform:translateY(-1px)}
+    .card-sanggu .btn-add{background:#8b6fb0;color:#fff;border:2px solid #7a5ca0}
+    .card-sanggu .btn-add:hover{background:#7a5ca0;border-color:#694b90;box-shadow:0 4px 16px rgba(139,111,176,.4);transform:translateY(-1px)}
+    @keyframes btn-pulse{0%,100%{box-shadow:0 2px 8px rgba(0,0,0,.15)}50%{box-shadow:0 2px 16px rgba(74,111,165,.35)}}
+    .btn-add{animation:btn-pulse 2.5s ease-in-out 3}
+
     .card-body{padding:20px 22px}
 
     /* 지표 내어쓰기 */
@@ -116,8 +126,10 @@
     /* ══ 추가/수정 모달 ══ */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}
     .modal-overlay.active{display:flex}
+    /* #5: 드래그 가능 모달 박스 */
     .modal-box{background:#fff;border-radius:6px;padding:32px 36px 28px;width:857px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
-    .modal-box h3{font-size:16px;color:var(--ink);margin-bottom:20px;font-weight:600}
+    .modal-box h3{font-size:16px;color:var(--ink);margin-bottom:20px;font-weight:600;cursor:grab;user-select:none}
+    .modal-box h3:active{cursor:grabbing}
     .field-group{margin-bottom:16px}
     .field-group label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:6px;font-weight:500}
     .field-group input,.field-group textarea{width:100%;border:1px solid var(--divider);border-radius:4px;padding:10px 14px;font-size:14px;font-family:inherit;line-height:1.7;outline:none;transition:border-color .2s}
@@ -158,11 +170,25 @@
     .btn-completion:hover{background:#3a5c8f}
     .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
     .toast.show{opacity:1}
+
+    /* ── 설문 방법 확인 버튼 ── */
+    .btn-guide{background:#fff;color:var(--accent);border:1.5px solid var(--accent);font-weight:600}
+    .btn-guide:hover{background:var(--accent);color:#fff}
+
+    /* ── 가이드 모달 ── */
+    .guide-modal-box{width:960px;max-width:96vw;height:90vh;max-height:95vh;display:flex;flex-direction:column;overflow:hidden;padding:0;border-radius:8px}
+    .guide-modal-header{display:flex;align-items:center;padding:14px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none;gap:12px}
+    .guide-modal-header:active{cursor:grabbing}
+    .guide-modal-title{font-size:16px;font-weight:600;color:var(--ink);flex:1}
+    .guide-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .guide-modal-close:hover{background:#eee}
+    .guide-iframe{flex:1;width:100%;border:none;min-height:400px}
+
     @media(max-width:768px){.header-title{font-size:18px}.nav-arrow{width:36px;min-width:36px;font-size:22px}.header-bar{gap:10px}}
   </style>
 </head>
-<body>
 
+<body>
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
     <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
@@ -171,8 +197,8 @@
 
   <!-- 데이터 로드 실패 모달 -->
   <div class="modal-overlay" id="retryModal">
-    <div class="modal-box end-modal-box">
-      <p id="retryMsg">설문 데이터를 불러오지 못했습니다.</p>
+    <div class="modal-box end-modal-box" id="retryModalBox">
+      <p id="retryMsg" style="cursor:grab;user-select:none">설문 데이터를 불러오지 못했습니다.</p>
       <div class="modal-actions">
         <button class="modal-confirm" id="retryBtn">다시 시도</button>
       </div>
@@ -198,7 +224,7 @@
 
   <!-- 추가/수정 모달 -->
   <div class="modal-overlay" id="addModal">
-    <div class="modal-box">
+    <div class="modal-box" id="addModalBox">
       <h3 id="addModalTitle">평정 지표 추가하기</h3>
       <div class="field-group">
         <label>추가 지표 *</label>
@@ -217,7 +243,7 @@
 
   <!-- 삭제 확인 모달 -->
   <div class="modal-overlay" id="delModal">
-    <div class="modal-box end-modal-box">
+    <div class="modal-box end-modal-box" id="delModalBox">
       <p id="delModalMsg">이 지표를 삭제하시겠습니까?</p>
       <div class="modal-actions">
         <button class="modal-cancel" id="delModalCancel">취소</button>
@@ -228,8 +254,8 @@
 
   <!-- 설문 종료 확인 모달 -->
   <div class="modal-overlay" id="endModal">
-    <div class="modal-box end-modal-box">
-      <p>전체 설문이 아직 완료되지 않았습니다.<br>완료되지 않은 설문은 이후에 다시 가능합니다.<br>설문을 종료하시겠습니까?</p>
+    <div class="modal-box end-modal-box" id="endModalBox">
+      <p id="endModalMsg" style="cursor:grab;user-select:none">전체 설문이 아직 완료되지 않았습니다.<br>완료되지 않은 설문은 이후에 다시 가능합니다.<br>설문을 종료하시겠습니까?</p>
       <div class="modal-actions">
         <button class="modal-cancel" id="endModalCancel">취소</button>
         <button class="modal-confirm" id="endModalConfirm">종료</button>
@@ -237,10 +263,21 @@
     </div>
   </div>
 
+  <!-- #7: 제출 확인 모달 -->
+  <div class="modal-overlay" id="submitConfirmModal">
+    <div class="modal-box end-modal-box" id="submitConfirmBox">
+      <p id="submitConfirmMsg" style="cursor:grab;user-select:none">설문 응답 내용을 제출하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="submitConfirmCancel">취소</button>
+        <button class="modal-confirm" id="submitConfirmOk">제출</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 설문 완료 안내 모달 -->
   <div class="modal-overlay" id="doneModal">
-    <div class="modal-box end-modal-box">
-      <p>1차 델파이 설문이 완료되었습니다.<br>감사합니다.</p>
+    <div class="modal-box end-modal-box" id="doneModalBox">
+      <p id="doneModalMsg" style="cursor:grab;user-select:none">1차 델파이 설문이 완료되었습니다.<br>감사합니다.</p>
       <div class="modal-actions">
         <button class="modal-confirm" id="doneModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
       </div>
@@ -249,11 +286,22 @@
 
   <!-- 안내 메시지 모달 -->
   <div class="modal-overlay" id="infoModal">
-    <div class="modal-box end-modal-box">
-      <p id="infoModalMsg"></p>
+    <div class="modal-box end-modal-box" id="infoModalBox">
+      <p id="infoModalMsg" style="cursor:grab;user-select:none"></p>
       <div class="modal-actions">
         <button class="modal-confirm" id="infoModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 설문 방법 확인 가이드 모달 -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-box guide-modal-box" id="guideModalBox">
+      <div class="guide-modal-header" id="guideModalHeader">
+        <span class="guide-modal-title">설문 방법 확인</span>
+        <button class="guide-modal-close" id="guideModalClose">닫기</button>
+      </div>
+      <iframe class="guide-iframe" id="guideIframe" src="about:blank"></iframe>
     </div>
   </div>
 
@@ -272,6 +320,7 @@
         <span class="font-scale-label" id="fontScaleLabel">100%</span>
         <button class="btn-font btn-font-up" id="btnFontUp" title="글자 확대"><span class="btn-font-letter">A</span><span class="btn-font-icon">+</span></button>
       </div>
+      <button class="btn-hdr btn-guide" id="btnGuide">설문 방법 확인</button>
       <button class="btn-hdr btn-end" id="btnEnd">나가기</button>
     </div>
   </div>
@@ -318,7 +367,7 @@
       <!-- 설문 완료 페이지 -->
       <div class="completion-page" id="completionPage" style="display:none">
         <p class="completion-text">교육활동 평정 지표에 대한 1차 델파이 설문의 마지막 페이지입니다.</p>
-        <p class="completion-text" style="margin-top:0">설문을 완료하시겠습니까?</p>
+        <p class="completion-text" id="completionQuestion" style="margin-top:0">설문을 완료하시겠습니까?</p>
         <button class="btn-completion" id="btnComplete">설문 완료</button>
       </div>
     </div>
@@ -331,17 +380,31 @@
 <script>
   /* ════════════════════ 설정 ════════════════════ */
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbx_2YnwVqMGOYnVIvEOxv1m_40JXpmWW3umPzirMaEzTfCo8Z6tcOZqkCw_WPOPObo/exec';
-  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
 
-  const panelEmail = sessionStorage.getItem('panelEmail') || '';
-  const panelNo    = sessionStorage.getItem('panelNo')    || '';
-  if (!panelEmail) location.href = 'index.html';
+  const _params = new URLSearchParams(location.search);
+  const isPreview = _params.get('preview') === '1';
+  const panelEmail = isPreview ? (_params.get('panel') || 'preview@admin') : (sessionStorage.getItem('panelEmail') || '');
+  const panelNo    = isPreview ? (_params.get('panel') || 'panel_01')      : (sessionStorage.getItem('panelNo')    || '');
+  if (!panelEmail && !isPreview) location.href = 'index.html';
+
+  /* ?refresh=1 → 캐시 강제 초기화 후 파라미터 제거 */
+  if (new URLSearchParams(location.search).get('refresh') === '1') {
+    sessionStorage.removeItem('1st_delphi_cache_v3');
+    sessionStorage.removeItem('1st_delphi_cache_v3_time');
+    // 이전 버전 캐시도 제거
+    sessionStorage.removeItem('1st_delphi_cache_v2');
+    sessionStorage.removeItem('1st_delphi_cache_v2_time');
+    const cleanUrl = location.pathname;
+    history.replaceState(null, '', cleanUrl);
+  }
   document.getElementById('panelLabel').textContent = '패널 : ' + panelEmail;
 
   let allRows      = [];
   let allAdditions = [];   // GAS에서 불러온 추가 지표 전체
   let currentIndex  = 0;
   let dirty         = false;
+  let isResubmit    = false; // #8: 재응답 여부
 
   // 추가/수정 모달 상태
   let modalMode     = 'add';   // 'add' | 'edit'
@@ -349,10 +412,29 @@
   let editSheetRow  = null;    // 수정 시 대상 시트 행 번호
 
   /* ── 유틸 ── */
+  /* (#1) 타임아웃 포함 fetch 래퍼 — GAS cold start 대응 */
+  function fetchWithTimeout(url, options, timeoutMs = 30000) {
+    return Promise.race([
+      fetch(url, options),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('요청 시간 초과 (서버 응답 없음)')), timeoutMs))
+    ]);
+  }
+
+  /* GAS 응답이 HTML 에러 페이지인지 검사 */
+  function isHtmlErrorResponse(text) {
+    if (!text || typeof text !== 'string') return false;
+    const trimmed = text.trim().substring(0, 500).toLowerCase();
+    return trimmed.startsWith('<!doctype') || trimmed.startsWith('<html') || trimmed.includes('<script') || trimmed.includes('페이지를 찾을 수 없음');
+  }
+
   async function gasCall(payload) {
-    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+    const res = await fetchWithTimeout(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) }, 30000);
     const t = await res.text();
-    try { return JSON.parse(t); } catch { return { status:'error', message:'GAS 응답 파싱 실패: '+t }; }
+    if (isHtmlErrorResponse(t)) {
+      console.error('[gasCall] HTML 에러 페이지 수신:', t.substring(0, 200));
+      return { status:'error', message:'GAS 서버 오류 (HTML 응답 수신). 잠시 후 다시 시도해주세요.' };
+    }
+    try { return JSON.parse(t); } catch { return { status:'error', message:'GAS 응답 파싱 실패: '+t.substring(0, 200) }; }
   }
   function showToast(m, d=2000) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d); }
   function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('active',v); }
@@ -368,6 +450,7 @@
   const retryMsg   = document.getElementById('retryMsg');
 
   document.getElementById('retryBtn').addEventListener('click', () => {
+    if (typeof resetRetryModalPos === 'function') resetRetryModalPos();
     retryModal.classList.remove('active');
     loadData();
   });
@@ -375,12 +458,13 @@
   async function loadData() {
     showLoading(true);
     try {
-      /* sessionStorage 캐시 확인 (5분 유효) */
-      const cacheKey = '1st_delphi_cache';
-      const cacheTimeKey = '1st_delphi_cache_time';
+      /* 캐시 키 v3: 이전 오염된 캐시 무효화 */
+      const cacheKey = '1st_delphi_cache_v3';
+      const cacheTimeKey = '1st_delphi_cache_v3_time';
       const cached = sessionStorage.getItem(cacheKey);
       const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
-      const CACHE_TTL = 5 * 60 * 1000; // 5분
+      const CACHE_TTL = 30 * 60 * 1000; // 30분 (select_delphi에서 프리페치한 캐시 활용)
+      const MAX_RETRIES = 2;
 
       let dataRes, addRes;
       if (cached && (Date.now() - cachedTime < CACHE_TTL)) {
@@ -388,34 +472,77 @@
         const c = JSON.parse(cached);
         dataRes = c.dataRes;
         addRes = c.addRes;
-        console.log('[loadData] 캐시에서 로드 (백그라운드 갱신 시작)');
-        // 백그라운드에서 최신 데이터 갱신
-        Promise.all([
-          gasCall({ action:'getData' }),
-          gasCall({ action:'getAdditions', panel: panelNo || panelEmail })
-        ]).then(([d, a]) => {
-          sessionStorage.setItem(cacheKey, JSON.stringify({ dataRes: d, addRes: a }));
-          sessionStorage.setItem(cacheTimeKey, String(Date.now()));
-        }).catch(() => {});
-      } else {
-        /* 캐시 없음 → 병렬 호출 */
-        [dataRes, addRes] = await Promise.all([
-          gasCall({ action:'getData' }),
-          gasCall({ action:'getAdditions', panel: panelNo || panelEmail })
-        ]);
-        sessionStorage.setItem(cacheKey, JSON.stringify({ dataRes, addRes }));
-        sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+        // 캐시된 데이터도 유효성 검증
+        if (!dataRes || dataRes.status !== 'ok' || !Array.isArray(dataRes.rows) || dataRes.rows.length === 0) {
+          console.warn('[loadData] 캐시 데이터 무효 — 서버 재호출');
+          sessionStorage.removeItem(cacheKey);
+          sessionStorage.removeItem(cacheTimeKey);
+          // 아래 else 블록으로 fall through
+          dataRes = null; addRes = null;
+        } else {
+          console.log('[loadData] 캐시에서 로드 (백그라운드 갱신 시작)');
+          // 백그라운드에서 최신 데이터 갱신 (에러 응답은 캐시하지 않음)
+          Promise.all([
+            gasCall({ action:'getData' }),
+            gasCall({ action:'getAdditions', panel: panelNo || panelEmail })
+          ]).then(([d, a]) => {
+            if (d && d.status === 'ok' && Array.isArray(d.rows) && d.rows.length > 0) {
+              sessionStorage.setItem(cacheKey, JSON.stringify({ dataRes: d, addRes: a }));
+              sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+            }
+          }).catch(() => {});
+        }
       }
 
-      if (dataRes.status !== 'ok') throw new Error(dataRes.message);
+      if (!dataRes) {
+        /* 캐시 없음/무효 → 재시도 로직 포함 병렬 호출 */
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            [dataRes, addRes] = await Promise.all([
+              gasCall({ action:'getData' }),
+              gasCall({ action:'getAdditions', panel: panelNo || panelEmail })
+            ]);
+            if (dataRes && dataRes.status === 'ok') break;
+          } catch(e) {
+            console.warn('[loadData] 데이터 로드 시도 ' + (attempt+1) + ' 실패:', e.message);
+            if (attempt === MAX_RETRIES) throw new Error('설문 데이터 로드 실패: ' + e.message);
+            await new Promise(r => setTimeout(r, 1500));
+          }
+        }
+        /* 성공 응답만 캐시 */
+        if (dataRes && dataRes.status === 'ok' && Array.isArray(dataRes.rows) && dataRes.rows.length > 0) {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ dataRes, addRes }));
+          sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+        }
+      }
+
+      if (!dataRes || dataRes.status !== 'ok') throw new Error(dataRes ? dataRes.message : '서버 응답 없음');
       allRows = dataRes.rows || [];
-      allAdditions = (addRes.status === 'ok' ? addRes.additions : []) || [];
+      allAdditions = (addRes && addRes.status === 'ok' ? addRes.additions : []) || [];
+
+      /* 데이터 유효성 검사: HTML 에러 페이지가 데이터에 섞이지 않았는지 확인 */
+      if (allRows.length > 0) {
+        const firstRow = allRows[0];
+        const sampleFields = [firstRow.Index_edu_act, firstRow.Index_hahwa_act, firstRow.Index_sanggu_act].filter(Boolean);
+        const hasHtmlContent = sampleFields.some(f => isHtmlErrorResponse(f));
+        if (hasHtmlContent) {
+          console.error('[loadData] 데이터에 HTML 에러 콘텐츠 감지 — 캐시 삭제');
+          sessionStorage.removeItem(cacheKey);
+          sessionStorage.removeItem(cacheTimeKey);
+          throw new Error('서버에서 잘못된 데이터를 반환했습니다. 잠시 후 다시 시도해주세요.');
+        }
+      }
+
       if (allRows.length === 0) {
         retryMsg.textContent = '설문 데이터가 없습니다. 다시 시도해주세요.';
         retryModal.classList.add('active');
       } else {
         renderPage();
       }
+
+      /* #8: 패널 완료 상태 확인 (Basic_Data에서) */
+      checkPanelCompletionStatus();
+
     } catch(e) {
       retryMsg.textContent = '데이터 로드 실패: ' + e.message;
       retryModal.classList.add('active');
@@ -423,9 +550,56 @@
     finally { showLoading(false); }
   }
 
+  /* #8: 패널 완료 상태 확인 — sessionStorage 우선, fallback으로 GAS 호출 */
+  async function checkPanelCompletionStatus() {
+    try {
+      /* 1) select_delphi에서 저장한 패널 상태를 먼저 확인 (GAS 호출 불필요) */
+      const cachedPanel = sessionStorage.getItem('panelStatusData');
+      if (cachedPanel) {
+        const panel = JSON.parse(cachedPanel);
+        const status1st = (panel['1st_delphi_status'] || '').trim();
+        if (status1st.startsWith('완료')) {
+          isResubmit = true;
+          document.getElementById('completionQuestion').textContent = '설문 응답을 수정하시겠습니까?';
+          document.getElementById('btnComplete').textContent = '응답 수정';
+        }
+        console.log('[checkPanelCompletionStatus] sessionStorage에서 확인 완료');
+        return;
+      }
+
+      /* 2) fallback: GAS 직접 호출 (getPanelByEmail) */
+      const res = await fetchWithTimeout(BASIC_GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'getPanelByEmail',
+          email: panelEmail
+        })
+      }, 25000);
+      const text = await res.text();
+      let result;
+      try { result = JSON.parse(text); } catch { return; }
+      if (result.status === 'ok' && result.panel) {
+        const status1st = (result.panel['1st_delphi_status'] || '').trim();
+        if (status1st.startsWith('완료')) {
+          isResubmit = true;
+          document.getElementById('completionQuestion').textContent = '설문 응답을 수정하시겠습니까?';
+          document.getElementById('btnComplete').textContent = '응답 수정';
+        }
+      }
+    } catch(e) {
+      console.log('[checkPanelCompletionStatus 에러]', e);
+    }
+  }
+
   /* ════════════════════ 내어쓰기 ════════════════════ */
   function fmtIdx(text) {
     if (!text) return '';
+    // 안전 검사: HTML 에러 페이지 콘텐츠 차단
+    if (isHtmlErrorResponse(text)) {
+      console.error('[fmtIdx] HTML 에러 콘텐츠 차단됨');
+      return '<span class="index-line" style="color:#d9534f;font-weight:600">데이터 로드 오류 — 페이지를 새로고침해주세요.</span>';
+    }
     // "[" 기준으로 개별 지표 분리 (첫 "[" 앞 빈 문자열 제거)
     const parts = text.split(/(?=\[)/).filter(s => s.trim());
     return parts.map(part => {
@@ -558,6 +732,8 @@
   const descHeader  = document.getElementById('descModalHeader');
 
   function openDescModal(title, text) {
+    descFontScale = 100;
+    applyDescFontScale();
     document.getElementById('descModalTitle').textContent = title;
     const body = document.getElementById('descModalBody');
     const paras = text.split(/\n+/).filter(p=>p.trim());
@@ -576,7 +752,7 @@
   document.getElementById('descModalClose').addEventListener('click', closeDescModal);
   descOverlay.addEventListener('click', closeDescModal);
 
-  // 드래그
+  // 드래그 (지표 설명 모달)
   let isDrag=false, dOX=0, dOY=0;
   descHeader.addEventListener('mousedown', e => {
     if (e.target.closest('.desc-modal-right')) return;
@@ -596,11 +772,92 @@
   document.addEventListener('touchmove', e => { if(!isDrag)return; const t=e.touches[0]; descModal.style.left=(t.clientX-dOX)+'px'; descModal.style.top=(t.clientY-dOY)+'px'; }, {passive:true});
   document.addEventListener('touchend', ()=>{ isDrag=false; });
 
+  /* ════════════════════ #5/#6: 범용 모달 드래그 시스템 ════════════════════ */
+  function setupModalDrag(overlayEl, boxEl, handleEl) {
+    let dragging = false, offsetX = 0, offsetY = 0;
+    let mouseDownOnOverlay = false; // #6: 드래그 중 모달 닫힘 방지용
+
+    handleEl.addEventListener('mousedown', e => {
+      if (e.target.closest('input, textarea, button, select')) return;
+      dragging = true;
+      const r = boxEl.getBoundingClientRect();
+      offsetX = e.clientX - r.left;
+      offsetY = e.clientY - r.top;
+      // overlay를 flex에서 block으로 전환하여 absolute 위치 사용
+      boxEl.style.position = 'fixed';
+      boxEl.style.left = r.left + 'px';
+      boxEl.style.top = r.top + 'px';
+      boxEl.style.margin = '0';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      boxEl.style.left = (e.clientX - offsetX) + 'px';
+      boxEl.style.top = (e.clientY - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragging) dragging = false;
+    });
+
+    // 터치 지원
+    handleEl.addEventListener('touchstart', e => {
+      if (e.target.closest('input, textarea, button, select')) return;
+      dragging = true;
+      const t = e.touches[0], r = boxEl.getBoundingClientRect();
+      offsetX = t.clientX - r.left;
+      offsetY = t.clientY - r.top;
+      boxEl.style.position = 'fixed';
+      boxEl.style.left = r.left + 'px';
+      boxEl.style.top = r.top + 'px';
+      boxEl.style.margin = '0';
+    }, {passive:true});
+
+    document.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      boxEl.style.left = (t.clientX - offsetX) + 'px';
+      boxEl.style.top = (t.clientY - offsetY) + 'px';
+    }, {passive:true});
+
+    document.addEventListener('touchend', () => { if (dragging) dragging = false; });
+
+    // #6: overlay 클릭으로 모달 닫힘 방지 (mousedown이 overlay에서 시작된 경우만 닫기)
+    overlayEl.addEventListener('mousedown', e => {
+      mouseDownOnOverlay = (e.target === overlayEl);
+    });
+    overlayEl.addEventListener('click', e => {
+      if (e.target === overlayEl && mouseDownOnOverlay && !dragging) {
+        // 모달 위치 리셋
+        boxEl.style.position = '';
+        boxEl.style.left = '';
+        boxEl.style.top = '';
+        boxEl.style.margin = '';
+        overlayEl.classList.remove('active');
+      }
+      mouseDownOnOverlay = false;
+    });
+
+    // 모달 닫힐 때 위치 리셋하는 헬퍼
+    return function resetPosition() {
+      boxEl.style.position = '';
+      boxEl.style.left = '';
+      boxEl.style.top = '';
+      boxEl.style.margin = '';
+    };
+  }
+
   /* ════════════════════ 추가/수정 모달 ════════════════════ */
   const addModal    = document.getElementById('addModal');
+  const addModalBox = document.getElementById('addModalBox');
   const addIdxInput = document.getElementById('addModalIndex');
   const addResInput = document.getElementById('addModalReason');
   const addConfirm  = document.getElementById('addModalConfirm');
+  const addModalTitle = document.getElementById('addModalTitle');
+
+  // #5: 추가/수정 모달 드래그 설정
+  const resetAddModalPos = setupModalDrag(addModal, addModalBox, addModalTitle);
 
   function getModalSubtitle(type) {
     const row = allRows[currentIndex];
@@ -614,20 +871,22 @@
 
   function openAddModal(type) {
     modalMode = 'add'; modalType = type; editSheetRow = null;
-    document.getElementById('addModalTitle').textContent =
+    addModalTitle.textContent =
       TYPE_LABELS[type] + ' 평정 지표 추가하기' + getModalSubtitle(type);
     addConfirm.textContent = '추가';
     addIdxInput.value = ''; addResInput.value = '';
+    resetAddModalPos();
     addModal.classList.add('active');
     setTimeout(()=>addIdxInput.focus(), 100);
   }
   function openEditModal(type, addition, idx, desc) {
     modalMode = 'edit'; modalType = type; editSheetRow = addition.sheetRow;
-    document.getElementById('addModalTitle').textContent =
+    addModalTitle.textContent =
       TYPE_LABELS[type] + ' 평정 지표 수정' + getModalSubtitle(type);
     addConfirm.textContent = '저장';
     addIdxInput.value = idx || '';
     addResInput.value = desc || '';
+    resetAddModalPos();
     addModal.classList.add('active');
     setTimeout(()=>addIdxInput.focus(), 100);
   }
@@ -635,8 +894,11 @@
   document.querySelectorAll('.btn-add').forEach(btn => {
     btn.addEventListener('click', () => openAddModal(btn.dataset.type));
   });
-  document.getElementById('addModalCancel').addEventListener('click', ()=>addModal.classList.remove('active'));
-  addModal.addEventListener('click', e=>{ if(e.target===addModal) addModal.classList.remove('active'); });
+  document.getElementById('addModalCancel').addEventListener('click', () => {
+    resetAddModalPos();
+    addModal.classList.remove('active');
+  });
+  // #6: overlay 클릭 닫힘은 setupModalDrag에서 처리 (mousedown 추적)
 
   addConfirm.addEventListener('click', async () => {
     const idxVal = addIdxInput.value.trim();
@@ -673,11 +935,46 @@
       }
       if (result.status !== 'ok') throw new Error(result.message);
 
-      // 추가지표 목록 다시 로드
-      const addRes = await gasCall({ action:'getAdditions', panel: panelNo || panelEmail });
-      if (addRes.status === 'ok') allAdditions = addRes.additions || [];
-      renderAllAdded();
+      /* #3/#4: 로컬 업데이트 — GAS 재호출 없이 allAdditions 직접 갱신 */
+      if (modalMode === 'add') {
+        const newItem = {
+          sheetRow: result.sheetRow,
+          panel: panelNo || panelEmail,
+          rowId: row.ID,
+          category: row.category || '',
+          edu_index: '', edu_desc: '',
+          hahwa_index: '', hahwa_desc: '',
+          sanggu_index: '', sanggu_desc: ''
+        };
+        if (modalType === 'edu')    { newItem.edu_index = idxVal;    newItem.edu_desc = reasonVal; }
+        if (modalType === 'hahwa')  { newItem.hahwa_index = idxVal;  newItem.hahwa_desc = reasonVal; }
+        if (modalType === 'sanggu') { newItem.sanggu_index = idxVal;  newItem.sanggu_desc = reasonVal; }
+        allAdditions.push(newItem);
+      } else {
+        // 수정: allAdditions에서 해당 항목 찾아 업데이트
+        const target = allAdditions.find(a => a.sheetRow === editSheetRow);
+        if (target) {
+          if (modalType === 'edu')    { target.edu_index = idxVal;    target.edu_desc = reasonVal; }
+          if (modalType === 'hahwa')  { target.hahwa_index = idxVal;  target.hahwa_desc = reasonVal; }
+          if (modalType === 'sanggu') { target.sanggu_index = idxVal;  target.sanggu_desc = reasonVal; }
+        }
+      }
 
+      // 캐시도 갱신
+      const ck = '1st_delphi_cache_v3';
+      const ctk = '1st_delphi_cache_v3_time';
+      const cachedStr = sessionStorage.getItem(ck);
+      if (cachedStr) {
+        try {
+          const c = JSON.parse(cachedStr);
+          c.addRes = { status: 'ok', additions: allAdditions };
+          sessionStorage.setItem(ck, JSON.stringify(c));
+          sessionStorage.setItem(ctk, String(Date.now()));
+        } catch {}
+      }
+
+      renderAllAdded();
+      resetAddModalPos();
       addModal.classList.remove('active');
       showToast(modalMode === 'add' ? '추가되었습니다.' : '수정되었습니다.');
     } catch(e) { showToast('오류: '+e.message, 4000); }
@@ -689,14 +986,26 @@
 
   /* ════════════════════ 삭제 확인 ════════════════════ */
   const delModal = document.getElementById('delModal');
+  const delModalBox = document.getElementById('delModalBox');
   let pendingDelRow = null;
+
+  // #5: 삭제 모달은 h3가 없으므로 p 요소를 드래그 핸들로 사용
+  const delDragHandle = document.getElementById('delModalMsg');
+  delDragHandle.style.cursor = 'grab';
+  delDragHandle.style.userSelect = 'none';
+  const resetDelModalPos = setupModalDrag(delModal, delModalBox, delDragHandle);
 
   function openDelModal(sheetRow) {
     pendingDelRow = sheetRow;
+    resetDelModalPos();
     delModal.classList.add('active');
   }
-  document.getElementById('delModalCancel').addEventListener('click', ()=>{ delModal.classList.remove('active'); pendingDelRow=null; });
-  delModal.addEventListener('click', e=>{ if(e.target===delModal){ delModal.classList.remove('active'); pendingDelRow=null; } });
+  document.getElementById('delModalCancel').addEventListener('click', ()=>{
+    resetDelModalPos();
+    delModal.classList.remove('active');
+    pendingDelRow=null;
+  });
+  // #6: overlay 클릭 닫힘은 setupModalDrag에서 처리
 
   document.getElementById('delModalConfirm').addEventListener('click', async () => {
     if (!pendingDelRow) return;
@@ -705,44 +1014,109 @@
     try {
       const result = await gasCall({ action:'deleteAddition', sheetRow: pendingDelRow });
       if (result.status !== 'ok') throw new Error(result.message);
-      // 목록 새로고침
-      const addRes = await gasCall({ action:'getAdditions', panel: panelNo || panelEmail });
-      if (addRes.status === 'ok') allAdditions = addRes.additions || [];
+
+      /* #3/#4: 로컬 삭제 — GAS 재호출 없이 allAdditions에서 제거 */
+      allAdditions = allAdditions.filter(a => a.sheetRow !== pendingDelRow);
+
+      // 캐시도 갱신
+      const ck2 = '1st_delphi_cache_v3';
+      const ctk2 = '1st_delphi_cache_v3_time';
+      const cachedStr2 = sessionStorage.getItem(ck2);
+      if (cachedStr2) {
+        try {
+          const c = JSON.parse(cachedStr2);
+          c.addRes = { status: 'ok', additions: allAdditions };
+          sessionStorage.setItem(ck2, JSON.stringify(c));
+          sessionStorage.setItem(ctk2, String(Date.now()));
+        } catch {}
+      }
+
       renderAllAdded();
+      resetDelModalPos();
       delModal.classList.remove('active');
       showToast('삭제되었습니다.');
     } catch(e) { showToast('오류: '+e.message, 4000); }
     finally { btn.disabled=false; btn.textContent='삭제'; pendingDelRow=null; }
   });
 
-  /* ════════════════════ 안내 모달 ════════════════════ */
+  /* ════════════════════ 안내 모달 (드래그 지원) ════════════════════ */
   const infoModal = document.getElementById('infoModal');
+  const infoModalBox = document.getElementById('infoModalBox');
+  const resetInfoModalPos = setupModalDrag(infoModal, infoModalBox, document.getElementById('infoModalMsg'));
   function showInfoModal(msg) {
     document.getElementById('infoModalMsg').textContent = msg;
+    resetInfoModalPos();
     infoModal.classList.add('active');
   }
-  document.getElementById('infoModalOk').addEventListener('click', () => infoModal.classList.remove('active'));
-  infoModal.addEventListener('click', e => { if (e.target === infoModal) infoModal.classList.remove('active'); });
-
-  /* ════════════════════ 종료 ════════════════════ */
-  // 설문 종료
-  const endModal = document.getElementById('endModal');
-  document.getElementById('btnEnd').addEventListener('click', ()=> endModal.classList.add('active'));
-  document.getElementById('endModalCancel').addEventListener('click', ()=> endModal.classList.remove('active'));
-  endModal.addEventListener('click', e=>{ if(e.target===endModal) endModal.classList.remove('active'); });
-  document.getElementById('endModalConfirm').addEventListener('click', ()=> {
-    location.href = 'select_delphi.html';
+  document.getElementById('infoModalOk').addEventListener('click', () => {
+    resetInfoModalPos();
+    infoModal.classList.remove('active');
   });
 
-  // 설문 완료 버튼 → GAS로 상태 저장 → 완료 모달
-  const doneModal = document.getElementById('doneModal');
+  /* ════════════════════ 데이터 로드 실패 모달 (드래그 지원) ════════════════════ */
+  const retryModalBox = document.getElementById('retryModalBox');
+  const resetRetryModalPos = setupModalDrag(retryModal, retryModalBox, document.getElementById('retryMsg'));
 
-  document.getElementById('btnComplete').addEventListener('click', async () => {
+  /* ════════════════════ 종료 (드래그 지원) ════════════════════ */
+  const endModal = document.getElementById('endModal');
+  const endModalBox = document.getElementById('endModalBox');
+  const resetEndModalPos = setupModalDrag(endModal, endModalBox, document.getElementById('endModalMsg'));
+  document.getElementById('btnEnd').addEventListener('click', ()=> {
+    resetEndModalPos();
+    endModal.classList.add('active');
+  });
+  document.getElementById('endModalCancel').addEventListener('click', ()=> {
+    resetEndModalPos();
+    endModal.classList.remove('active');
+  });
+  document.getElementById('endModalConfirm').addEventListener('click', ()=> {
+    if (isPreview) { window.close(); return; }
+    location.href = 'select_delphi.html?refresh=1';
+  });
+
+  /* ════════════════════ #7: 제출 확인 모달 (드래그 지원) ════════════════════ */
+  const submitConfirmModal = document.getElementById('submitConfirmModal');
+  const submitConfirmBox = document.getElementById('submitConfirmBox');
+  const resetSubmitConfirmPos = setupModalDrag(submitConfirmModal, submitConfirmBox, document.getElementById('submitConfirmMsg'));
+  document.getElementById('submitConfirmCancel').addEventListener('click', () => {
+    resetSubmitConfirmPos();
+    submitConfirmModal.classList.remove('active');
+  });
+
+  // 설문 완료 버튼 → #7 제출 확인 모달 먼저 → 그 다음 GAS 호출
+  const doneModal = document.getElementById('doneModal');
+  const doneModalBox = document.getElementById('doneModalBox');
+  const resetDoneModalPos = setupModalDrag(doneModal, doneModalBox, document.getElementById('doneModalMsg'));
+
+  document.getElementById('btnComplete').addEventListener('click', () => {
+    // #7: 먼저 확인 모달 표시
+    if (isResubmit) {
+      document.getElementById('submitConfirmMsg').textContent = '설문 응답 내용을 수정 제출하시겠습니까?';
+      document.getElementById('submitConfirmOk').textContent = '응답 수정';
+    } else {
+      document.getElementById('submitConfirmMsg').textContent = '설문 응답 내용을 제출하시겠습니까?';
+      document.getElementById('submitConfirmOk').textContent = '제출';
+    }
+    resetSubmitConfirmPos();
+    submitConfirmModal.classList.add('active');
+  });
+
+  // 제출 확인 → 실제 GAS 호출
+  document.getElementById('submitConfirmOk').addEventListener('click', async () => {
+    resetSubmitConfirmPos();
+    submitConfirmModal.classList.remove('active');
+
+    /* 미리보기 모드 → GAS 호출 없이 안내만 */
+    if (isPreview) {
+      showToast('미리보기 모드에서는 제출되지 않습니다.', 3000);
+      return;
+    }
+
     const btn = document.getElementById('btnComplete');
     btn.disabled = true; btn.textContent = '처리 중…';
     try {
       // Basic_Data GAS 호출 (admin 페이지와 동일 방식)
-      const res = await fetch(BASIC_GAS_URL, {
+      const res = await fetchWithTimeout(BASIC_GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
@@ -750,7 +1124,7 @@
           email: panelEmail,
           round: 1
         })
-      });
+      }, 30000);
       const text = await res.text();
       console.log('[completeSurvey 응답 원문]', text);
       let result;
@@ -758,21 +1132,41 @@
       console.log('[completeSurvey 결과]', result);
       if (result.status !== 'ok') {
         showToast('완료 처리 오류: ' + (result.message || '알 수 없는 오류'), 4000);
-        btn.disabled = false; btn.textContent = '설문 완료';
+        btn.disabled = false; btn.textContent = isResubmit ? '응답 수정' : '설문 완료';
         return;
       }
     } catch(e) {
       console.error('[completeSurvey 에러]', e);
       showToast('서버 통신 오류: ' + e.message, 4000);
-      btn.disabled = false; btn.textContent = '설문 완료';
+      btn.disabled = false; btn.textContent = isResubmit ? '응답 수정' : '설문 완료';
       return;
     }
-    btn.disabled = false; btn.textContent = '설문 완료';
+    btn.disabled = false; btn.textContent = isResubmit ? '응답 수정' : '설문 완료';
+    resetDoneModalPos();
     doneModal.classList.add('active');
   });
 
   document.getElementById('doneModalOk').addEventListener('click', () => {
-    location.href = 'select_delphi.html';
+    resetDoneModalPos();
+    if (isPreview) { window.close(); return; }
+    location.href = 'select_delphi.html?refresh=1';
+  });
+
+  /* ════════════════════ 설문 방법 확인 가이드 모달 (드래그 지원) ════════════════════ */
+  const guideModal = document.getElementById('guideModal');
+  const guideModalBox = document.getElementById('guideModalBox');
+  const guideIframe = document.getElementById('guideIframe');
+  const resetGuideModalPos = setupModalDrag(guideModal, guideModalBox, document.getElementById('guideModalHeader'));
+
+  document.getElementById('btnGuide').addEventListener('click', () => {
+    guideIframe.src = '1st_delphi_guide.html?embed=1';
+    resetGuideModalPos();
+    guideModal.classList.add('active');
+  });
+  document.getElementById('guideModalClose').addEventListener('click', () => {
+    resetGuideModalPos();
+    guideModal.classList.remove('active');
+    guideIframe.src = 'about:blank';
   });
 
   /* ════════════════════ 네비게이션 ════════════════════ */
@@ -805,8 +1199,19 @@
 
   document.addEventListener('keydown', e => {
     if (addModal.classList.contains('active') || descModal.classList.contains('active')
-        || delModal.classList.contains('active') || endModal.classList.contains('active')) {
-      if (e.key==='Escape') { addModal.classList.remove('active'); closeDescModal(); delModal.classList.remove('active'); endModal.classList.remove('active'); }
+        || delModal.classList.contains('active') || endModal.classList.contains('active')
+        || submitConfirmModal.classList.contains('active') || guideModal.classList.contains('active')
+        || doneModal.classList.contains('active') || infoModal.classList.contains('active')) {
+      if (e.key==='Escape') {
+        resetAddModalPos(); addModal.classList.remove('active');
+        closeDescModal();
+        resetDelModalPos(); delModal.classList.remove('active');
+        resetEndModalPos(); endModal.classList.remove('active');
+        resetSubmitConfirmPos(); submitConfirmModal.classList.remove('active');
+        resetDoneModalPos(); doneModal.classList.remove('active');
+        resetInfoModalPos(); infoModal.classList.remove('active');
+        resetGuideModalPos(); guideModal.classList.remove('active'); guideIframe.src = 'about:blank';
+      }
       return;
     }
     if (e.key==='ArrowLeft')  navigate(-1);

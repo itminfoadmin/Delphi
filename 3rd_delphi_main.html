@@ -398,19 +398,23 @@
 
 <script>
   /* ════════════════════ 설정 ════════════════════ */
-  // ※ GAS_URL: 평정 결과를 시트에 기록하는 Google Apps Script 웹앱 주소
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbyB4Ec7Kd4bCCQwL_7TIS0UuLxXQQKqvWpktkmHDB3BXRUoS62S6IWq_6wSeRppm4s5/exec';
-  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
 
-  const SHEET_ID = '1paf79LNNgX5Y328o51DSvkcRROblV7v-FyU__YIkC8Q';
+  const SHEET_ID = '132IlIeq1jV-4Mpy1TC3Zp5dTxtvIVzk7Yvy6lk9EEmc';
   /* CSV URL은 폴백용으로 보관 */
-  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS7UDAZqMDbD0louyQOl8pk5O-1BYqCfTcJGyQ1efJgk7_d8zuW0Q8yhTcmARrb5DbRZKjRgZeQ2JRQ/pub';
+  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH5TWR7RzzdBIt-PELYfcDtQvqHn3qhcLvJCd7ddtWep0C0G45vi10ZE5PNvUj0Gqd29P5fWW3bV2A/pub';
 
   const RATING_LABELS = ['매우\n부적절','부적절','적절','매우\n적절'];
 
-  const panelEmail = sessionStorage.getItem('panelEmail') || '';
+  const _params = new URLSearchParams(location.search);
+  const isPreview = _params.get('preview') === '1';
+  const previewPanel = _params.get('panel') || 'panel_01';
+  const previewIndex = parseInt(_params.get('panelIndex') || '1', 10);
+
+  const panelEmail = sessionStorage.getItem('panelEmail') || (isPreview ? 'admin_preview' : '');
   if (!panelEmail) location.href = 'index.html';
-  document.getElementById('panelLabel').textContent = '패널 : ' + panelEmail;
+  document.getElementById('panelLabel').textContent = isPreview ? '패널 : 관리자 미리보기' : '패널 : ' + panelEmail;
 
   /* 패널 번호: GAS에서 Basic_Data 조회하여 설정 */
   let panelColValue = '';  // 'panel_01' ~ 'panel_15'
@@ -572,13 +576,18 @@
         console.log('[loadData] 캐시에서 로드');
       } else {
         /* ── 3개 동시 호출 ── */
-        // 1) 패널 조회 (BASIC_GAS)
-        const panelP = fetch(BASIC_GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
-        }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
-          .catch(() => ({ status:'error' }));
+        // 1) 패널 조회 (BASIC_GAS) — 미리보기 시 GAS 호출 생략
+        let panelP;
+        if (isPreview) {
+          panelP = Promise.resolve({ status:'ok', panelCol: previewPanel, panelIndex: previewIndex });
+        } else {
+          panelP = fetch(BASIC_GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+          }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
+            .catch(() => ({ status:'error' }));
+        }
 
         // 2) 설문 데이터 (GAS - 가벼운 getAllData)
         const dataP = fetch(GAS_URL + '?action=getAllData')
@@ -1034,6 +1043,15 @@
 
     const btn = document.getElementById('btnComplete');
     btn.disabled = true; btn.textContent = '처리 중…';
+
+    /* 미리보기 모드: 실제 저장/완료 호출 차단 → 바로 탭 닫기 */
+    if (isPreview) {
+      showToast('미리보기 모드: 실제 저장은 수행되지 않습니다.', 2000);
+      btn.disabled = false; btn.textContent = '설문 완료';
+      setTimeout(() => window.close(), 1500);
+      return;
+    }
+
     try {
       // 전체 응답 저장
       const col = getPanelCol();
@@ -1097,6 +1115,7 @@
   });
 
   document.getElementById('doneModalOk').addEventListener('click', () => {
+    if (isPreview) { window.close(); return; }
     location.href = 'select_delphi.html';
   });
 
@@ -1241,6 +1260,8 @@
   const descHeader  = document.getElementById('descModalHeader');
 
   function openDescModal(title, text) {
+    descFontScale = 100;
+    applyDescFontScale();
     document.getElementById('descModalTitle').textContent = title;
     const body = document.getElementById('descModalBody');
     const paras = text.split(/\n+/).filter(p=>p.trim());
@@ -1294,6 +1315,7 @@
   document.getElementById('endModalCancel').addEventListener('click', ()=> endModal.classList.remove('active'));
   endModal.addEventListener('click', e=>{ if(e.target===endModal) endModal.classList.remove('active'); });
   document.getElementById('endModalConfirm').addEventListener('click', ()=> {
+    if (isPreview) { window.close(); return; }
     location.href = 'select_delphi.html';
   });
 

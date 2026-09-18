@@ -50,11 +50,15 @@
     .btn-row button:disabled { opacity: .45; cursor: default; }
     .btn-confirm { background: #1e1e1e; border: none; color: #fff; }
     .btn-cancel  { background: #fff; border: 1.5px solid #ccc; color: #333; }
+
+    /* embed 모드: iframe 내에서 배경 투명, 카드 그림자 제거 */
+    body.embed { background: transparent; padding: 20px; min-height: auto; }
+    body.embed .card { box-shadow: none; padding: 32px 36px 28px; }
   </style>
 </head>
 <body>
 <div class="card">
-  <p class="card-title">
+  <p class="card-title" id="cardTitle">
     최초 로그인 하셨습니다.<br>
     보안을 위해 로그인 비밀번호를 변경해주세요.
   </p>
@@ -89,8 +93,14 @@
   /* ════════════════════════════════
      설정
   ════════════════════════════════ */
-  const GAS_URL   = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
-  const PANEL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
+  const GAS_URL   = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
+
+  /* ── embed 모드 감지 ── */
+  const isEmbed = new URLSearchParams(location.search).has('embed');
+  if (isEmbed) {
+    document.body.classList.add('embed');
+    document.getElementById('cardTitle').innerHTML = '비밀번호 변경을 위해 아래 내용을 입력하고<br>[확인(Confirm)] 버튼을 클릭해주세요.';
+  }
 
   /* 세션에서 이메일 자동 채우기 */
   const savedEmail = sessionStorage.getItem('panelEmail') || '';
@@ -101,27 +111,14 @@
   const confirmBtn = document.getElementById('confirmBtn');
   const cancelBtn  = document.getElementById('cancelBtn');
 
-  // 취소 → select_delphi.html
-  cancelBtn.addEventListener('click', () => { location.href = 'select_delphi.html'; });
-
-  /* CSV 파싱 */
-  function parseCSV(text) {
-    const lines = text.trim().split(/\r\n|\r|\n/);
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
-    return lines.slice(1).filter(l=>l.trim()!=='').map(line => {
-      const cols=[]; let cur='', inQ=false;
-      for (let i=0;i<line.length;i++) {
-        const ch=line[i];
-        if (ch==='"') { if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ; }
-        else if (ch===','&&!inQ){cols.push(cur.trim());cur='';}
-        else cur+=ch;
-      }
-      cols.push(cur.trim());
-      const row={};
-      headers.forEach((h,i)=>{row[h]=(cols[i]||'').replace(/^"|"$/g,'').trim();});
-      return row;
-    });
-  }
+  // 취소
+  cancelBtn.addEventListener('click', () => {
+    if (isEmbed && window.parent !== window) {
+      window.parent.postMessage({ type: 'pwModalClose' }, '*');
+    } else {
+      location.href = 'select_delphi.html';
+    }
+  });
 
   /* GAS 호출 */
   async function gasCall(payload) {
@@ -155,26 +152,33 @@
 
     confirmBtn.disabled=true; confirmBtn.textContent='처리 중…';
     try {
-      // 현재 패스워드 검증
-      const res  = await fetch(PANEL_CSV);
-      const text = await res.text();
-      const rows = parseCSV(text);
-      const user = rows.find(r=>r['e-mail']===email);
+      // 1) GAS로 현재 패스워드 검증 (CSV 캐시 문제 방지 — 항상 최신 데이터 조회)
+      const verifyResult = await gasCall({
+        action: 'verifyPanel',
+        email: email,
+        password: currentPw
+      });
 
-      if (!user) { errorEl.textContent='등록되지 않은 이메일입니다.'; return; }
-      if (user['password']!==currentPw) { errorEl.textContent='현재 패스워드가 올바르지 않습니다.'; return; }
+      if (verifyResult.status !== 'ok') {
+        errorEl.textContent = verifyResult.message || '현재 패스워드가 올바르지 않습니다.';
+        return;
+      }
 
-      // GAS로 패스워드 업데이트 (panel_no 기반)
+      // 2) GAS로 패스워드 업데이트 (panel_no 기반)
       const result = await gasCall({
         action    : 'changePanelPassword',
-        panel_no  : user['panel_no'],
+        panel_no  : verifyResult.panel_no,
         newPassword: newPw
       });
 
-      if (result.status==='ok'||result.status===undefined) {
-        successEl.textContent='비밀번호가 성공적으로 변경되었습니다. 잠시 후 이동합니다.';
-        sessionStorage.setItem('panelData', JSON.stringify({...user, password: newPw}));
-        setTimeout(()=>{ location.href='select_delphi.html'; }, 2000);
+      if (result.status === 'ok') {
+        if (isEmbed && window.parent !== window) {
+          successEl.textContent='비밀번호가 성공적으로 변경되었습니다.';
+          setTimeout(() => { window.parent.postMessage({ type: 'pwModalClose' }, '*'); }, 1500);
+        } else {
+          successEl.textContent='비밀번호가 성공적으로 변경되었습니다. 잠시 후 이동합니다.';
+          setTimeout(()=>{ location.href='select_delphi.html'; }, 2000);
+        }
       } else {
         errorEl.textContent='변경 실패: '+(result.message||'알 수 없는 오류');
       }

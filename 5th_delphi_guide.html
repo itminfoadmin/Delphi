@@ -730,5 +730,11 @@
     </div>
   </div>
 
+<script>
+if (new URLSearchParams(location.search).get('embed') === '1') {
+  var r = document.querySelector('.btn-row'); if (r) r.style.display = 'none';
+  var b = document.querySelector('.btn-top-back'); if (b) b.style.display = 'none';
+}
+</script>
 </body>
 </html>

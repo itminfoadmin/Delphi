@@ -178,6 +178,23 @@
     .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
     .toast.show{opacity:1}
 
+    /* ── 설문 방법 확인 버튼 ── */
+    .btn-guide{background:#fff;color:var(--accent);border:1.5px solid var(--accent);font-weight:600}
+    .btn-guide:hover{background:var(--accent);color:#fff}
+
+    /* ── 가이드 모달 ── */
+    .guide-modal-box{width:960px;max-width:96vw;height:90vh;max-height:95vh;display:flex;flex-direction:column;overflow:hidden;padding:0;border-radius:8px}
+    .guide-modal-header{display:flex;align-items:center;padding:14px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none;gap:12px}
+    .guide-modal-header:active{cursor:grabbing}
+    .guide-modal-title{font-size:16px;font-weight:600;color:var(--ink);flex:1}
+    .guide-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .guide-modal-close:hover{background:#eee}
+    .guide-iframe{flex:1;width:100%;border:none;min-height:400px}
+
+    /* ── 자동저장 진행바 (#6) ── */
+    .autosave-progress{position:fixed;top:0;left:0;width:100%;height:3px;z-index:3001;pointer-events:none;opacity:0;transition:opacity .2s}
+    .autosave-progress.active{opacity:1}
+    .autosave-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:0 2px 2px 0;transition:width .3s ease}
 
     @media(max-width:768px){
       .header-title{font-size:18px}
@@ -199,10 +216,15 @@
     <span class="loading-text">설문 데이터를 불러오는 중...</span>
   </div>
 
+  <!-- 자동저장 진행바 (#6) -->
+  <div class="autosave-progress" id="autosaveProgress">
+    <div class="autosave-progress-bar" id="autosaveProgressBar"></div>
+  </div>
+
   <!-- 데이터 로드 실패 모달 -->
   <div class="modal-overlay" id="retryModal">
-    <div class="modal-box end-modal-box">
-      <p id="retryMsg">설문 데이터를 불러오지 못했습니다.</p>
+    <div class="modal-box end-modal-box" id="retryModalBox">
+      <p id="retryMsg" style="cursor:grab;user-select:none">설문 데이터를 불러오지 못했습니다.</p>
       <div class="modal-actions">
         <button class="modal-confirm" id="retryBtn">다시 시도</button>
       </div>
@@ -228,8 +250,8 @@
 
   <!-- 미평정 확인 모달 -->
   <div class="modal-overlay" id="unratedNavModal">
-    <div class="modal-box end-modal-box">
-      <p id="unratedNavMsg">평정되지 않은 지표가 있습니다.<br>그래도 이동하시겠습니까?</p>
+    <div class="modal-box end-modal-box" id="unratedNavModalBox">
+      <p id="unratedNavMsg" style="cursor:grab;user-select:none">평정되지 않은 지표가 있습니다.<br>그래도 이동하시겠습니까?</p>
       <div class="modal-actions">
         <button class="modal-cancel" id="unratedNavCancel">취소</button>
         <button class="modal-confirm" id="unratedNavConfirm">이동</button>
@@ -239,8 +261,8 @@
 
   <!-- 설문 종료 확인 모달 -->
   <div class="modal-overlay" id="endModal">
-    <div class="modal-box end-modal-box">
-      <p>전체 설문이 아직 완료되지 않았습니다.<br>완료되지 않은 설문은 이후에 다시 가능합니다.<br>설문을 종료하시겠습니까?</p>
+    <div class="modal-box end-modal-box" id="endModalBox">
+      <p id="endModalMsg" style="cursor:grab;user-select:none">전체 설문이 아직 완료되지 않았습니다.<br>완료되지 않은 설문은 이후에 다시 가능합니다.<br>설문을 종료하시겠습니까?</p>
       <div class="modal-actions">
         <button class="modal-cancel" id="endModalCancel">취소</button>
         <button class="modal-confirm" id="endModalConfirm">종료</button>
@@ -250,8 +272,8 @@
 
   <!-- 저장 확인 모달 -->
   <div class="modal-overlay" id="saveConfirmModal">
-    <div class="modal-box end-modal-box">
-      <p id="saveConfirmMsg">현재 페이지의 평정을 저장하시겠습니까?</p>
+    <div class="modal-box end-modal-box" id="saveConfirmBox">
+      <p id="saveConfirmMsg" style="cursor:grab;user-select:none">현재 페이지의 평정을 저장하시겠습니까?</p>
       <div class="modal-actions">
         <button class="modal-cancel" id="saveConfirmCancel">취소</button>
         <button class="modal-confirm" id="saveConfirmOk">저장</button>
@@ -259,10 +281,21 @@
     </div>
   </div>
 
+  <!-- 제출 확인 모달 (#3) -->
+  <div class="modal-overlay" id="submitConfirmModal">
+    <div class="modal-box end-modal-box" id="submitConfirmBox">
+      <p id="submitConfirmMsg" style="cursor:grab;user-select:none">설문 응답 내용을 제출하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="submitConfirmCancel">취소</button>
+        <button class="modal-confirm" id="submitConfirmOk">제출</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 설문 완료 안내 모달 -->
   <div class="modal-overlay" id="doneModal">
-    <div class="modal-box end-modal-box">
-      <p>2차 델파이 설문이 완료되었습니다.<br>감사합니다.</p>
+    <div class="modal-box end-modal-box" id="doneModalBox">
+      <p id="doneModalMsg" style="cursor:grab;user-select:none">2차 델파이 설문이 완료되었습니다.<br>감사합니다.</p>
       <div class="modal-actions">
         <button class="modal-confirm" id="doneModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
       </div>
@@ -271,8 +304,8 @@
 
   <!-- 안내 메시지 모달 -->
   <div class="modal-overlay" id="infoModal">
-    <div class="modal-box end-modal-box">
-      <p id="infoModalMsg"></p>
+    <div class="modal-box end-modal-box" id="infoModalBox">
+      <p id="infoModalMsg" style="cursor:grab;user-select:none"></p>
       <div class="modal-actions">
         <button class="modal-confirm" id="infoModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
       </div>
@@ -281,12 +314,23 @@
 
   <!-- 추가 사유 확인 모달 -->
   <div class="modal-overlay" id="addReasonModal">
-    <div class="modal-box" style="width:600px;max-height:80vh;display:flex;flex-direction:column">
+    <div class="modal-box" id="addReasonModalBox" style="width:600px;max-height:80vh;display:flex;flex-direction:column">
       <h3 id="addReasonModalTitle" style="flex-shrink:0">추가 사유</h3>
       <div id="addReasonModalBody" style="overflow-y:auto;flex:1;font-size:14px;color:var(--ink-mid);line-height:1.9;word-break:keep-all"></div>
       <div class="modal-actions" style="flex-shrink:0;justify-content:center">
         <button class="modal-cancel" id="addReasonModalClose" style="flex:none;width:140px">닫기</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 설문 방법 확인 모달 -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-box guide-modal-box" id="guideModalBox">
+      <div class="guide-modal-header" id="guideModalHeader">
+        <span class="guide-modal-title">설문 방법 확인</span>
+        <button class="guide-modal-close" id="guideModalClose">닫기</button>
+      </div>
+      <iframe class="guide-iframe" id="guideIframe" src="about:blank"></iframe>
     </div>
   </div>
 
@@ -296,7 +340,7 @@
   <div class="header-bar" id="surveyHeader" style="display:none">
     <div class="id-badge" id="idBadge">ID</div>
     <div class="header-title" id="headerTitle">불러오는 중...</div>
-    
+
     <div class="header-right">
       <span class="panel-label" id="panelLabel">패널 : </span>
       <div class="font-ctrl">
@@ -304,6 +348,7 @@
         <span class="font-scale-label" id="fontScaleLabel">100%</span>
         <button class="btn-font btn-font-up" id="btnFontUp" title="글자 확대"><span class="btn-font-letter">A</span><span class="btn-font-icon">+</span></button>
       </div>
+      <button class="btn-hdr btn-guide" id="btnGuide">설문 방법 확인</button>
       <button class="btn-hdr btn-save" id="btnSave">저장</button>
       <button class="btn-hdr btn-end" id="btnEnd">나가기</button>
     </div>
@@ -348,7 +393,7 @@
       <!-- 설문 완료 페이지 -->
       <div class="completion-page" id="completionPage" style="display:none">
         <p class="completion-text">교육활동 지표 적절성에 대한 2차 델파이 설문의 마지막 페이지입니다.</p>
-        <p class="completion-text" style="margin-top:0">설문을 완료하시겠습니까?</p>
+        <p class="completion-text" id="completionQuestion" style="margin-top:0">설문을 완료하시겠습니까?</p>
         <button class="btn-completion" id="btnComplete">설문 완료</button>
       </div>
     </div>
@@ -362,11 +407,11 @@
   /* ════════════════════ 설정 ════════════════════ */
   // ※ GAS_URL: 평정 결과를 시트에 기록하는 Google Apps Script 웹앱 주소
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbysXI5mioZlwDqCxAwFlWt2Q38juTSvVgMd3iDNsUE1wpgofacS0TdGV6hdPYhJoe7p/exec';
-  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
 
-  const SHEET_ID = '1YhffsxsOaEflHiKI9QNLeUcCBPxZos_KJCOdpbx9kEk';
+  const SHEET_ID = '1NNGVW2uSdsMVZhuWJM4HhUWv4-PDIGR0S6EWoGund74';
   /* CSV URL은 폴백용으로 보관 */
-  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSZ7A3YBvKX7FnI0JZMLQhTj-wVpC1cS8zM4mVyJGkiVIWzZSASDuJf56zJDH3rSBGeSafUQgd8nQE1/pub';
+  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQfsutGZh1Xm6BuYN8umJ5gukyRLGG-jK52QoBfvxeRwbEntR1q_P9_HUBLSIDQruLdYETVYpADLlMy/pub';
 
   const RATING_LABELS = ['매우\n부적절','부적절','적절','매우\n적절'];
 
@@ -386,6 +431,8 @@
     return panelColValue;
   }
 
+  /* (#4) 재제출 여부 플래그 */
+  let isResubmit = false;
 
   let idRows      = [];   // id 탭 데이터
   let eduIndices   = {};   // { ID: [ {index, row#, ...} ] }
@@ -397,6 +444,9 @@
   // 평정 상태를 메모리에 보관 (pageId-type-indexRow → {rating, reason})
   let responses = {};
 
+  /* (#2, #5) Dirty tracking — 수정된 페이지만 자동 저장 */
+  const dirtyPages = new Set();
+
   /* ── 유틸 ── */
   function showToast(m, d=2000) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d); }
   function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('active',v); }
@@ -407,6 +457,30 @@
     document.getElementById('surveyMain').style.display = v ? '' : 'none';
   }
   function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  /* (#6) 자동저장 진행바 */
+  function showAutosaveProgress(show) {
+    const wrap = document.getElementById('autosaveProgress');
+    const bar = document.getElementById('autosaveProgressBar');
+    if (show) {
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      wrap.classList.add('active');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          bar.style.transition = 'width 1.5s ease';
+          bar.style.width = '85%';
+        });
+      });
+    } else {
+      bar.style.transition = 'width .2s ease';
+      bar.style.width = '100%';
+      setTimeout(() => {
+        wrap.classList.remove('active');
+        bar.style.width = '0%';
+      }, 300);
+    }
+  }
 
   /* ════════════════════ CSV 파싱 ════════════════════ */
   function parseCSV(text) {
@@ -452,7 +526,7 @@
     return csvToObjects(text, 0);
   }
 
-  /* index 탭: gviz/tq는 병합 헤더를 별도 행으로 반환할 수 있음 
+  /* index 탭: gviz/tq는 병합 헤더를 별도 행으로 반환할 수 있음
      → "I-ID" 또는 "ID" 컬럼이 있는 행을 헤더로 자동 감지 */
   function parseIndexTab(text) {
     const raw = parseCSV(text);
@@ -517,12 +591,20 @@
     return await res.text();
   }
 
+  /* (#1) 타임아웃 포함 fetch 래퍼 — GAS cold start 대응 */
+  function fetchWithTimeout(url, options, timeoutMs = 30000) {
+    return Promise.race([
+      fetch(url, options),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('요청 시간 초과 (서버 응답 없음)')), timeoutMs))
+    ]);
+  }
+
   async function loadData() {
     showLoading(true);
     try {
-      /* sessionStorage 캐시 확인 (5분 유효) */
-      const cacheKey = '2nd_delphi_cache_' + panelEmail;
-      const cacheTimeKey = '2nd_delphi_cache_time_' + panelEmail;
+      /* (#1) 캐시 키 갱신 — 기존 캐시와 충돌 방지 */
+      const cacheKey = '2nd_delphi_cache_v2_' + panelEmail;
+      const cacheTimeKey = '2nd_delphi_cache_time_v2_' + panelEmail;
       const cached = sessionStorage.getItem(cacheKey);
       const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
       const CACHE_TTL = 5 * 60 * 1000;
@@ -536,7 +618,7 @@
         const c = JSON.parse(cached);
         const firstEdu = (c.surveyData && c.surveyData.eduRows && c.surveyData.eduRows[0]) || {};
         const hasNewFormat = !!firstEdu['E-ID'];
-        
+
         if (hasNewFormat || !(c.surveyData && c.surveyData.eduRows && c.surveyData.eduRows.length)) {
           panelCol = c.panelCol || '';
           panelIdx = c.panelIdx || 0;
@@ -554,25 +636,40 @@
 
       if (!surveyData) {
         /* ── 서버에서 로드 (캐시 미스 또는 기존 포맷 무효화) ── */
+        // (#1) 재시도 로직 포함
+        const MAX_RETRIES = 2;
+
         // 1) 패널 조회 — 미리보기 모드에서는 URL 파라미터 사용
         let panelP;
         if (isPreview) {
           panelP = Promise.resolve({ status:'ok', panelCol: previewPanel, panelIndex: previewIndex });
         } else {
-          panelP = fetch(BASIC_GAS_URL, {
+          panelP = fetchWithTimeout(BASIC_GAS_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
-          }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
+          }, 30000).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
             .catch(() => ({ status:'error' }));
         }
 
-        // 2) 설문 데이터 (GAS - 가벼운 getAllData)
-        const dataP = fetch(GAS_URL + '?action=getAllData')
-          .then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{throw new Error('파싱 실패')} });
+        // 2) 설문 데이터 (GAS - getAllData) — 재시도 포함
+        let dataResult = null;
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            const dataRes = await fetchWithTimeout(GAS_URL + '?action=getAllData', {}, 30000);
+            const dataText = await dataRes.text();
+            dataResult = JSON.parse(dataText);
+            if (dataResult && dataResult.status === 'ok') break;
+          } catch(e) {
+            console.warn('[loadData] 데이터 로드 시도 ' + (attempt+1) + ' 실패:', e.message);
+            if (attempt === MAX_RETRIES) throw new Error('설문 데이터 로드 실패: ' + e.message);
+            // 재시도 전 짧은 대기
+            await new Promise(r => setTimeout(r, 1500));
+          }
+        }
 
-        // 패널 + 데이터 동시 대기
-        const [panelResult, dataResult] = await Promise.all([panelP, dataP]);
+        // 패널 결과 대기
+        const panelResult = await panelP;
 
         if (panelResult.status === 'ok' && panelResult.panelCol) {
           panelCol = panelResult.panelCol;
@@ -585,7 +682,7 @@
         if (panelCol && panelIdx > 0) {
           try {
             const srUrl = GAS_URL + '?action=getSavedRatings&panelCol=' + encodeURIComponent(panelCol) + '&panelIndex=' + panelIdx;
-            const srRes = await fetch(srUrl);
+            const srRes = await fetchWithTimeout(srUrl, {}, 25000);
             const srText = await srRes.text();
             savedRatingsData = JSON.parse(srText);
           } catch(e) { console.warn('[loadData] savedRatings 조회 실패:', e); }
@@ -634,6 +731,8 @@
         retryMsg.textContent = '설문 데이터가 없습니다. 시트를 확인해주세요.';
         retryModal.classList.add('active');
       } else {
+        /* (#4) 완료 상태 확인 — 재제출 여부 판별 */
+        await checkPanelCompletionStatus();
         renderPage();
         showSurveyUI(true);
       }
@@ -644,6 +743,29 @@
       showSurveyUI(false);
     }
     finally { showLoading(false); }
+  }
+
+  /* (#4) Basic_Data에서 2차 설문 완료 상태 확인 */
+  async function checkPanelCompletionStatus() {
+    if (isPreview) return;
+    try {
+      const res = await fetchWithTimeout(BASIC_GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+      }, 15000);
+      const text = await res.text();
+      const data = JSON.parse(text);
+      if (data.status === 'ok' && data.panelInfo) {
+        const status = data.panelInfo['2nd_delphi_status'] || '';
+        if (status === 'completed' || status === '완료') {
+          isResubmit = true;
+          console.log('[checkCompletion] 2차 설문 이미 완료 → 재제출 모드');
+        }
+      }
+    } catch(e) {
+      console.warn('[checkCompletion] 상태 확인 실패:', e);
+    }
   }
 
   /* init 응답에서 기존 응답 복원 */
@@ -693,7 +815,7 @@
     console.log('[restore] 총 복원된 평정:', totalRestored);
   }
 
-  /* GAS에서 받은 배열을 E-ID별로 그룹핑 (페이지 = e-id 탭 기준) 
+  /* GAS에서 받은 배열을 E-ID별로 그룹핑 (페이지 = e-id 탭 기준)
      하위호환: 기존 GAS가 'ID'만 반환하는 경우에도 동작 */
   function groupByIdFromGAS(arr) {
     const map = {};
@@ -738,9 +860,9 @@
     document.getElementById('completionPage').style.display = 'none';
     document.querySelectorAll('.indicator-card').forEach(c => c.style.display = '');
     document.getElementById('progressBottom').style.display = '';
-    
 
-    
+
+
   }
 
   function renderCard(type, idRow, elemKey, descKey, indicesMap, labelElId, bodyElId, descBtnId, cardElId) {
@@ -863,6 +985,9 @@
             else { reasonRow.classList.remove('show'); }
           }
         }
+
+        /* (#2, #5) 현재 페이지를 dirty로 마킹 */
+        dirtyPages.add(currentIndex);
       });
     });
 
@@ -872,6 +997,9 @@
         const k = ta.dataset.key;
         if (!responses[k]) responses[k] = {};
         responses[k].reason = ta.value;
+
+        /* (#2, #5) 현재 페이지를 dirty로 마킹 */
+        dirtyPages.add(currentIndex);
       });
     });
   }
@@ -885,10 +1013,21 @@
     document.querySelectorAll('.indicator-card').forEach(c => c.style.display = 'none');
     document.getElementById('completionPage').style.display = 'flex';
     document.getElementById('progressBottom').style.display = 'none';
-    
+
     document.getElementById('navNextCol').style.visibility = 'hidden';
     document.getElementById('navPrevCol').style.visibility = 'visible';
     document.getElementById('btnPrev').disabled = false;
+
+    /* (#4) 재제출 여부에 따라 텍스트/버튼 변경 */
+    const questionEl = document.getElementById('completionQuestion');
+    const btnComplete = document.getElementById('btnComplete');
+    if (isResubmit) {
+      questionEl.textContent = '설문 응답을 수정하시겠습니까?';
+      btnComplete.textContent = '응답 수정';
+    } else {
+      questionEl.textContent = '설문을 완료하시겠습니까?';
+      btnComplete.textContent = '설문 완료';
+    }
   }
 
   /* ════════════════════ 저장 (GAS) ════════════════════ */
@@ -901,7 +1040,6 @@
     document.getElementById('addReasonModal').classList.add('active');
   }
   document.getElementById('addReasonModalClose').addEventListener('click', () => document.getElementById('addReasonModal').classList.remove('active'));
-  document.getElementById('addReasonModal').addEventListener('click', e => { if (e.target.id === 'addReasonModal') e.target.classList.remove('active'); });
 
   async function gasCall(payload) {
     const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
@@ -951,6 +1089,8 @@
     try {
       const result = await gasCall(payload);
       if (result.status !== 'ok') throw new Error(result.message || '저장 실패');
+      /* (#5) 저장 성공 시 dirty 해제 */
+      dirtyPages.delete(currentIndex);
       showToast('저장되었습니다.');
     } catch(e) {
       showToast('저장 오류: ' + e.message, 4000);
@@ -966,6 +1106,18 @@
   /* ════════════════════ 설문 완료 ════════════════════ */
   const doneModal = document.getElementById('doneModal');
 
+  /* (#3) 제출 확인 모달 핸들러 */
+  const submitConfirmModal = document.getElementById('submitConfirmModal');
+  document.getElementById('submitConfirmCancel').addEventListener('click', () => {
+    submitConfirmModal.classList.remove('active');
+  });
+
+  document.getElementById('submitConfirmOk').addEventListener('click', () => {
+    submitConfirmModal.classList.remove('active');
+    doCompleteSurvey();
+  });
+
+  /* (#3) btnComplete 클릭 시 확인 모달 먼저 표시 */
   document.getElementById('btnComplete').addEventListener('click', async () => {
     // 미평정 확인
     let totalUnrated = 0;
@@ -985,7 +1137,14 @@
       return;
     }
 
+    // (#3) 제출 확인 모달 표시
+    submitConfirmModal.classList.add('active');
+  });
+
+  /* (#3) 실제 설문 완료 처리 함수 */
+  async function doCompleteSurvey() {
     const btn = document.getElementById('btnComplete');
+    const originalBtnText = btn.textContent;
     btn.disabled = true; btn.textContent = '처리 중…';
     try {
       // 전체 응답 저장
@@ -1036,21 +1195,23 @@
       try { compParsed = JSON.parse(compText); } catch { compParsed = { status:'error', message: compText }; }
       if (compParsed.status !== 'ok') {
         showToast('완료 처리 오류: ' + (compParsed.message || '알 수 없는 오류'), 4000);
-        btn.disabled = false; btn.textContent = '설문 완료';
+        btn.disabled = false; btn.textContent = originalBtnText;
         return;
       }
     } catch(e) {
       console.error('[completeSurvey 에러]', e);
       showToast('서버 통신 오류: ' + e.message, 4000);
-      btn.disabled = false; btn.textContent = '설문 완료';
+      btn.disabled = false; btn.textContent = isResubmit ? '응답 수정' : '설문 완료';
       return;
     }
-    btn.disabled = false; btn.textContent = '설문 완료';
+    /* (#5) 완료 후 dirty 전부 클리어 */
+    dirtyPages.clear();
+    btn.disabled = false; btn.textContent = isResubmit ? '응답 수정' : '설문 완료';
     doneModal.classList.add('active');
-  });
+  }
 
   document.getElementById('doneModalOk').addEventListener('click', () => {
-    location.href = 'select_delphi.html';
+    location.href = 'select_delphi.html?refresh=1';
   });
 
   /* ════════════════════ 네비게이션 ════════════════════ */
@@ -1086,8 +1247,10 @@
     return unrated;
   }
 
-  /* 자동 저장 (변경사항 있을 때만, 토스트로 알림) */
+  /* (#2, #5, #7) 자동 저장 — dirty 페이지만 저장 + 진행바 표시 */
   async function autoSaveCurrentPage() {
+    /* (#5) dirty tracking: 수정된 페이지만 저장 */
+    if (!dirtyPages.has(currentIndex)) return;
     if (!hasRatingsOnCurrentPage()) return;
     const col = getPanelCol();
     if (!col) return;
@@ -1106,10 +1269,18 @@
       });
     });
     if (payload.ratings.length === 0) return;
+
+    /* (#6) 진행바 표시 */
+    showAutosaveProgress(true);
     try {
       await gasCall(payload);
+      /* (#5) 저장 성공 시 dirty 해제 */
+      dirtyPages.delete(currentIndex);
       showToast('자동 저장됨', 1200);
     } catch(e) { console.warn('[autoSave 에러]', e); }
+    finally {
+      showAutosaveProgress(false);
+    }
   }
 
   /* 미평정 확인 모달 */
@@ -1120,16 +1291,16 @@
     unratedNavModal.classList.remove('active');
     pendingNavDir = 0;
   });
-  unratedNavModal.addEventListener('click', e => { if (e.target === unratedNavModal) { unratedNavModal.classList.remove('active'); pendingNavDir = 0; } });
+
   document.getElementById('unratedNavConfirm').addEventListener('click', async () => {
     unratedNavModal.classList.remove('active');
     await doNavigate(pendingNavDir);
     pendingNavDir = 0;
   });
 
-  /* 실제 이동 수행 */
+  /* (#7) 실제 이동 수행 — 이전/다음 모두 자동 저장 (doNavigate에서 처리) */
   async function doNavigate(dir) {
-    // 자동 저장
+    // (#7) 자동 저장 — 이전/다음 모두 동일하게 수행
     await autoSaveCurrentPage();
 
     if (onCompletionPage && dir === -1) {
@@ -1174,14 +1345,28 @@
   document.getElementById('btnNext').addEventListener('click', ()=>navigate(1));
 
   document.addEventListener('keydown', e => {
-    if (descModal.classList.contains('active') || endModal.classList.contains('active')
+    const anyModal = descModal.classList.contains('active') || endModal.classList.contains('active')
         || document.getElementById('saveConfirmModal').classList.contains('active')
-        || document.getElementById('infoModal').classList.contains('active')
-        || unratedNavModal.classList.contains('active')) {
-      if (e.key==='Escape') { closeDescModal(); endModal.classList.remove('active');
-        document.getElementById('saveConfirmModal').classList.remove('active');
-        document.getElementById('infoModal').classList.remove('active');
-        unratedNavModal.classList.remove('active'); pendingNavDir=0; }
+        || infoModal.classList.contains('active')
+        || submitConfirmModal.classList.contains('active')
+        || unratedNavModal.classList.contains('active')
+        || retryModal.classList.contains('active')
+        || doneModal.classList.contains('active')
+        || document.getElementById('addReasonModal').classList.contains('active')
+        || guideModal.classList.contains('active');
+    if (anyModal) {
+      if (e.key==='Escape') {
+        closeDescModal();
+        if (typeof resetEndModalPos==='function') resetEndModalPos(); endModal.classList.remove('active');
+        if (typeof resetSaveConfirmPos==='function') resetSaveConfirmPos(); document.getElementById('saveConfirmModal').classList.remove('active');
+        if (typeof resetInfoModalPos==='function') resetInfoModalPos(); infoModal.classList.remove('active');
+        if (typeof resetSubmitConfirmPos==='function') resetSubmitConfirmPos(); submitConfirmModal.classList.remove('active');
+        if (typeof resetUnratedNavModalPos==='function') resetUnratedNavModalPos(); unratedNavModal.classList.remove('active'); pendingNavDir=0;
+        if (typeof resetRetryModalPos==='function') resetRetryModalPos(); retryModal.classList.remove('active');
+        if (typeof resetDoneModalPos==='function') resetDoneModalPos(); doneModal.classList.remove('active');
+        if (typeof resetAddReasonModalPos==='function') resetAddReasonModalPos(); document.getElementById('addReasonModal').classList.remove('active');
+        if (typeof resetGuideModalPos==='function') { resetGuideModalPos(); guideModal.classList.remove('active'); guideIframe.src='about:blank'; }
+      }
       return;
     }
     if (e.key==='ArrowLeft')  navigate(-1);
@@ -1194,6 +1379,8 @@
   const descHeader  = document.getElementById('descModalHeader');
 
   function openDescModal(title, text) {
+    descFontScale = 100;
+    applyDescFontScale();
     document.getElementById('descModalTitle').textContent = title;
     const body = document.getElementById('descModalBody');
     const paras = text.split(/\n+/).filter(p=>p.trim());
@@ -1239,15 +1426,13 @@
     infoModal.classList.add('active');
   }
   document.getElementById('infoModalOk').addEventListener('click', () => infoModal.classList.remove('active'));
-  infoModal.addEventListener('click', e => { if (e.target === infoModal) infoModal.classList.remove('active'); });
 
   /* ════════════════════ 종료 ════════════════════ */
   const endModal = document.getElementById('endModal');
   document.getElementById('btnEnd').addEventListener('click', ()=> endModal.classList.add('active'));
   document.getElementById('endModalCancel').addEventListener('click', ()=> endModal.classList.remove('active'));
-  endModal.addEventListener('click', e=>{ if(e.target===endModal) endModal.classList.remove('active'); });
   document.getElementById('endModalConfirm').addEventListener('click', ()=> {
-    location.href = 'select_delphi.html';
+    location.href = 'select_delphi.html?refresh=1';
   });
 
   /* ════════════════════ 글자 크기 조절 (메인) ════════════════════ */
@@ -1302,6 +1487,61 @@
     if (descFontScale <= DESC_FONT_MIN) return;
     descFontScale -= FONT_STEP;
     applyDescFontScale();
+  });
+
+  /* ════════════════════ 모달 드래그 (공통) ════════════════════ */
+  function setupModalDrag(overlay, box, handle) {
+    let dragging = false, didDrag = false, ox = 0, oy = 0;
+    function onDown(cx, cy, evt) {
+      dragging = true; didDrag = false;
+      const r = box.getBoundingClientRect();
+      ox = cx - r.left; oy = cy - r.top;
+      box.style.position = 'fixed';
+      box.style.margin = '0';
+      box.style.left = r.left + 'px';
+      box.style.top = r.top + 'px';
+      box.style.transform = 'none';
+      if (evt && evt.preventDefault) evt.preventDefault();
+    }
+    function onMove(cx, cy) { if (!dragging) return; didDrag = true; box.style.left = (cx - ox) + 'px'; box.style.top = (cy - oy) + 'px'; }
+    function onUp() { dragging = false; }
+    handle.addEventListener('mousedown', e => { if (e.target.closest('button') || e.target.closest('.desc-modal-right')) return; onDown(e.clientX, e.clientY, e); });
+    document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    document.addEventListener('mouseup', onUp);
+    handle.addEventListener('touchstart', e => { if (e.target.closest('button') || e.target.closest('.desc-modal-right')) return; const t = e.touches[0]; onDown(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchmove', e => { if (!dragging) return; const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchend', onUp);
+    if (overlay) {
+      overlay.addEventListener('click', e => { if (e.target === overlay && !didDrag) overlay.classList.remove('active'); });
+    }
+    function resetPos() { box.style.position = ''; box.style.margin = ''; box.style.left = ''; box.style.top = ''; box.style.transform = ''; }
+    return resetPos;
+  }
+
+  /* ── 각 모달에 드래그 적용 ── */
+  const resetRetryModalPos = setupModalDrag(retryModal, document.getElementById('retryModalBox'), document.getElementById('retryMsg'));
+  const resetUnratedNavModalPos = setupModalDrag(unratedNavModal, document.getElementById('unratedNavModalBox'), document.getElementById('unratedNavMsg'));
+  const resetEndModalPos = setupModalDrag(endModal, document.getElementById('endModalBox'), document.getElementById('endModalMsg'));
+  const resetSaveConfirmPos = setupModalDrag(document.getElementById('saveConfirmModal'), document.getElementById('saveConfirmBox'), document.getElementById('saveConfirmMsg'));
+  const resetSubmitConfirmPos = setupModalDrag(submitConfirmModal, document.getElementById('submitConfirmBox'), document.getElementById('submitConfirmMsg'));
+  const resetDoneModalPos = setupModalDrag(doneModal, document.getElementById('doneModalBox'), document.getElementById('doneModalMsg'));
+  const resetInfoModalPos = setupModalDrag(infoModal, document.getElementById('infoModalBox'), document.getElementById('infoModalMsg'));
+  const resetAddReasonModalPos = setupModalDrag(document.getElementById('addReasonModal'), document.getElementById('addReasonModalBox'), document.getElementById('addReasonModalTitle'));
+
+  /* ── 가이드 모달 ── */
+  const guideModal = document.getElementById('guideModal');
+  const guideModalBox = document.getElementById('guideModalBox');
+  const guideIframe = document.getElementById('guideIframe');
+  const resetGuideModalPos = setupModalDrag(guideModal, guideModalBox, document.getElementById('guideModalHeader'));
+  document.getElementById('btnGuide').addEventListener('click', () => {
+    guideIframe.src = '2nd_delphi_guide.html?embed=1';
+    resetGuideModalPos();
+    guideModal.classList.add('active');
+  });
+  document.getElementById('guideModalClose').addEventListener('click', () => {
+    resetGuideModalPos();
+    guideModal.classList.remove('active');
+    guideIframe.src = 'about:blank';
   });
 
   loadData();

@@ -398,19 +398,23 @@
 
 <script>
   /* ════════════════════ 설정 ════════════════════ */
-  // ※ GAS_URL: 5th_delphi_sheet의 Google Apps Script 웹앱 주소 (배포 후 교체)
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVX_7atj29tetASrhrMg6Tmy1FU0Cn0b9Pq8j_LS9Qkb5ccjn5D6ZnVd6QzuLCLBqU2g/exec';
-  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbws4BreiIVwWoUrySkQCG3pFhy3tiY8fXgRgPCSlYdvIpoXrpLwwoD3WuhJHFZllG03nw/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzLjM6p2xzAHxABaOp7MHuEvUbXvTffvTxkk0PSFFkRVRcy4dJuyZ-bCR69lGcEOQM83g/exec';
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
 
-  const SHEET_ID = '1s6yJcII_ANynOPwN222QHRGD-eppHnIVEhgeeGAPos0';
+  const SHEET_ID = '1GphplLZk-U7mQFJa-KC_kvH_Bdefo8Vcd80ZWA8C6D0';
   /* CSV URL은 폴백용으로 보관 */
-  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS3G-AERBzVw106OInHEez1gpzUyr-Wxl4u4QHmemsPMCRd8LWqYwfB8xEjr2M98npg9vlMSmgst7-G/pub';
+  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzl8_TKzX_wrXjI9UChijpLuaG9T1uAOlngNne9A6jinbJrz-Ow4yR94BJ3e2I3KVB4zhwyrC9dPlt/pub?output=csv';
 
   const RATING_LABELS = ['매우\n낮음','낮음','보통','높음','매우\n높음'];
 
-  const panelEmail = sessionStorage.getItem('panelEmail') || '';
+  const _params = new URLSearchParams(location.search);
+  const isPreview = _params.get('preview') === '1';
+  const previewPanel = _params.get('panel') || 'panel_01';
+  const previewIndex = parseInt(_params.get('panelIndex') || '1', 10);
+
+  const panelEmail = sessionStorage.getItem('panelEmail') || (isPreview ? 'admin_preview' : '');
   if (!panelEmail) location.href = 'index.html';
-  document.getElementById('panelLabel').textContent = '패널 : ' + panelEmail;
+  document.getElementById('panelLabel').textContent = isPreview ? '패널 : 관리자 미리보기' : '패널 : ' + panelEmail;
 
   /* 패널 번호: GAS에서 Basic_Data 조회하여 설정 */
   let panelColValue = '';  // 'panel_01' ~ 'panel_15'
@@ -553,8 +557,8 @@
     showLoading(true);
     try {
       /* sessionStorage 캐시 확인 (5분 유효) */
-      const cacheKey = '3rd_delphi_cache_v2_' + panelEmail;
-      const cacheTimeKey = '3rd_delphi_cache_time_v2_' + panelEmail;
+      const cacheKey = '5th_delphi_cache_v1_' + panelEmail;
+      const cacheTimeKey = '5th_delphi_cache_time_v1_' + panelEmail;
       const cached = sessionStorage.getItem(cacheKey);
       const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
       const CACHE_TTL = 5 * 60 * 1000;
@@ -572,13 +576,18 @@
         console.log('[loadData] 캐시에서 로드');
       } else {
         /* ── 3개 동시 호출 ── */
-        // 1) 패널 조회 (BASIC_GAS)
-        const panelP = fetch(BASIC_GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
-        }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
-          .catch(() => ({ status:'error' }));
+        // 1) 패널 조회 (BASIC_GAS) — 미리보기 시 GAS 호출 생략
+        let panelP;
+        if (isPreview) {
+          panelP = Promise.resolve({ status:'ok', panelCol: previewPanel, panelIndex: previewIndex });
+        } else {
+          panelP = fetch(BASIC_GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+          }).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
+            .catch(() => ({ status:'error' }));
+        }
 
         // 2) 설문 데이터 (GAS - 가벼운 getAllData)
         const dataP = fetch(GAS_URL + '?action=getAllData')
@@ -900,14 +909,7 @@
           responses[k].rating = v;
           group.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
-          if (reasonRow) {
-            if (v <= 2) {
-              reasonRow.classList.add('show');
-              const ta = reasonRow.querySelector('.reason-input');
-              if (ta) ta.placeholder = v === 1 ? '매우 부적절로 판단하신 이유를 기술해주세요.' : '부적절로 판단하신 이유를 기술해주세요.';
-            }
-            else { reasonRow.classList.remove('show'); }
-          }
+          // 5차(가중치) 설문: 사유 입력 없음
         }
       });
     });
@@ -1022,6 +1024,15 @@
 
     const btn = document.getElementById('btnComplete');
     btn.disabled = true; btn.textContent = '처리 중…';
+
+    /* 미리보기 모드: 실제 저장/완료 호출 차단 → 바로 탭 닫기 */
+    if (isPreview) {
+      showToast('미리보기 모드: 실제 저장은 수행되지 않습니다.', 2000);
+      btn.disabled = false; btn.textContent = '설문 완료';
+      setTimeout(() => window.close(), 1500);
+      return;
+    }
+
     try {
       // 전체 응답 저장
       const col = getPanelCol();
@@ -1063,7 +1074,7 @@
         body: JSON.stringify({
           action: 'completeSurvey',
           email: panelEmail,
-          round: 3
+          round: 5
         })
       });
       const compText = await compResult.text();
@@ -1085,6 +1096,7 @@
   });
 
   document.getElementById('doneModalOk').addEventListener('click', () => {
+    if (isPreview) { window.close(); return; }
     location.href = 'select_delphi.html';
   });
 
@@ -1229,6 +1241,8 @@
   const descHeader  = document.getElementById('descModalHeader');
 
   function openDescModal(title, text) {
+    descFontScale = 100;
+    applyDescFontScale();
     document.getElementById('descModalTitle').textContent = title;
     const body = document.getElementById('descModalBody');
     const paras = text.split(/\n+/).filter(p=>p.trim());
@@ -1282,6 +1296,7 @@
   document.getElementById('endModalCancel').addEventListener('click', ()=> endModal.classList.remove('active'));
   endModal.addEventListener('click', e=>{ if(e.target===endModal) endModal.classList.remove('active'); });
   document.getElementById('endModalConfirm').addEventListener('click', ()=> {
+    if (isPreview) { window.close(); return; }
     location.href = 'select_delphi.html';
   });
 

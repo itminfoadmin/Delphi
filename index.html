@@ -137,13 +137,43 @@
     }
     .login-btn:disabled { opacity: .5; cursor: default; }
 
-    /* 오류 메시지 */
-    .login-error {
-      max-width: 1076px; width: 100%;
-      margin-top: 10px;
-      font-size: 13px; color: #c0392b;
-      text-align: center; min-height: 18px;
+    /* ── 로그인 오류 모달 ── */
+    .error-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(26,26,46,.45); z-index: 1100;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(2px);
     }
+    .error-modal-overlay.active { display: flex; }
+
+    .error-modal {
+      background: var(--card-bg);
+      border-top: 4px solid #c0392b;
+      border-radius: 4px;
+      padding: 36px 44px 32px;
+      width: 420px; max-width: 90vw;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(26,26,46,.18);
+    }
+    .error-modal-icon {
+      font-size: 36px; margin-bottom: 12px; color: #c0392b;
+    }
+    .error-modal-msg {
+      font-size: 15px; line-height: 1.7;
+      color: var(--ink-mid); margin-bottom: 24px;
+      word-break: keep-all;
+    }
+    .error-modal-btn {
+      display: inline-block;
+      padding: 10px 36px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px; font-weight: 600;
+      border-radius: 4px; cursor: pointer;
+      background: #c0392b; border: 1.5px solid #c0392b; color: #fff;
+      box-shadow: 0 2px 8px rgba(192,57,43,.25);
+      transition: all .2s;
+    }
+    .error-modal-btn:hover { background: #a93226; border-color: #a93226; }
 
     /* 안내 */
     .notice {
@@ -264,7 +294,14 @@
     <button class="login-btn" id="panelLoginBtn">Log-in</button>
   </div>
 
-  <p class="login-error" id="loginError"></p>
+  <!-- 로그인 오류 모달 -->
+  <div class="error-modal-overlay" id="loginErrorModal">
+    <div class="error-modal">
+      <div class="error-modal-icon">⚠</div>
+      <p class="error-modal-msg" id="loginErrorMsg"></p>
+      <button class="error-modal-btn" id="loginErrorCloseBtn">확인</button>
+    </div>
+  </div>
 
   <!-- Admin Login Modal -->
   <div class="modal-overlay" id="adminModal">
@@ -288,47 +325,50 @@
   </div>
 
   <script>
-    const ADMIN_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkDVzf4EpV7PqZSd-IkSKDbJznhnuABEjcOddp0HCsRqPIVjsbpiAqjdPPn03A1Amp8XzUTbhUwXx-/pub?gid=0&single=true&output=csv';
-    const PANEL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBQ3YJBvAuWfk6oVrVwhrvekjP4PGmoEDO4XvGvexhp8zlDbX2K2o_dHZMHulA4QcvnvoW_PYrgLl3/pub?gid=1627073953&single=true&output=csv';
+    const ADMIN_GAS = 'https://script.google.com/macros/s/AKfycbzDES_x1oHeiC_NbN97iCpwS4bKwY7zGTRFlp_IqmEC4wPbgpzmyDimoPSx5TQPPnfVPQ/exec';
+    const PANEL_GAS = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
 
-    function parseCSV(text) {
-      const lines = text.trim().split(/\r\n|\r|\n/);
-      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-      return lines.slice(1).filter(l => l.trim() !== '').map(line => {
-        const cols = []; let cur = '', inQ = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (ch === '"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
-          else if (ch===',' && !inQ) { cols.push(cur.trim()); cur=''; }
-          else cur+=ch;
-        }
-        cols.push(cur.trim());
-        const row = {};
-        headers.forEach((h, i) => { row[h] = (cols[i]||'').replace(/^"|"$/g,'').trim(); });
-        return row;
-      });
+    /* ── 로그인 오류 모달 ── */
+    const loginErrorModal   = document.getElementById('loginErrorModal');
+    const loginErrorMsg     = document.getElementById('loginErrorMsg');
+    const loginErrorCloseBtn = document.getElementById('loginErrorCloseBtn');
+
+    function showLoginError(msg) {
+      loginErrorMsg.textContent = msg;
+      loginErrorModal.classList.add('active');
     }
+    function closeLoginError() {
+      loginErrorModal.classList.remove('active');
+    }
+    loginErrorCloseBtn.addEventListener('click', closeLoginError);
+    loginErrorModal.addEventListener('click', e => { if (e.target === loginErrorModal) closeLoginError(); });
 
     /* ── 패널 로그인 ── */
     const panelLoginBtn = document.getElementById('panelLoginBtn');
-    const loginError    = document.getElementById('loginError');
 
     async function doPanelLogin() {
       const email = document.getElementById('panelEmail').value.trim();
       const pw    = document.getElementById('panelPw').value;
-      if (!email || !pw) { loginError.textContent = '이메일과 패스워드를 입력해주세요.'; return; }
-      panelLoginBtn.disabled = true; panelLoginBtn.textContent = '확인 중…'; loginError.textContent = '';
+      if (!email || !pw) { showLoginError('이메일과 패스워드를 입력해주세요.'); return; }
+      panelLoginBtn.disabled = true; panelLoginBtn.textContent = '확인 중…';
       try {
-        const rows = parseCSV(await (await fetch(PANEL_CSV)).text());
-        const user = rows.find(r => r['e-mail'] === email);
-        if (!user) { loginError.textContent = '등록되지 않은 이메일입니다.'; return; }
-        if (user['password'] !== pw) { loginError.textContent = '패스워드가 올바르지 않습니다.'; return; }
+        const res = await fetch(PANEL_GAS, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'verifyPanel', email, password: pw }),
+          redirect: 'follow'
+        });
+        const data = await res.json();
+        if (data.status !== 'ok') {
+          showLoginError(data.message || '인증에 실패했습니다.');
+          return;
+        }
         sessionStorage.setItem('panelEmail', email);
-        sessionStorage.setItem('panelNo',    user['panel_no'] || '');
-        sessionStorage.setItem('panelData',  JSON.stringify(user));
-        location.href = (user['e-mail'] === user['password']) ? 'pass_change.html' : 'select_delphi.html';
+        sessionStorage.setItem('panelNo',    data.panel_no || '');
+        sessionStorage.setItem('panelData',  JSON.stringify(data.panelData || {}));
+        location.href = data.firstLogin ? 'pass_change.html' : 'select_delphi.html';
       } catch(err) {
-        loginError.textContent = '인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        showLoginError('인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         console.error(err);
       } finally {
         panelLoginBtn.disabled = false; panelLoginBtn.textContent = 'Log-in';
@@ -357,7 +397,7 @@
     closeBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if(e.target===modal) closeModal(); });
-    document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+    document.addEventListener('keydown', e => { if(e.key==='Escape') { closeModal(); closeLoginError(); } });
 
     async function doAdminLogin() {
       const email = emailInput.value.trim();
@@ -365,12 +405,19 @@
       if (!email || !pw) { errorEl.textContent='이메일과 패스워드를 입력해주세요.'; return; }
       confirmBtn.disabled=true; confirmBtn.textContent='확인 중…'; errorEl.textContent='';
       try {
-        const rows = parseCSV(await (await fetch(ADMIN_CSV)).text());
-        const user = rows.find(r => r['e-mail']===email);
-        if (!user)               { errorEl.textContent='등록되지 않은 이메일입니다.'; return; }
-        if (user['password']!==pw){ errorEl.textContent='패스워드가 올바르지 않습니다.'; return; }
+        const res = await fetch(ADMIN_GAS, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'verifyAdmin', email, password: pw }),
+          redirect: 'follow'
+        });
+        const data = await res.json();
+        if (data.status !== 'ok') {
+          errorEl.textContent = data.message || '인증에 실패했습니다.';
+          return;
+        }
         sessionStorage.setItem('adminEmail', email);
-        location.href = (user['e-mail']===user['password']) ? '/admin_mng/admin_pass_change.html' : 'admin_mng-01.html';
+        location.href = data.firstLogin ? '/admin_mng/admin_pass_change.html' : '/admin_mng/admin_mng-intro.html';
       } catch(err) {
         errorEl.textContent='인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
         console.error(err);
